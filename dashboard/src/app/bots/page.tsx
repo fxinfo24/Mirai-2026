@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { Navbar } from '@/components/shared';
 import { Terminal } from '@/components/terminal';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, useToast } from '@/components/ui';
+import { exportToCSV, exportToJSON, copyToClipboard } from '@/lib/export';
 
 interface Bot {
   id: string;
@@ -17,6 +18,7 @@ interface Bot {
 
 export default function BotsPage() {
   const [selectedBot, setSelectedBot] = useState<Bot | null>(null);
+  const { showToast } = useToast();
 
   const bots: Bot[] = [
     { id: 'bot-001', ip: '192.168.1.100', type: 'Router', location: 'USA', status: 'online', uptime: '2h 15m', bandwidth: '1.2 Mbps' },
@@ -98,9 +100,24 @@ export default function BotsPage() {
                   <CardTitle>Active Bots</CardTitle>
                   <CardDescription>Click a bot to view details</CardDescription>
                 </div>
-                <Button variant="primary" size="sm">
-                  Refresh
-                </Button>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      exportToCSV(bots, 'bots-export');
+                      showToast('Exported bots to CSV', 'success');
+                    }}
+                    title="Export to CSV"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </Button>
+                  <Button variant="primary" size="sm">
+                    Refresh
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>

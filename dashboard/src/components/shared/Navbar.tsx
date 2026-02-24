@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui';
+import { GlobalSearch } from './GlobalSearch';
 
 export const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -45,6 +46,9 @@ export const Navbar = () => {
 
           {/* Right Side */}
           <div className="hidden md:flex items-center space-x-4">
+            {/* Global Search */}
+            <GlobalSearch />
+            
             {/* Status Indicator */}
             <div className="flex items-center space-x-2 glass-card px-3 py-1.5 rounded-full">
               <div className="w-2 h-2 bg-accent-primary rounded-full animate-pulse" />
