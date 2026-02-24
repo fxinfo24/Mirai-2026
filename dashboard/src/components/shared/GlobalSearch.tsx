@@ -16,7 +16,7 @@ export const GlobalSearch = () => {
   const [results, setResults] = useState<SearchResult[]>([]);
 
   // Sample search data - memoized to prevent re-creation
-  const searchableItems = useMemo(() => [
+  const searchableItems = useMemo<SearchResult[]>(() => [
     { type: 'page', title: 'Dashboard', description: 'Main dashboard with 3D globe', url: '/dashboard' },
     { type: 'page', title: 'Bots', description: 'Bot management and control', url: '/bots' },
     { type: 'page', title: 'Attacks', description: 'Attack configuration and monitoring', url: '/attacks' },
