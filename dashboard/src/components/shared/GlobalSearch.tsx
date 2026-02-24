@@ -55,7 +55,7 @@ export const GlobalSearch = () => {
       item.description.toLowerCase().includes(query.toLowerCase())
     );
     setResults(filtered);
-  }, [query]);
+  }, [query, searchableItems]);
 
   if (!isOpen) {
     return (
