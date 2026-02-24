@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary-bg: #0a0e1a;
+    --secondary-bg: #131824;
+    --accent-primary: #00ff9f;
+    --accent-secondary: #00d4ff;
+    --accent-warning: #ff6b35;
+    --accent-danger: #ff006e;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-primary-bg text-text-primary;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-primary-bg-secondary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-accent-primary/30 rounded;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-accent-primary/50;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-glass border border-white/10 rounded-lg;
+  }
+
+  .neon-glow {
+    box-shadow: 0 0 20px rgba(0, 255, 159, 0.3);
+  }
+
+  .neon-text {
+    @apply text-accent-primary;
+    text-shadow: 0 0 10px rgba(0, 255, 159, 0.5);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
