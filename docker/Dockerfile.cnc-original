@@ -1,0 +1,35 @@
+# Dockerfile for Original Mirai C&C Server
+# For testing purposes only
+
+FROM golang:1.21-alpine AS builder
+
+WORKDIR /build
+
+# Install dependencies
+RUN apk add --no-cache git
+
+# Copy C&C source code
+COPY mirai/cnc/ ./
+
+# Initialize Go module
+RUN go mod init mirai/cnc && \
+    go mod tidy
+
+# Build the C&C server
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o cnc-server .
+
+# Runtime stage
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates mysql-client
+
+WORKDIR /app
+
+# Copy binary from builder
+COPY --from=builder /build/cnc-server .
+
+# Expose ports
+EXPOSE 23 101
+
+# Run the C&C server
+CMD ["./cnc-server"]

