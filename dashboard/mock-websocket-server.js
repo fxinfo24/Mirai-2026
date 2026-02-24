@@ -9,7 +9,7 @@
 
 const { Server } = require('socket.io');
 
-const PORT = 8000;
+const PORT = 8888;
 
 console.log('🚀 Starting Mock WebSocket Server...');
 

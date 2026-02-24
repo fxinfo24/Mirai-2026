@@ -5,7 +5,7 @@ class WebSocketService {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
 
-  connect(url: string = 'http://localhost:8000') {
+  connect(url: string = 'http://localhost:8888') {
     if (this.socket?.connected) {
       console.log('WebSocket already connected');
       return this.socket;
