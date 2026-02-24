@@ -1,0 +1,120 @@
+name: Security Scanning
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM
+  workflow_dispatch:
+
+jobs:
+  sast-scan:
+    name: Static Application Security Testing
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      security-events: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Run Bandit (Python SAST)
+      run: |
+        pip install bandit
+        bandit -r ai/ -f json -o bandit-results.json
+      continue-on-error: true
+    
+    - name: Upload Bandit results
+      uses: actions/upload-artifact@v3
+      with:
+        name: bandit-results
+        path: bandit-results.json
+    
+    - name: Flawfinder (C/C++ SAST)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y flawfinder
+        flawfinder --html --minlevel=4 src/ > flawfinder-results.html
+      continue-on-error: true
+    
+    - name: Upload Flawfinder results
+      uses: actions/upload-artifact@v3
+      with:
+        name: flawfinder-results
+        path: flawfinder-results.html
+
+  secrets-scan:
+    name: Secrets Detection
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: TruffleHog OSS
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: ${{ github.event.repository.default_branch }}
+        head: HEAD
+        extra_args: --debug --only-verified
+
+  container-scan:
+    name: Container Security Scan
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        image: [bot, ai-service]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Build Docker image
+      run: |
+        docker build -f docker/Dockerfile.${{ matrix.image }} \
+          -t mirai-2026-${{ matrix.image }}:scan .
+    
+    - name: Run Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: mirai-2026-${{ matrix.image }}:scan
+        format: 'table'
+        exit-code: '0'
+        severity: 'CRITICAL,HIGH'
+    
+    - name: Run Grype
+      uses: anchore/scan-action@v3
+      with:
+        image: mirai-2026-${{ matrix.image }}:scan
+        fail-build: false
+        severity-cutoff: high
+
+  dependency-audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Python dependency audit
+      run: |
+        pip install pip-audit
+        pip-audit -r ai/requirements.txt
+      continue-on-error: true
+    
+    - name: SBOM Generation
+      uses: anchore/sbom-action@v0
+      with:
+        path: ./
+        format: spdx-json
+    
+    - name: Upload SBOM
+      uses: actions/upload-artifact@v3
+      with:
+        name: sbom
+        path: ./sbom.spdx.json

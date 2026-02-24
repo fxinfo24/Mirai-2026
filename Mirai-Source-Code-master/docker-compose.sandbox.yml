@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.bot
+    container_name: mirai-bot-sandbox
+    networks:
+      - mirai-sandbox
+    ports:
+      - "9090:9090"  # Metrics
+    environment:
+      - LOG_LEVEL=DEBUG
+      - SCANNER_MAX_CONNECTIONS=64
+      - AI_API_ENDPOINT=http://ai-service:5000
+    volumes:
+      - ./config/sandbox.json:/app/config/bot.json:ro
+    cap_add:
+      - NET_RAW  # Required for raw sockets
+    restart: unless-stopped
+  
+  ai-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ai-service
+    container_name: mirai-ai-sandbox
+    networks:
+      - mirai-sandbox
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - LOG_LEVEL=DEBUG
+    restart: unless-stopped
+  
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-sandbox
+    networks:
+      - mirai-sandbox
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+  
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-sandbox
+    networks:
+      - mirai-sandbox
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./observability/grafana:/etc/grafana/provisioning:ro
+    restart: unless-stopped
+
+networks:
+  mirai-sandbox:
+    external: true
