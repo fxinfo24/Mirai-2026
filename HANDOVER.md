@@ -401,9 +401,10 @@ Note: Requires LLM API key in .env
    - Status: Working as designed
    - Solution: Add OpenRouter API key to `.env`
 
-2. **C&C Server:** Placeholder implementation
-   - Status: Go implementation in progress
-   - Current: Runs but no full functionality
+2. **C&C Server:** Original 2016 Mirai implementation
+   - Status: Fully functional (1,191 lines of Go code)
+   - Features: Telnet interface, API, attack commands, database
+   - Note: Could benefit from modernization (observability, security improvements)
 
 3. **Minor Compiler Warning:** Sign comparison in binary.c
    - Impact: Cosmetic only, no functional issue
@@ -557,12 +558,27 @@ pytest tests/    # Run tests
 - Redis caching
 - Complete service discovery
 
-### In Development
+✅ **C&C Server (Original Mirai)**
+- Go implementation (1,191 lines)
+- Telnet interface (port 23)
+- API interface (port 101)
+- Attack command handling
+- Client management
+- Database integration
 
-🚧 **C&C Server** - Go implementation
-🚧 **Kubernetes Production** - Prod overlays
-🚧 **CI/CD Pipeline** - Automated workflows
-🚧 **Advanced ML Models** - Enhanced training
+✅ **Kubernetes**
+- Base manifests (8 files)
+- Dev overlay (1 replica, debug logging)
+- Prod overlay (10 bot replicas, HPA 5-50)
+- Network policies configured
+- Monitoring integrated
+
+### Planned Enhancements
+
+🚧 **Modern C&C Server** - Rewrite with observability, security, and cloud-native features
+🚧 **CI/CD Pipeline** - Automated testing and deployment workflows
+🚧 **Advanced ML Models** - Enhanced training with larger datasets
+🚧 **Multi-cloud Support** - AWS, GCP, Azure deployment templates
 
 ---
 
