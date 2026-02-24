@@ -71,8 +71,8 @@ function GlobeModel({ bots = [] }: { bots: BotLocation[] }) {
 
   return (
     <group>
-      {/* Main globe sphere */}
-      <Sphere ref={globeRef} args={[1, 64, 64]}>
+      {/* Main globe sphere - reduced segments for performance */}
+      <Sphere ref={globeRef} args={[1, 32, 32]}>
         <meshPhongMaterial
           color="#0a0e27"
           emissive="#00ff9f"
@@ -83,8 +83,8 @@ function GlobeModel({ bots = [] }: { bots: BotLocation[] }) {
         />
       </Sphere>
 
-      {/* Wireframe overlay */}
-      <Sphere args={[1.005, 32, 32]}>
+      {/* Wireframe overlay - reduced segments */}
+      <Sphere args={[1.005, 16, 16]}>
         <meshBasicMaterial
           color="#00ff9f"
           wireframe
@@ -106,8 +106,8 @@ function GlobeModel({ bots = [] }: { bots: BotLocation[] }) {
         </points>
       )}
 
-      {/* Atmosphere glow */}
-      <Sphere args={[1.1, 64, 64]}>
+      {/* Atmosphere glow - reduced segments */}
+      <Sphere args={[1.1, 24, 24]}>
         <meshBasicMaterial
           color="#00ff9f"
           transparent
@@ -124,7 +124,13 @@ export const Globe3D = ({ bots = [], autoRotate = true }: Globe3DProps) => {
     <div className="w-full h-full min-h-[400px] rounded-lg overflow-hidden bg-gradient-to-br from-primary-bg-secondary to-primary-bg">
       <Canvas
         camera={{ position: [0, 0, 2.5], fov: 45 }}
-        gl={{ antialias: true, alpha: true }}
+        gl={{ 
+          antialias: false,  // Disable antialiasing for performance
+          alpha: true,
+          powerPreference: 'high-performance'
+        }}
+        dpr={[1, 1.5]}  // Limit pixel ratio for performance
+        performance={{ min: 0.5 }}  // Allow frame rate to drop if needed
       >
         {/* Lighting */}
         <ambientLight intensity={0.5} />

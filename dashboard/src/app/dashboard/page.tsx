@@ -1,12 +1,43 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Navbar } from '@/components/shared';
 import { StatCard } from '@/components/dashboard';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button } from '@/components/ui';
 import { Globe3D } from '@/components/globe';
 import { Terminal } from '@/components/terminal';
+import { useWebSocket, useMetricsUpdates } from '@/hooks';
 
 export default function DashboardPage() {
+  const { isConnected, lastUpdate } = useWebSocket();
+  const [metrics, setMetrics] = useState({
+    activeBots: 1234,
+    activeAttacks: 42,
+    totalBandwidth: '2.5 TB/s',
+    successRate: 94.2,
+  });
+
+  // Listen for real-time metric updates
+  useMetricsUpdates((data) => {
+    setMetrics(data);
+  });
+
+  // Simulate live updates if WebSocket not available
+  useEffect(() => {
+    if (isConnected) return;
+
+    const interval = setInterval(() => {
+      setMetrics(prev => ({
+        activeBots: prev.activeBots + Math.floor(Math.random() * 10 - 5),
+        activeAttacks: Math.max(0, prev.activeAttacks + Math.floor(Math.random() * 3 - 1)),
+        totalBandwidth: prev.totalBandwidth,
+        successRate: Math.min(100, Math.max(90, prev.successRate + (Math.random() * 2 - 1))),
+      }));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [isConnected]);
+
   return (
     <div className="min-h-screen bg-primary-bg">
       <Navbar />
@@ -23,11 +54,22 @@ export default function DashboardPage() {
           </p>
         </div>
 
+        {/* Connection Status */}
+        {isConnected && (
+          <div className="mb-4 glass-card px-4 py-2 rounded-lg inline-flex items-center space-x-2">
+            <div className="w-2 h-2 bg-accent-primary rounded-full animate-pulse" />
+            <span className="text-xs text-text-secondary">Live updates active</span>
+            {lastUpdate && (
+              <span className="text-xs text-text-muted">• Last: {lastUpdate.toLocaleTimeString()}</span>
+            )}
+          </div>
+        )}
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Active Bots"
-            value="1,234"
+            value={metrics.activeBots.toLocaleString()}
             change={{ value: 12.5, trend: 'up' }}
             color="primary"
             icon={
@@ -44,7 +86,7 @@ export default function DashboardPage() {
           
           <StatCard
             title="Active Attacks"
-            value="42"
+            value={metrics.activeAttacks.toString()}
             change={{ value: 8.3, trend: 'up' }}
             color="warning"
             icon={
@@ -61,7 +103,7 @@ export default function DashboardPage() {
           
           <StatCard
             title="Total Bandwidth"
-            value="2.5 TB/s"
+            value={metrics.totalBandwidth}
             change={{ value: 5.2, trend: 'down' }}
             color="secondary"
             icon={
@@ -78,7 +120,7 @@ export default function DashboardPage() {
           
           <StatCard
             title="Success Rate"
-            value="94.2%"
+            value={`${metrics.successRate.toFixed(1)}%`}
             change={{ value: 2.1, trend: 'up' }}
             color="primary"
             icon={
