@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/ui';
 
 interface SearchResult {
@@ -15,8 +15,8 @@ export const GlobalSearch = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
 
-  // Sample search data
-  const searchableItems: SearchResult[] = [
+  // Sample search data - memoized to prevent re-creation
+  const searchableItems = useMemo(() => [
     { type: 'page', title: 'Dashboard', description: 'Main dashboard with 3D globe', url: '/dashboard' },
     { type: 'page', title: 'Bots', description: 'Bot management and control', url: '/bots' },
     { type: 'page', title: 'Attacks', description: 'Attack configuration and monitoring', url: '/attacks' },
@@ -25,7 +25,7 @@ export const GlobalSearch = () => {
     { type: 'command', title: 'help', description: 'Show terminal help', url: '/test-terminal' },
     { type: 'command', title: 'status', description: 'Show system status', url: '/test-terminal' },
     { type: 'command', title: 'bots', description: 'List active bots', url: '/test-terminal' },
-  ];
+  ], []);
 
   // Keyboard shortcut (Cmd/Ctrl + K)
   useEffect(() => {
