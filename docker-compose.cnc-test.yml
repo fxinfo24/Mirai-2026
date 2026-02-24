@@ -14,7 +14,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./mirai/cnc/database.py:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./mirai/cnc/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
     networks:
       - cnc-network
     healthcheck:
@@ -36,10 +36,10 @@ services:
       mysql:
         condition: service_healthy
     environment:
-      - DATABASE_HOST=mysql
-      - DATABASE_USER=mirai
-      - DATABASE_PASS=mirai_pass
-      - DATABASE_NAME=mirai
+      - DATABASE_ADDR=mysql
+      - DATABASE_USER=root
+      - DATABASE_PASS=password
+      - DATABASE_TABLE=mirai
     networks:
       - cnc-network
     restart: unless-stopped
