@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Card } from '@/components/ui';
+import { Card } from '@/components/ui/Card';
 
 interface TerminalLine {
   type: 'input' | 'output' | 'error' | 'success';

@@ -345,8 +345,10 @@ class AdaptiveAgent:
             data = json.load(f)
         
         # Convert back to tuple keys
+        # SECURITY FIX: Use ast.literal_eval instead of eval to prevent code injection
+        import ast
         self.q_table = {
-            eval(k): v for k, v in data['q_table'].items()
+            ast.literal_eval(k): v for k, v in data['q_table'].items()
         }
         
         logger.info(f"Model loaded from {filepath}")

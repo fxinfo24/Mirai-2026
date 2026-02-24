@@ -58,7 +58,7 @@ python api_server.py --host 0.0.0.0 --port 5000
 
 ```bash
 # Test credential generation
-curl -X POST http://localhost:8001/api/credentials/generate \
+curl -X POST http://localhost:5000/api/credentials/generate \
   -H "Content-Type: application/json" \
   -d '{
     "target_device": "IoT Camera",
@@ -71,7 +71,7 @@ curl -X POST http://localhost:8001/api/credentials/generate \
 
 ```bash
 # Get evasion suggestions
-curl -X POST http://localhost:8001/api/evasion/suggest \
+curl -X POST http://localhost:5000/api/evasion/suggest \
   -H "Content-Type: application/json" \
   -d '{
     "current_pattern": {
@@ -172,7 +172,7 @@ sudo setcap cap_net_raw+ep ./build/src/bot/mirai_bot
 **Issue**: AI service connection refused
 ```bash
 # Solution: Check if service is running
-curl http://localhost:8001/health
+curl http://localhost:5000/health
 ```
 
 **Issue**: Docker build fails

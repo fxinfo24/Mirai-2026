@@ -205,7 +205,7 @@ curl http://localhost:8001/health
 
 ### 5.1 Access Dashboards
 
-Open your browser to: http://localhost:3010
+Open your browser to: http://localhost:3000
 
 - **Username**: admin
 - **Password**: admin (change on first login)
@@ -331,14 +331,14 @@ docker-compose exec bot /bin/sh
 open http://localhost:9091/targets
 
 # View Grafana
-open http://localhost:3010
+open http://localhost:3000
 ```
 
 ### Useful URLs
 
 - AI Service: http://localhost:8001
 - Prometheus: http://localhost:9091
-- Grafana: http://localhost:3010
+- Grafana: http://localhost:3000
 - Bot Metrics: http://localhost:9090/metrics
 
 ---

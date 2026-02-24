@@ -29,6 +29,7 @@ requests>=2.31.0
 python-dotenv>=1.0.0
 pyyaml>=6.0
 click>=8.1.0  # CLI framework
+flask>=3.0.0  # Web framework
 
 # Development
 pytest>=7.4.0

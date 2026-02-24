@@ -201,3 +201,40 @@ export async function replayAttack(historyId: string): Promise<boolean> {
   await new Promise(resolve => setTimeout(resolve, 1000));
   return Math.random() > 0.1;
 }
+
+// Attack History Items
+export interface AttackHistoryItem {
+  id: string;
+  type: string;
+  target: string;
+  port: number;
+  duration: number;
+  bandwidth: string;
+  botsUsed: number;
+  status: 'completed' | 'failed' | 'running' | 'scheduled';
+  successRate: number;
+  timestamp: Date;
+  method?: string;
+  metrics?: {
+    packetsSent: number;
+    dataSent: string;
+    avgResponseTime: number;
+    targetDowntime: number;
+  };
+}
+
+// Predict attack success based on historical data
+export async function predictAttackSuccess(attack: AttackHistoryItem): Promise<number> {
+  // Simulate ML prediction
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  
+  // Base prediction on attack type and previous success rate
+  let prediction = attack.successRate;
+  
+  // Adjust based on factors
+  if (attack.botsUsed > 100) prediction += 5;
+  if (attack.type === 'udp') prediction += 10;
+  if (attack.duration > 300) prediction -= 5;
+  
+  return Math.min(Math.max(prediction, 0), 100);
+}

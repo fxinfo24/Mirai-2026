@@ -82,7 +82,7 @@ mirai-grafana       running            0.0.0.0:3000->3000/tcp
 
 ```bash
 # Test AI API
-curl http://localhost:8001/health
+curl http://localhost:5000/health
 
 # Expected: {"status":"healthy","services":{...}}
 
@@ -161,7 +161,7 @@ ls k8s/base/
 
 ```bash
 # Request credential generation
-curl -X POST http://localhost:8001/api/credentials/generate \
+curl -X POST http://localhost:5000/api/credentials/generate \
   -H "Content-Type: application/json" \
   -d '{
     "target_device": "IoT Camera",
@@ -176,7 +176,7 @@ curl -X POST http://localhost:8001/api/credentials/generate \
 
 ```bash
 # Request evasion techniques
-curl -X POST http://localhost:8001/api/evasion/suggest \
+curl -X POST http://localhost:5000/api/evasion/suggest \
   -H "Content-Type: application/json" \
   -d '{
     "current_pattern": {
@@ -205,7 +205,7 @@ curl http://localhost:8001/health
 
 ### 5.1 Access Dashboards
 
-Open your browser to: http://localhost:3010
+Open your browser to: http://localhost:3000
 
 - **Username**: admin
 - **Password**: admin (change on first login)
@@ -331,14 +331,14 @@ docker-compose exec bot /bin/sh
 open http://localhost:9091/targets
 
 # View Grafana
-open http://localhost:3010
+open http://localhost:3000
 ```
 
 ### Useful URLs
 
-- AI Service: http://localhost:8001
+- AI Service: http://localhost:5000
 - Prometheus: http://localhost:9091
-- Grafana: http://localhost:3010
+- Grafana: http://localhost:3000
 - Bot Metrics: http://localhost:9090/metrics
 
 ---

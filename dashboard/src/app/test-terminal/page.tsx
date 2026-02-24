@@ -1,7 +1,7 @@
 'use client';
 
 import { Terminal } from '@/components/terminal';
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 
 export default function TestTerminalPage() {
   return (

