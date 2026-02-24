@@ -1,0 +1,116 @@
+{
+  "dashboard": {
+    "title": "Mirai 2026 - Detection & Evasion Dashboard",
+    "tags": ["mirai", "security", "detection"],
+    "timezone": "browser",
+    "refresh": "10s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Detection Event Timeline",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 0, "w": 24, "h": 10},
+        "targets": [
+          {
+            "expr": "rate(mirai_bot_detections_total[1m])",
+            "legendFormat": "{{type}}",
+            "refId": "A"
+          }
+        ],
+        "alert": {
+          "name": "Critical Detection Rate",
+          "conditions": [
+            {
+              "evaluator": {"params": [10], "type": "gt"},
+              "query": {"params": ["A", "1m", "now"]},
+              "reducer": {"type": "avg"}
+            }
+          ],
+          "notifications": [
+            {"uid": "slack-channel"}
+          ]
+        }
+      },
+      {
+        "id": 2,
+        "title": "Detection by Type",
+        "type": "piechart",
+        "gridPos": {"x": 0, "y": 10, "w": 8, "h": 8},
+        "targets": [
+          {
+            "expr": "sum by (type) (increase(mirai_bot_detections_total[1h]))",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Evasion Actions Triggered",
+        "type": "stat",
+        "gridPos": {"x": 8, "y": 10, "w": 8, "h": 4},
+        "targets": [
+          {
+            "expr": "sum(increase(mirai_bot_evasion_actions_total[1h]))",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Time Since Last Detection",
+        "type": "gauge",
+        "gridPos": {"x": 16, "y": 10, "w": 8, "h": 8},
+        "targets": [
+          {
+            "expr": "time() - mirai_bot_last_detection_timestamp",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 300},
+                {"color": "green", "value": 600}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "title": "Polymorphic Transformations",
+        "type": "graph",
+        "gridPos": {"x": 0, "y": 18, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "rate(mirai_bot_signature_changes_total[5m])",
+            "legendFormat": "Signature Changes",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(mirai_bot_behavior_changes_total[5m])",
+            "legendFormat": "Behavior Changes",
+            "refId": "B"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Binary Updates",
+        "type": "table",
+        "gridPos": {"x": 12, "y": 18, "w": 12, "h": 8},
+        "targets": [
+          {
+            "expr": "mirai_bot_binary_updates_total",
+            "format": "table",
+            "instant": true,
+            "refId": "A"
+          }
+        ]
+      }
+    ]
+  }
+}

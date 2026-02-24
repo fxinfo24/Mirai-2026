@@ -1,0 +1,54 @@
+# GitHub Pages Configuration
+
+title: Mirai 2026
+description: Modernized IoT Security Research Platform
+theme: jekyll-theme-cayman
+show_downloads: true
+
+# Repository information
+github:
+  repository_url: https://github.com/fxinfo24/Mirai-2026
+  is_project_page: true
+
+# Navigation
+navigation:
+  - title: Home
+    url: /
+  - title: Documentation
+    url: /README
+  - title: Getting Started
+    url: /guides/GETTING_STARTED
+  - title: API Reference
+    url: /api/LLM_INTEGRATION
+  - title: GitHub
+    url: https://github.com/fxinfo24/Mirai-2026
+
+# Exclude from processing
+exclude:
+  - development/
+  - archive/
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Plugins
+plugins:
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+  - jekyll-titles-from-headings
+  - jekyll-sitemap
+
+relative_links:
+  enabled: true
+  collections: false
+
+optional_front_matter:
+  remove_originals: false
+
+titles_from_headings:
+  enabled: true
+  strip_title: false
+  collections: false

@@ -1,0 +1,53 @@
+# Multi-stage build for AI service
+FROM python:3.11-slim AS builder
+
+WORKDIR /build
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python requirements
+COPY ai/requirements.txt ai/ml_evasion/requirements.txt ./
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# Runtime stage
+FROM python:3.11-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -r -u 1000 -m -s /sbin/nologin aiuser
+
+WORKDIR /app
+
+# Copy installed packages from builder
+COPY --from=builder /root/.local /home/aiuser/.local
+
+# Copy application code
+COPY ai/ /app/
+
+# Set ownership
+RUN chown -R aiuser:aiuser /app
+
+# Update PATH
+ENV PATH=/home/aiuser/.local/bin:$PATH
+
+USER aiuser
+
+# Expose API port
+EXPOSE 5000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD python -c "import requests; requests.get('http://localhost:5000/health')"
+
+ENTRYPOINT ["python", "api_server.py"]
+CMD ["--host", "0.0.0.0", "--port", "5000"]

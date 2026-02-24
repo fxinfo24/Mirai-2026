@@ -1,26 +1,15 @@
-# Mirai BotNet
-Leaked Linux.Mirai Source Code for Research/IoT Development Purposes
+# Mirai 2026 - Modernized IoT Security Research Platform
 
-Uploaded for research purposes and so we can develop IoT and such.
+[![Release](https://img.shields.io/github/v/release/fxinfo24/Mirai-2026?style=for-the-badge)](https://github.com/fxinfo24/Mirai-2026/releases)
+[![License](https://img.shields.io/github/license/fxinfo24/Mirai-2026?style=for-the-badge)](LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/fxinfo24/Mirai-2026/ci.yml?branch=main&style=for-the-badge&label=CI)](https://github.com/fxinfo24/Mirai-2026/actions)
+[![Documentation](https://img.shields.io/badge/docs-latest-blue?style=for-the-badge)](https://fxinfo24.github.io/Mirai-2026/)
+[![Stars](https://img.shields.io/github/stars/fxinfo24/Mirai-2026?style=for-the-badge)](https://github.com/fxinfo24/Mirai-2026/stargazers)
 
-See "ForumPost.txt" or [ForumPost.md](ForumPost.md) for the post in which it
-leaks, if you want to know how it is all set up and the likes.
+[![Language: C](https://img.shields.io/badge/C-C17%2FC23-blue?style=flat-square&logo=c)](src/)
+[![Language: Python](https://img.shields.io/badge/Python-3.11+-yellow?style=flat-square&logo=python)](ai/)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?style=flat-square&logo=docker)](docker-compose.yml)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-ready-326CE5?style=flat-square&logo=kubernetes)](k8s/)
 
-## Requirements
-* gcc
-* golang
-* electric-fence
-* mysql-server
-* mysql-client
+**Transform the legendary 2016 Mirai botnet into a cutting-edge security research platform.**
 
-## Credits
-[Anna-senpai](https://hackforums.net/showthread.php?tid=5420472)
-
-## Disclaimer
-This repository is for academic purposes, the use of this software is your
-responsibility.
-
-## Warning
-The [zip file](https://www.virustotal.com/en/file/f10667215040e87dae62dd48a5405b3b1b0fe7dbbfbf790d5300f3cd54893333/analysis/1477822491/) for this repo is being identified by some AV programs as malware.  Please take caution. 
-# Mirai-Source-Code
-# Mirai-Source-Code

@@ -1,0 +1,85 @@
+{
+  "version": "2.1.0",
+  "environment": "sandbox",
+  
+  "scanner": {
+    "enabled": true,
+    "max_connections": 64,
+    "scan_rate_pps": 500,
+    "target_ports": [23, 2323, 22, 80, 8080],
+    "timeout_seconds": 10
+  },
+  
+  "attack": {
+    "enabled": true,
+    "max_concurrent": 4,
+    "default_vector": "tcp_syn",
+    "duration_seconds": 30
+  },
+  
+  "self_improvement": {
+    "enabled": true,
+    "detection_engine": {
+      "enabled": true,
+      "check_interval_seconds": 30,
+      "check_debugger": true,
+      "check_sandbox": true,
+      "check_ids": true,
+      "thresholds": {
+        "ids_drop_rate_percent": 25,
+        "honeypot_delay_ms": 100
+      },
+      "auto_respond": true
+    },
+    "rl_agent": {
+      "enabled": true,
+      "learning_rate": 0.1,
+      "exploration_rate": 0.2,
+      "model_path": "/app/models/agent.json"
+    },
+    "auto_update": {
+      "enabled": false,
+      "check_interval_seconds": 3600
+    }
+  },
+  
+  "ai": {
+    "enabled": true,
+    "api_endpoint": "http://ai-service:5000",
+    "timeout_seconds": 30,
+    "credential_generation": true,
+    "pattern_evolution": true,
+    "federated_learning": false
+  },
+  
+  "logging": {
+    "level": "debug",
+    "destination": "stdout",
+    "format": "json"
+  },
+  
+  "metrics": {
+    "enabled": true,
+    "port": 9090,
+    "path": "/metrics"
+  },
+  
+  "targets": {
+    "whitelist": [
+      "honeypot-http",
+      "honeypot-telnet",
+      "honeypot-ssh",
+      "localhost",
+      "127.0.0.1"
+    ],
+    "blacklist": [],
+    "exclude_private": false
+  },
+  
+  "safety": {
+    "sandbox_mode": true,
+    "rate_limit_enabled": true,
+    "max_targets_per_second": 10,
+    "respect_robots_txt": true
+  }
+}

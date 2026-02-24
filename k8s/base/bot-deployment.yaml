@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mirai-bot
+  namespace: mirai-2026
+  labels:
+    app: mirai-bot
+    component: bot
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mirai-bot
+  template:
+    metadata:
+      labels:
+        app: mirai-bot
+        component: bot
+    spec:
+      securityContext:
+        runAsNonRoot: false  # Requires root for raw sockets
+        fsGroup: 1000
+      
+      containers:
+      - name: bot
+        image: mirai-2026/bot:latest
+        imagePullPolicy: IfNotPresent
+        
+        securityContext:
+          capabilities:
+            add:
+              - NET_RAW        # Required for raw socket scanning
+              - NET_ADMIN      # Required for network operations
+            drop:
+              - ALL
+          readOnlyRootFilesystem: true
+        
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        
+        env:
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: mirai-config
+              key: LOG_LEVEL
+        - name: SCANNER_MAX_CONNECTIONS
+          valueFrom:
+            configMapKeyRef:
+              name: mirai-config
+              key: SCANNER_MAX_CONNECTIONS
+        - name: AI_API_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: mirai-config
+              key: AI_API_ENDPOINT
+        
+        volumeMounts:
+        - name: config
+          mountPath: /etc/mirai
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+        
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "pgrep -x mirai_bot"
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "pgrep -x mirai_bot"
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      
+      volumes:
+      - name: config
+        configMap:
+          name: mirai-config
+      - name: tmp
+        emptyDir: {}
+      
+      restartPolicy: Always

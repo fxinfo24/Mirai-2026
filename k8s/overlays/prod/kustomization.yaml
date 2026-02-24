@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: mirai-2026-prod
+
+bases:
+  - ../../base
+
+namePrefix: prod-
+
+commonLabels:
+  environment: production
+
+patches:
+  - target:
+      kind: Deployment
+      name: mirai-bot
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 10
+  
+  - target:
+      kind: Deployment
+      name: ai-service
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 3
+
+configMapGenerator:
+  - name: mirai-config
+    behavior: merge
+    literals:
+      - LOG_LEVEL=INFO
+      - SCANNER_MAX_CONNECTIONS=512
+      - SCANNER_SCAN_RATE=5000
+
+resources:
+  - hpa.yaml

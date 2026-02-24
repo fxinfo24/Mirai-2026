@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: mirai-2026
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - bot-deployment.yaml
+  - ai-service-deployment.yaml
+  - postgres-statefulset.yaml
+  - networkpolicy.yaml
+  - monitoring.yaml
+
+commonLabels:
+  project: mirai-2026
+  managed-by: kustomize
