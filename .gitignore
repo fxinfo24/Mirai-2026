@@ -2,3 +2,12 @@ Mirai-Source-Code-master/mirai/.DS_Store
 Mirai-Source-Code-master/loader/src/.DS_Store
 Mirai-Source-Code-master/loader/.DS_Store
 Mirai-Source-Code-master/.DS_Store
+
+# Legacy directories (not part of Mirai 2026)
+Mirai-Source-Code-master/
+dlr/
+scripts/
+
+# macOS
+.DS_Store
+**/.DS_Store
