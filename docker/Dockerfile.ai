@@ -1,0 +1,61 @@
+# Multi-stage build for AI service
+FROM python:3.11-slim AS builder
+
+WORKDIR /build
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python requirements
+COPY ai/requirements.txt ./requirements.txt
+COPY ai/llm_integration/requirements.txt ./llm_requirements.txt
+
+# Install Python dependencies (both files)
+RUN pip install --no-cache-dir --user -r requirements.txt && \
+    pip install --no-cache-dir --user -r llm_requirements.txt
+
+# Runtime stage
+FROM python:3.11-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libgomp1 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd -r -u 1000 -m -s /sbin/nologin aiuser
+
+WORKDIR /app
+
+# Copy installed packages from builder
+COPY --from=builder /root/.local /home/aiuser/.local
+
+# Copy application code
+COPY ai/ /app/ai/
+
+# Create .env file from example if it doesn't exist
+COPY ai/llm_integration/.env.example /app/ai/llm_integration/.env.example
+
+# Set ownership
+RUN chown -R aiuser:aiuser /app
+
+# Update PATH
+ENV PATH=/home/aiuser/.local/bin:$PATH
+ENV PYTHONPATH=/app
+
+USER aiuser
+
+# Expose API port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Start the API server
+WORKDIR /app/ai
+CMD ["python", "-u", "api_server.py", "--host", "0.0.0.0", "--port", "8000"]

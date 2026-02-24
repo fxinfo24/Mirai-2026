@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: mirai-2026
-  labels:
-    name: mirai-2026
-    purpose: security-research

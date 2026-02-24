@@ -1,0 +1,164 @@
+version: '3.8'
+
+# Mirai 2026 - Simplified Development Stack for Docker Desktop
+# This version focuses on core services that work reliably
+
+services:
+  # PostgreSQL database
+  postgres:
+    image: postgres:16-alpine
+    container_name: mirai-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-mirai}
+      POSTGRES_USER: ${POSTGRES_USER:-mirai}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-research_password_change_me}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - mirai-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mirai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: mirai-redis
+    ports:
+      - "6380:6379"
+    networks:
+      - mirai-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: mirai-prometheus
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - mirai-net
+
+  # Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: mirai-grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./observability/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./observability/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    ports:
+      - "3002:3000"
+    networks:
+      - mirai-net
+    depends_on:
+      - prometheus
+
+  # Loki for logs
+  loki:
+    image: grafana/loki:latest
+    container_name: mirai-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./observability/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+    networks:
+      - mirai-net
+    command: -config.file=/etc/loki/local-config.yaml
+
+  # Jaeger for tracing
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: mirai-jaeger
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"  # Jaeger UI
+      - "14268:14268"
+      - "14250:14250"
+      - "9411:9411"
+    networks:
+      - mirai-net
+
+  # AI/ML Service
+  ai-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.ai
+    container_name: mirai-ai-service
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://mirai:research_password_change_me@postgres:5432/mirai
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - PYTHONUNBUFFERED=1
+      # LLM Configuration (optional)
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-openai/gpt-3.5-turbo}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+    volumes:
+      - ./ai:/app/ai:ro
+      - ai_models:/models
+    ports:
+      - "8001:8000"
+    networks:
+      - mirai-net
+    depends_on:
+      - redis
+      - postgres
+    restart: unless-stopped
+
+  # CNC Placeholder
+  cnc:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.cnc
+    container_name: mirai-cnc
+    environment:
+      - DATABASE_URL=postgresql://mirai:research_password_change_me@postgres:5432/mirai
+      - REDIS_URL=redis://redis:6379
+    ports:
+      - "2323:23"
+      - "8080:8080"
+    networks:
+      - mirai-net
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:
+  ai_models:
+
+networks:
+  mirai-net:
+    driver: bridge
+    name: mirai-network
