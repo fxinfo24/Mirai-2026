@@ -79,23 +79,21 @@ export function KeyboardShortcutsHelp() {
     <div className="glass-card p-4 rounded-lg">
       <h3 className="text-lg font-semibold text-text-primary mb-3">Keyboard Shortcuts</h3>
       <div className="space-y-2">
-        {shortcuts.map((shortcut, i) => {
-          return (
-            <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-text-secondary">{shortcut.description}</span>
-              <div className="flex items-center space-x-1">
-                {shortcut.ctrl && (
-                  <kbd className="px-2 py-1 bg-white/5 rounded border border-white/10 text-xs">
-                    ⌘
-                  </kbd>
-                )}
+        {shortcuts.map((shortcut, i) => (
+          <div key={i} className="flex items-center justify-between text-sm">
+            <span className="text-text-secondary">{shortcut.description}</span>
+            <div className="flex items-center space-x-1">
+              {shortcut.ctrl && (
                 <kbd className="px-2 py-1 bg-white/5 rounded border border-white/10 text-xs">
-                  {shortcut.key.toUpperCase()}
+                  ⌘
                 </kbd>
-              </div>
+              )}
+              <kbd className="px-2 py-1 bg-white/5 rounded border border-white/10 text-xs">
+                {shortcut.key.toUpperCase()}
+              </kbd>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );

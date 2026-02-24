@@ -93,7 +93,7 @@ export const GlobalSearch = () => {
         <div className="max-h-96 overflow-y-auto p-2">
           {results.length === 0 && query && (
             <div className="p-8 text-center text-text-muted">
-              No results found for "{query}"
+              No results found for &quot;{query}&quot;
             </div>
           )}
           
