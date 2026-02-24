@@ -3,6 +3,8 @@
 import { Navbar } from '@/components/shared';
 import { StatCard } from '@/components/dashboard';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button } from '@/components/ui';
+import { Globe3D } from '@/components/globe';
+import { Terminal } from '@/components/terminal';
 
 export default function DashboardPage() {
   return (
@@ -94,31 +96,29 @@ export default function DashboardPage() {
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Map Visualization Placeholder */}
+          {/* 3D Globe Visualization */}
           <Card variant="elevated" className="lg:col-span-2">
             <CardHeader>
               <CardTitle>Global Bot Network</CardTitle>
               <CardDescription>Real-time geographic distribution</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="aspect-video bg-gradient-to-br from-primary-bg-secondary to-primary-bg rounded-lg border border-white/10 flex items-center justify-center">
-                <div className="text-center">
-                  <svg
-                    className="w-16 h-16 mx-auto mb-4 text-accent-primary opacity-50"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <p className="text-text-secondary">3D Globe Visualization</p>
-                  <p className="text-sm text-text-muted mt-1">Coming soon</p>
-                </div>
+              <div className="h-[400px]">
+                <Globe3D
+                  autoRotate
+                  bots={[
+                    { lat: 40.7128, lon: -74.0060, count: 150, country: 'USA' },
+                    { lat: 51.5074, lon: -0.1278, count: 80, country: 'UK' },
+                    { lat: 35.6762, lon: 139.6503, count: 120, country: 'Japan' },
+                    { lat: -33.8688, lon: 151.2093, count: 45, country: 'Australia' },
+                    { lat: 55.7558, lon: 37.6173, count: 90, country: 'Russia' },
+                    { lat: 39.9042, lon: 116.4074, count: 200, country: 'China' },
+                    { lat: 52.5200, lon: 13.4050, count: 65, country: 'Germany' },
+                    { lat: -23.5505, lon: -46.6333, count: 75, country: 'Brazil' },
+                    { lat: 19.0760, lon: 72.8777, count: 110, country: 'India' },
+                    { lat: 1.3521, lon: 103.8198, count: 50, country: 'Singapore' },
+                  ]}
+                />
               </div>
             </CardContent>
           </Card>
