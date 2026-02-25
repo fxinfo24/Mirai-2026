@@ -375,6 +375,386 @@ suricatasc -c reload-rules
 
 ---
 
+## Honeypot Deployment for Research
+
+### Purpose
+Honeypots allow security researchers to:
+- Observe botnet behavior in controlled environments
+- Collect malware samples safely
+- Understand attack patterns
+- Test detection methods
+- Generate threat intelligence
+
+### 5.1 Low-Interaction Honeypot (Cowrie)
+
+**Best for:** Capturing credentials, commands, and malware downloads
+
+**Setup:**
+```bash
+# Install Cowrie SSH/Telnet honeypot
+sudo apt-get install python3-virtualenv git
+git clone https://github.com/cowrie/cowrie
+cd cowrie
+virtualenv cowrie-env
+source cowrie-env/bin/activate
+pip install -r requirements.txt
+
+# Configure
+cp etc/cowrie.cfg.dist etc/cowrie.cfg
+```
+
+**Configuration (etc/cowrie.cfg):**
+```ini
+[honeypot]
+hostname = vulnerable-router
+arch = armv7l
+
+[ssh]
+enabled = true
+listen_endpoints = tcp:2222:interface=0.0.0.0
+
+[telnet]
+enabled = true
+listen_endpoints = tcp:2323:interface=0.0.0.0
+
+[output_jsonlog]
+enabled = true
+logfile = var/log/cowrie/cowrie.json
+
+# Log all credentials attempted
+[output_mysql]
+enabled = true
+host = localhost
+database = cowrie
+username = cowrie
+password = secret
+```
+
+**Port forwarding (route traffic to honeypot):**
+```bash
+# Forward telnet to Cowrie
+iptables -t nat -A PREROUTING -p tcp --dport 23 -j REDIRECT --to-port 2323
+
+# Forward SSH to Cowrie
+iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+```
+
+**Running:**
+```bash
+./bin/cowrie start
+tail -f var/log/cowrie/cowrie.log
+```
+
+### 5.2 Medium-Interaction Honeypot (Custom)
+
+**Architecture:**
+```
+┌────────────────────────────────────┐
+│   Isolated Network (No Internet)   │
+│                                    │
+│  ┌──────────┐      ┌───────────┐  │
+│  │ Honeypot │◄────►│ Fake C&C  │  │
+│  │  Device  │      │  Server   │  │
+│  └──────────┘      └───────────┘  │
+│        ▲                           │
+│        │                           │
+└────────┼───────────────────────────┘
+         │
+    ┌────┴─────┐
+    │ Observer │ ← Monitoring/Logging
+    │  System  │
+    └──────────┘
+```
+
+**Docker-based honeypot:**
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  honeypot:
+    build: ./honeypot
+    container_name: mirai_honeypot
+    network_mode: "bridge"
+    ports:
+      - "23:23"    # Telnet
+      - "2323:2323"
+      - "22:22"    # SSH
+    volumes:
+      - ./logs:/var/log/honeypot
+    environment:
+      - HONEYPOT_MODE=research
+    cap_add:
+      - NET_ADMIN
+    
+  # Fake C&C server for analysis
+  fake_cnc:
+    build: ./fake-cnc
+    container_name: fake_cnc_server
+    ports:
+      - "48101:48101"
+    volumes:
+      - ./cnc-logs:/var/log/cnc
+    
+  # Database for storing captures
+  database:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: honeypot
+      POSTGRES_USER: researcher
+      POSTGRES_PASSWORD: research123
+    volumes:
+      - ./data:/var/lib/postgresql/data
+```
+
+**Honeypot Dockerfile:**
+```dockerfile
+FROM ubuntu:22.04
+
+# Emulate vulnerable IoT device
+RUN apt-get update && apt-get install -y \
+    telnetd \
+    openssh-server \
+    tcpdump \
+    strace
+
+# Set weak credentials (intentionally)
+RUN useradd -m -s /bin/bash admin && \
+    echo 'admin:admin' | chpasswd && \
+    echo 'root:root' | chpasswd
+
+# Install monitoring
+COPY monitor.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/monitor.sh
+
+# Start services
+CMD service ssh start && \
+    service openbsd-inetd start && \
+    /usr/local/bin/monitor.sh
+```
+
+**Monitoring script (monitor.sh):**
+```bash
+#!/bin/bash
+# Log all activity for analysis
+
+LOG_DIR=/var/log/honeypot
+mkdir -p $LOG_DIR
+
+# Monitor all connections
+tcpdump -i any -w $LOG_DIR/traffic_$(date +%Y%m%d_%H%M%S).pcap &
+
+# Monitor process execution
+while true; do
+    ps aux | grep -v grep | grep -E "(wget|curl|tftp|nc)" >> $LOG_DIR/suspicious_processes.log
+    
+    # Log new connections
+    netstat -an | grep ESTABLISHED >> $LOG_DIR/connections.log
+    
+    sleep 5
+done
+```
+
+### 5.3 High-Interaction Honeypot (Full System)
+
+**Using actual IoT devices with monitoring:**
+
+```bash
+# Set up isolated test network
+# 192.168.99.0/24 - Honeypot network (no Internet)
+
+# Router configuration
+iptables -A FORWARD -s 192.168.99.0/24 -j DROP  # Block outbound
+iptables -A FORWARD -d 192.168.99.0/24 -j ACCEPT  # Allow inbound
+
+# Deploy actual vulnerable devices
+# - Old IP cameras with default creds
+# - Routers with telnet enabled
+# - DVRs with known vulnerabilities
+
+# Central logging server
+rsyslog -c /etc/rsyslog.d/honeypot.conf
+```
+
+### 5.4 Data Collection & Analysis
+
+**Automated analysis pipeline:**
+```python
+#!/usr/bin/env python3
+"""
+Analyze honeypot logs to extract threat intelligence
+"""
+import json
+import re
+from collections import Counter
+
+def analyze_cowrie_logs(logfile):
+    """Extract credentials, commands, malware URLs"""
+    credentials = []
+    commands = []
+    downloads = []
+    
+    with open(logfile) as f:
+        for line in f:
+            try:
+                event = json.loads(line)
+                
+                # Credential attempts
+                if event['eventid'] == 'cowrie.login.failed':
+                    credentials.append({
+                        'username': event['username'],
+                        'password': event['password'],
+                        'src_ip': event['src_ip']
+                    })
+                
+                # Commands executed
+                elif event['eventid'] == 'cowrie.command.input':
+                    commands.append(event['input'])
+                
+                # Malware downloads
+                elif event['eventid'] == 'cowrie.session.file_download':
+                    downloads.append({
+                        'url': event['url'],
+                        'shasum': event['shasum'],
+                        'outfile': event['outfile']
+                    })
+                    
+            except Exception as e:
+                continue
+    
+    # Generate statistics
+    print(f"[+] Total login attempts: {len(credentials)}")
+    print(f"[+] Unique credentials: {len(set((c['username'], c['password']) for c in credentials))}")
+    print(f"[+] Commands executed: {len(commands)}")
+    print(f"[+] Malware samples: {len(downloads)}")
+    
+    # Top credentials
+    print("\n[+] Top 10 credentials:")
+    cred_counter = Counter((c['username'], c['password']) for c in credentials)
+    for (user, passwd), count in cred_counter.most_common(10):
+        print(f"    {user}:{passwd} - {count} attempts")
+    
+    # Top commands
+    print("\n[+] Top 10 commands:")
+    cmd_counter = Counter(commands)
+    for cmd, count in cmd_counter.most_common(10):
+        print(f"    {cmd} - {count} times")
+    
+    return {
+        'credentials': credentials,
+        'commands': commands,
+        'downloads': downloads
+    }
+
+# Usage
+if __name__ == '__main__':
+    analyze_cowrie_logs('/opt/cowrie/var/log/cowrie/cowrie.json')
+```
+
+### 5.5 Safety & Ethical Considerations
+
+**⚠️ CRITICAL SAFETY RULES:**
+
+1. **Network Isolation**
+   - ✅ Honeypots MUST be isolated from production networks
+   - ✅ No Internet access for infected systems
+   - ✅ Use separate physical hardware or VLANs
+
+2. **Legal Compliance**
+   - ✅ Ensure you own/control the IP addresses
+   - ✅ Don't deploy on shared networks without permission
+   - ✅ Be aware of local laws regarding honeypots
+
+3. **Data Handling**
+   - ✅ Log everything (for research)
+   - ✅ Encrypt stored logs
+   - ✅ Don't share personally identifiable information (PII)
+
+4. **Incident Response**
+   - ✅ Have kill switch ready
+   - ✅ Monitor for containment breaches
+   - ✅ Automated alerts if honeypot attacks real systems
+
+**Kill switch example:**
+```bash
+#!/bin/bash
+# Emergency shutdown if honeypot is compromised
+
+# Check if honeypot is attacking external IPs
+if tcpdump -i eth0 -c 100 'src 192.168.99.0/24' | grep -v '192.168.99'; then
+    echo "ALERT: Honeypot containment breach!"
+    
+    # Immediate shutdown
+    iptables -F
+    iptables -P INPUT DROP
+    iptables -P OUTPUT DROP
+    iptables -P FORWARD DROP
+    
+    # Notify admin
+    mail -s "HONEYPOT BREACH" admin@example.com < /dev/null
+    
+    # Power off honeypot network
+    poweroff
+fi
+```
+
+### 5.6 Honeypot Deployment Checklist
+
+**Pre-deployment:**
+- [ ] Network isolation verified (no route to Internet)
+- [ ] Legal approval obtained
+- [ ] Monitoring systems in place
+- [ ] Backup/restore procedures tested
+- [ ] Kill switch configured and tested
+- [ ] Alert systems configured
+
+**During deployment:**
+- [ ] Services started (telnet, SSH)
+- [ ] Default credentials configured
+- [ ] Traffic logging enabled (tcpdump, NetFlow)
+- [ ] Database logging operational
+- [ ] Dashboard monitoring active
+
+**Post-deployment:**
+- [ ] Daily log review
+- [ ] Weekly analysis of captured data
+- [ ] Monthly security audit
+- [ ] Quarterly threat intelligence report
+
+### 5.7 Research Applications
+
+**Use honeypot data for:**
+
+1. **Credential Intelligence**
+   - Build database of common IoT credentials
+   - Feed into ML models for prediction
+   - Update detection signatures
+
+2. **Malware Analysis**
+   - Reverse engineer captured samples
+   - Identify new attack techniques
+   - Develop detection signatures
+
+3. **Attack Pattern Recognition**
+   - Understand botnet lifecycle
+   - Map C&C infrastructure
+   - Predict future attacks
+
+4. **Defense Testing**
+   - Validate detection methods
+   - Test IDS/IPS rules
+   - Benchmark security tools
+
+**Sample research workflow:**
+```
+Day 1-7:   Deploy honeypot, collect data
+Day 8-14:  Analyze patterns, extract samples
+Day 15-21: Reverse engineer malware
+Day 22-28: Develop detection signatures
+Day 29-30: Publish findings, update defenses
+```
+
+---
+
 ## Incident Response Checklist
 
 ### Detection Phase

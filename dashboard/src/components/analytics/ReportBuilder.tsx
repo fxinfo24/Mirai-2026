@@ -30,10 +30,82 @@ export function ReportBuilder() {
     ));
   };
 
-  const generateReport = (format: 'pdf' | 'excel') => {
-    console.log(`Generating ${format} report with sections:`, 
-      sections.filter(s => s.enabled).map(s => s.id)
-    );
+  const generateReport = async (format: 'pdf' | 'excel') => {
+    const enabledSections = sections.filter(s => s.enabled);
+    
+    if (enabledSections.length === 0) {
+      alert('Please select at least one section to include in the report');
+      return;
+    }
+
+    // Import export functions dynamically
+    const { exportToPDF, exportToExcel, exportDashboardToPDF } = await import('@/lib/export');
+    
+    // Mock data for demonstration (in production, fetch real data)
+    const mockData = {
+      overview: [
+        { metric: 'Total Bots', value: 1234, status: 'Active' },
+        { metric: 'Active Attacks', value: 45, status: 'Running' },
+        { metric: 'Success Rate', value: '87%', status: 'Good' },
+      ],
+      bot_stats: [
+        { region: 'US-East', count: 450, status: 'Healthy' },
+        { region: 'EU-West', count: 320, status: 'Healthy' },
+        { region: 'Asia-Pacific', count: 464, status: 'Degraded' },
+      ],
+      attack_history: [
+        { timestamp: '2026-02-25 10:30', target: '192.168.1.1', type: 'UDP Flood', status: 'Success' },
+        { timestamp: '2026-02-25 09:15', target: '10.0.0.50', type: 'TCP SYN', status: 'Success' },
+        { timestamp: '2026-02-25 08:00', target: '172.16.0.100', type: 'HTTP Flood', status: 'Failed' },
+      ],
+      performance: [
+        { time: '00:00', cpu: 45, memory: 62, network: 78 },
+        { time: '06:00', cpu: 52, memory: 68, network: 85 },
+        { time: '12:00', cpu: 71, memory: 75, network: 92 },
+      ],
+      security: [
+        { event: 'Unauthorized Access', severity: 'High', count: 3 },
+        { event: 'Rate Limit Exceeded', severity: 'Medium', count: 15 },
+        { event: 'Invalid Credentials', severity: 'Low', count: 42 },
+      ],
+      bandwidth: [
+        { interface: 'eth0', in: '1.2 GB', out: '3.4 GB', utilization: '45%' },
+        { interface: 'eth1', in: '0.8 GB', out: '2.1 GB', utilization: '32%' },
+      ],
+    };
+
+    try {
+      if (format === 'pdf') {
+        // Prepare sections for PDF export
+        const pdfSections = enabledSections.map(section => ({
+          title: section.title,
+          data: mockData[section.id as keyof typeof mockData] || []
+        }));
+
+        exportDashboardToPDF(
+          reportName,
+          pdfSections,
+          `${reportName.toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}`
+        );
+      } else if (format === 'excel') {
+        // Prepare sheets for Excel export
+        const { exportMultiSheetExcel } = await import('@/lib/export');
+        const excelSheets = enabledSections.map(section => ({
+          name: section.title,
+          data: mockData[section.id as keyof typeof mockData] || []
+        }));
+
+        exportMultiSheetExcel(
+          excelSheets,
+          `${reportName.toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}`
+        );
+      }
+
+      alert(`${format.toUpperCase()} report generated successfully!`);
+    } catch (error) {
+      console.error(`Error generating ${format} report:`, error);
+      alert(`Failed to generate ${format} report. Please try again.`);
+    }
   };
 
   return (

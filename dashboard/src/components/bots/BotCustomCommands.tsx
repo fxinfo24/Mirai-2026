@@ -2,12 +2,11 @@
 
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, Input, useToast } from '@/components/ui';
-import { executeCustomCommand } from '@/lib/botManagement';
+import { executeCustomCommand, BotWithHealth } from '@/lib/botManagement';
 import { CommandTemplate, DEFAULT_COMMAND_TEMPLATES } from '@/lib/botManagement.extended';
-import type { Bot } from '@/lib/botManagement';
 
 interface BotCustomCommandsProps {
-  bot: Bot;
+  bot: BotWithHealth;
   onCommandExecuted: () => void;
 }
 
@@ -29,7 +28,8 @@ export function BotCustomCommands({ bot, onCommandExecuted }: BotCustomCommandsP
         command = command.replace(`{${key}}`, value);
       });
 
-      await executeCustomCommand(bot.id, command);
+      const commandObj = { id: selectedTemplate.id, name: selectedTemplate.name, command, description: selectedTemplate.description, requiresConfirmation: false };
+      await executeCustomCommand(bot.id, commandObj);
       showToast(`Command executed: ${selectedTemplate.name}`, 'success');
       onCommandExecuted();
     } catch (error) {

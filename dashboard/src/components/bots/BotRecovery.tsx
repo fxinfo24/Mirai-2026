@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, Input, useToast } from '@/components/ui';
-import type { Bot } from '@/lib/botManagement';
+import type { BotWithHealth } from '@/lib/botManagement';
 import { RecoveryRule, applyRecoveryRule } from '@/lib/botManagement.extended';
 
 interface BotRecoveryProps {
-  bots: Bot[];
+  bots: BotWithHealth[];
   onRecoveryComplete: () => void;
 }
 

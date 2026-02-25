@@ -1,0 +1,452 @@
+# Snort/Suricata Rules for Mirai-based IoT Botnet Detection
+#
+# Purpose: Educational and defensive use only
+# Author: Mirai 2026 Research Team
+# Date: 2026-02-25
+#
+# Installation:
+#   Snort: Copy to /etc/snort/rules/mirai.rules
+#   Suricata: Copy to /etc/suricata/rules/mirai.rules
+#
+# Enable in snort.conf/suricata.yaml:
+#   include $RULE_PATH/mirai.rules
+
+# ============================================
+# 1. TELNET BRUTE FORCE DETECTION
+# ============================================
+
+# Rule 1001: Rapid telnet connection attempts (scanner behavior)
+alert tcp any any -> any 23 (
+    msg:"MIRAI Telnet brute force scanner detected";
+    flow:to_server,established;
+    threshold:type both, track by_src, count 10, seconds 60;
+    classtype:attempted-admin;
+    reference:url,github.com/fxinfo24/Mirai-2026;
+    sid:1000001;
+    rev:1;
+)
+
+# Rule 1002: Telnet connections to uncommon ports
+alert tcp any any -> any [2323,8023,5023,6023] (
+    msg:"MIRAI Telnet connection to uncommon port";
+    flow:to_server,established;
+    threshold:type both, track by_src, count 5, seconds 60;
+    classtype:trojan-activity;
+    sid:1000002;
+    rev:1;
+)
+
+# Rule 1003: Multiple failed telnet authentication attempts
+alert tcp any 23 -> any any (
+    msg:"MIRAI Multiple telnet authentication failures";
+    flow:from_server,established;
+    content:"Login incorrect";
+    threshold:type both, track by_dst, count 5, seconds 30;
+    classtype:attempted-admin;
+    sid:1000003;
+    rev:1;
+)
+
+# Rule 1004: Telnet IAC negotiation patterns
+alert tcp any any -> any 23 (
+    msg:"MIRAI Telnet IAC negotiation - potential scanner";
+    flow:to_server,established;
+    content:"|FF FB 01 FF FB 03|";
+    threshold:type both, track by_src, count 5, seconds 60;
+    classtype:network-scan;
+    sid:1000004;
+    rev:1;
+)
+
+# ============================================
+# 2. C&C COMMUNICATION DETECTION
+# ============================================
+
+# Rule 1005: Mirai bot heartbeat pattern (binary protocol)
+alert tcp any any -> any any (
+    msg:"MIRAI C&C heartbeat detected";
+    flow:established,to_server;
+    content:"|AA BB|";
+    dsize:2;
+    threshold:type both, track by_src, count 5, seconds 300;
+    classtype:trojan-activity;
+    sid:1000005;
+    rev:2;
+)
+
+# Rule 1006: Mirai version handshake
+alert tcp any any -> any any (
+    msg:"MIRAI C&C version handshake";
+    flow:established,to_server;
+    content:"|00 00 00 01|";
+    offset:0;
+    depth:4;
+    classtype:trojan-activity;
+    sid:1000006;
+    rev:1;
+)
+
+# Rule 1007: Regular beaconing pattern (60-second intervals)
+alert tcp any any -> any any (
+    msg:"MIRAI Regular beaconing behavior";
+    flow:established,to_server;
+    dsize:<10;
+    threshold:type threshold, track by_src, count 10, seconds 600;
+    classtype:trojan-activity;
+    sid:1000007;
+    rev:1;
+)
+
+# Rule 1008: Connection to known C&C ports (uncommon)
+alert tcp any any -> any [48101,666,1337,31337] (
+    msg:"MIRAI Connection to suspicious C&C port";
+    flow:to_server,established;
+    threshold:type limit, track by_src, count 1, seconds 60;
+    classtype:trojan-activity;
+    sid:1000008;
+    rev:1;
+)
+
+# ============================================
+# 3. NETWORK SCANNING DETECTION
+# ============================================
+
+# Rule 1009: High rate of SYN packets (port scanner)
+alert tcp any any -> any 23 (
+    msg:"MIRAI SYN flood scanner - telnet port";
+    flags:S,12;
+    threshold:type both, track by_src, count 100, seconds 60;
+    classtype:network-scan;
+    sid:1000009;
+    rev:1;
+)
+
+# Rule 1010: Scanning multiple telnet-related ports
+alert tcp any any -> any [23,2323,8023] (
+    msg:"MIRAI Multi-port telnet scanning";
+    flags:S;
+    threshold:type both, track by_src, count 50, seconds 30;
+    classtype:network-scan;
+    sid:1000010;
+    rev:1;
+)
+
+# Rule 1011: Random destination IP scanning
+alert tcp any any -> any 23 (
+    msg:"MIRAI Random IP scanning pattern";
+    flags:S;
+    threshold:type both, track by_src, count 200, seconds 60;
+    classtype:network-scan;
+    sid:1000011;
+    rev:1;
+)
+
+# Rule 1012: Scanner report server communication (port 48101)
+alert tcp any any -> any 48101 (
+    msg:"MIRAI Scanner report server communication";
+    flow:to_server,established;
+    classtype:trojan-activity;
+    priority:1;
+    sid:1000012;
+    rev:1;
+)
+
+# ============================================
+# 4. DDoS ATTACK DETECTION
+# ============================================
+
+# Rule 1013: UDP flood attack (outbound)
+alert udp any any -> any any (
+    msg:"MIRAI UDP flood attack detected";
+    threshold:type both, track by_src, count 1000, seconds 10;
+    classtype:attempted-dos;
+    sid:1000013;
+    rev:1;
+)
+
+# Rule 1014: SYN flood attack
+alert tcp any any -> any any (
+    msg:"MIRAI SYN flood attack";
+    flags:S,12;
+    threshold:type both, track by_src, count 1000, seconds 10;
+    classtype:attempted-dos;
+    sid:1000014;
+    rev:1;
+)
+
+# Rule 1015: HTTP flood attack
+alert tcp any any -> any [80,8080,443,8443] (
+    msg:"MIRAI HTTP flood attack";
+    flow:to_server,established;
+    content:"GET /";
+    http_method;
+    threshold:type both, track by_src, count 100, seconds 10;
+    classtype:attempted-dos;
+    sid:1000015;
+    rev:1;
+)
+
+# Rule 1016: DNS amplification attack
+alert udp any any -> any 53 (
+    msg:"MIRAI DNS amplification attack";
+    content:"|01 00 00 01|";
+    offset:2;
+    depth:4;
+    threshold:type both, track by_src, count 50, seconds 10;
+    classtype:attempted-dos;
+    sid:1000016;
+    rev:1;
+)
+
+# Rule 1017: GRE flood attack
+alert gre any any -> any any (
+    msg:"MIRAI GRE flood attack";
+    threshold:type both, track by_src, count 500, seconds 10;
+    classtype:attempted-dos;
+    sid:1000017;
+    rev:1;
+)
+
+# ============================================
+# 5. CREDENTIAL STUFFING DETECTION
+# ============================================
+
+# Rule 1018: Common default credentials in cleartext
+alert tcp any any -> any 23 (
+    msg:"MIRAI Default credentials attempted - admin:admin";
+    flow:to_server,established;
+    content:"admin";
+    nocase;
+    offset:0;
+    depth:100;
+    content:"admin";
+    nocase;
+    distance:0;
+    within:100;
+    classtype:attempted-admin;
+    sid:1000018;
+    rev:1;
+)
+
+# Rule 1019: Rapid credential testing
+alert tcp any any -> any 23 (
+    msg:"MIRAI Rapid credential stuffing detected";
+    flow:to_server,established;
+    pcre:"/(?:admin|root|user|guest).*(?:password|admin|1234)/i";
+    threshold:type both, track by_src, count 10, seconds 60;
+    classtype:attempted-admin;
+    sid:1000019;
+    rev:1;
+)
+
+# ============================================
+# 6. BINARY PROTOCOL DETECTION
+# ============================================
+
+# Rule 1020: Binary protocol communication (non-HTTP)
+alert tcp any any -> any any (
+    msg:"MIRAI Binary protocol communication";
+    flow:established,to_server;
+    content:!"|0d 0a|";
+    content:!"|20|";
+    dsize:<100;
+    threshold:type both, track by_src, count 10, seconds 300;
+    classtype:misc-activity;
+    sid:1000020;
+    rev:1;
+)
+
+# Rule 1021: Length-prefixed binary messages
+alert tcp any any -> any any (
+    msg:"MIRAI Length-prefixed binary protocol";
+    flow:established;
+    content:"|00 00|";
+    offset:0;
+    depth:2;
+    byte_test:2,>,0,2;
+    byte_test:2,<,1024,2;
+    classtype:trojan-activity;
+    sid:1000021;
+    rev:1;
+)
+
+# ============================================
+# 7. LOADER ACTIVITY DETECTION
+# ============================================
+
+# Rule 1022: Multi-IP loader activity
+alert tcp any any -> any any (
+    msg:"MIRAI Multi-IP loader detected";
+    flow:to_server,established;
+    threshold:type both, track by_dst, count 100, seconds 60;
+    classtype:trojan-activity;
+    sid:1000022;
+    rev:1;
+)
+
+# Rule 1023: Binary download via telnet session
+alert tcp any any -> any 23 (
+    msg:"MIRAI Binary download over telnet";
+    flow:established,from_server;
+    content:"|7F 45 4C 46|";
+    classtype:trojan-activity;
+    sid:1000023;
+    rev:1;
+)
+
+# Rule 1024: wget/curl download commands
+alert tcp any any -> any 23 (
+    msg:"MIRAI wget/curl download command detected";
+    flow:to_server,established;
+    pcre:"/(?:wget|curl|tftp|busybox)\s+(?:http|ftp)/i";
+    classtype:trojan-activity;
+    sid:1000024;
+    rev:1;
+)
+
+# ============================================
+# 8. PROCESS HIDING DETECTION
+# ============================================
+
+# Rule 1025: Process name spoofing indicators
+alert tcp any any -> any any (
+    msg:"MIRAI Process spoofing communication pattern";
+    flow:established;
+    content:"systemd";
+    nocase;
+    content:"kworker";
+    nocase;
+    distance:0;
+    within:100;
+    classtype:trojan-activity;
+    sid:1000025;
+    rev:1;
+)
+
+# ============================================
+# 9. KILLSWITCH DETECTION
+# ============================================
+
+# Rule 1026: Competing bot killing activity
+alert tcp any any -> any any (
+    msg:"MIRAI Competing botnet killer activity";
+    flow:established;
+    content:"kill";
+    nocase;
+    content:"botnet";
+    nocase;
+    distance:0;
+    within:50;
+    classtype:trojan-activity;
+    sid:1000026;
+    rev:1;
+)
+
+# ============================================
+# 10. AI-GENERATED TRAFFIC PATTERNS
+# ============================================
+
+# Rule 1027: AI credential generation API calls
+alert tcp any any -> any 443 (
+    msg:"MIRAI AI credential generation API access";
+    flow:to_server,established;
+    content:"openrouter.ai";
+    http_header;
+    classtype:policy-violation;
+    sid:1000027;
+    rev:1;
+)
+
+# Rule 1028: LLM API usage for attack planning
+alert tcp any any -> any 443 (
+    msg:"MIRAI LLM API usage detected";
+    flow:to_server,established;
+    pcre:"/(?:openai|anthropic|claude|llama)/i";
+    http_header;
+    threshold:type both, track by_src, count 10, seconds 60;
+    classtype:policy-violation;
+    sid:1000028;
+    rev:1;
+)
+
+# ============================================
+# 11. DISTRIBUTED LOADER DETECTION
+# ============================================
+
+# Rule 1029: Load balancer health check patterns
+alert tcp any any -> any 8000 (
+    msg:"MIRAI Distributor health check";
+    flow:to_server,established;
+    content:"GET /health";
+    http_method;
+    classtype:misc-activity;
+    sid:1000029;
+    rev:1;
+)
+
+# Rule 1030: Kubernetes service discovery
+alert tcp any any -> any any (
+    msg:"MIRAI Kubernetes service discovery activity";
+    flow:to_server,established;
+    content:"app=loader";
+    nocase;
+    classtype:misc-activity;
+    sid:1000030;
+    rev:1;
+)
+
+# ============================================
+# 12. ANOMALOUS BEHAVIOR DETECTION
+# ============================================
+
+# Rule 1031: Unusual outbound connections from IoT devices
+alert tcp $HOME_NET any -> $EXTERNAL_NET ![80,443,53,123] (
+    msg:"MIRAI Unusual outbound connection from IoT subnet";
+    flow:to_server,established;
+    threshold:type both, track by_src, count 10, seconds 300;
+    classtype:unusual-client-port-connection;
+    sid:1000031;
+    rev:1;
+)
+
+# Rule 1032: High connection rate from single source
+alert tcp any any -> any any (
+    msg:"MIRAI Abnormal connection rate detected";
+    flags:S;
+    threshold:type both, track by_src, count 500, seconds 60;
+    classtype:misc-attack;
+    sid:1000032;
+    rev:1;
+)
+
+# ============================================
+# RULE SET SUMMARY
+# ============================================
+#
+# Total Rules: 32
+# Categories:
+#   - Telnet Brute Force: 4 rules (1001-1004)
+#   - C&C Communication: 4 rules (1005-1008)
+#   - Network Scanning: 4 rules (1009-1012)
+#   - DDoS Attacks: 5 rules (1013-1017)
+#   - Credential Stuffing: 2 rules (1018-1019)
+#   - Binary Protocol: 2 rules (1020-1021)
+#   - Loader Activity: 3 rules (1022-1024)
+#   - Process Hiding: 1 rule (1025)
+#   - Killswitch: 1 rule (1026)
+#   - AI-Generated: 2 rules (1027-1028)
+#   - Distributed Loader: 2 rules (1029-1030)
+#   - Anomalous Behavior: 2 rules (1031-1032)
+#
+# Severity Levels:
+#   - Priority 1 (Critical): Rules with sid 1000006, 1000008, 1000012
+#   - Priority 2 (High): Rules with sid 1000001-1000024
+#   - Priority 3 (Medium): Rules with sid 1000025-1000032
+#
+# Usage:
+#   snort -A console -c /etc/snort/snort.conf -i eth0
+#   suricata -c /etc/suricata/suricata.yaml -i eth0
+#
+# Testing:
+#   snort -T -c /etc/snort/snort.conf
+#   suricata -T -c /etc/suricata/suricata.yaml

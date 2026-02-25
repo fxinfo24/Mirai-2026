@@ -11,3 +11,10 @@ scripts/
 # macOS
 .DS_Store
 **/.DS_Store
+
+# Environment files (contains secrets - never commit)
+.env
+**/.env
+!**/.env.example
+.env.local
+**/.env.local

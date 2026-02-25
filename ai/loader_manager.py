@@ -28,6 +28,7 @@ import threading
 import json
 import subprocess
 import queue
+import ipaddress
 from typing import List, Dict, Optional
 from dataclasses import dataclass
 from enum import Enum
@@ -115,6 +116,11 @@ class LoaderManager:
     def add_loader_node(self, host: str, port: int, source_ip: str,
                        max_connections: int = 12000):
         """Add a loader node to the pool"""
+        # SECURITY: Validate source IP before adding
+        if not self._validate_ip_address(source_ip):
+            logger.error(f"Cannot add loader node: invalid source IP: {source_ip}")
+            return False
+        
         node = LoaderNode(
             host=host,
             port=port,
@@ -124,6 +130,7 @@ class LoaderManager:
         self.loader_nodes.append(node)
         logger.info(f"Added loader node: {source_ip} -> {host}:{port} "
                    f"(max_conn={max_connections})")
+        return True
     
     def _select_loader_node(self) -> Optional[LoaderNode]:
         """Select best loader node based on strategy"""
@@ -156,6 +163,15 @@ class LoaderManager:
         
         return healthy_nodes[0]
     
+    def _validate_ip_address(self, ip_str: str) -> bool:
+        """Validate IP address format to prevent command injection"""
+        try:
+            ipaddress.ip_address(ip_str)
+            return True
+        except ValueError:
+            logger.error(f"Invalid IP address format: {ip_str}")
+            return False
+    
     def _invoke_loader(self, node: LoaderNode, target: Dict) -> bool:
         """
         Invoke the loader binary for a single target
@@ -163,6 +179,20 @@ class LoaderManager:
         Original loader protocol: ip:port user:pass (via STDIN)
         """
         try:
+            # SECURITY: Validate source IP to prevent command injection
+            if not self._validate_ip_address(node.source_ip):
+                logger.error(f"Invalid source IP address: {node.source_ip}")
+                node.failed_loads += 1
+                self.stats['total_failed'] += 1
+                return False
+            
+            # SECURITY: Validate target IP
+            if not self._validate_ip_address(target['ip']):
+                logger.error(f"Invalid target IP address: {target['ip']}")
+                node.failed_loads += 1
+                self.stats['total_failed'] += 1
+                return False
+            
             # Format: ip:port user:pass
             input_line = f"{target['ip']}:{target['port']} " \
                         f"{target['username']}:{target['password']}\n"

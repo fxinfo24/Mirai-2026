@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, Button, Input, useToast } from '@/components/ui';
-import type { Bot } from '@/lib/botManagement';
+import type { BotWithHealth } from '@/lib/botManagement';
 import { BotGroup, createGroup, addBotToGroup, removeBotFromGroup } from '@/lib/botManagement.extended';
 
 interface BotGroupingProps {
-  bots: Bot[];
+  bots: BotWithHealth[];
   groups: BotGroup[];
   onGroupUpdate: () => void;
 }

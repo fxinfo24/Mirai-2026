@@ -10,7 +10,7 @@ services:
     environment:
       POSTGRES_DB: mirai
       POSTGRES_USER: mirai
-      POSTGRES_PASSWORD: research_password_change_me
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-research_default_dev_only}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -103,7 +103,7 @@ services:
       dockerfile: docker/Dockerfile.ai
     environment:
       REDIS_URL: redis://redis:6379
-      DATABASE_URL: postgresql://mirai:research_password_change_me@postgres:5432/mirai
+      DATABASE_URL: postgresql://mirai:${POSTGRES_PASSWORD:-research_default_dev_only}@postgres:5432/mirai
     volumes:
       - ./ai:/app/ai
       - ai_models:/models
@@ -121,7 +121,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.cnc
     environment:
-      DATABASE_URL: postgresql://mirai:research_password_change_me@postgres:5432/mirai
+      DATABASE_URL: postgresql://mirai:${POSTGRES_PASSWORD:-research_default_dev_only}@postgres:5432/mirai
       REDIS_URL: redis://redis:6379
     ports:
       - "23:23"
