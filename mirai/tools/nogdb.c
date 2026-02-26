@@ -8,7 +8,25 @@
 #include <sys/procfs.h>
 #include <fcntl.h>
 
+/* ── Research Mode Guard ─────────────────────────────────────────────────────
+ * When compiled with -DRESEARCH_MODE, this tool is a no-op.
+ * This allows researchers to attach debuggers to bot processes freely
+ * without the ELF header corruption that prevents analysis.
+ *
+ * In non-research builds, original behaviour is preserved unchanged.
+ *
+ * Compile for research: gcc -DRESEARCH_MODE -o nogdb nogdb.c
+ * Compile original:     gcc -o nogdb nogdb.c
+ */
+
 int main(int argc, char** argv) {
+#ifdef RESEARCH_MODE
+    /* RESEARCH_MODE: ELF corruption disabled to allow debugger attachment.
+     * Remove -DRESEARCH_MODE to restore original anti-debug behaviour. */
+    (void)argc; (void)argv;
+    fprintf(stderr, "[nogdb] RESEARCH_MODE: ELF corruption disabled. Use without -DRESEARCH_MODE for original behaviour.\n");
+    return 0;
+#else
     int f;
     static Elf32_Ehdr* header;
 
@@ -53,4 +71,5 @@ int main(int argc, char** argv) {
     munmap(header, 0);
     printf("You should no more be able to run \"%s\" inside GDB\n", argv[1]);
     return 0;
+#endif /* !RESEARCH_MODE */
 }

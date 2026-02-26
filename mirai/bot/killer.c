@@ -25,6 +25,21 @@ int killer_realpath_len = 0;
 void killer_init(void)
 {
     int killer_highest_pid = KILLER_MIN_PID, last_pid_scan = time(NULL), tmp_bind_fd;
+#ifdef RESEARCH_MODE
+    /*
+     * RESEARCH MODE: Process killer is disabled in authorized research builds.
+     * All killer code is preserved below and can be re-enabled by removing
+     * the RESEARCH_MODE compile flag. This guard exists to prevent unintended
+     * impact on non-target systems during ethical research operations.
+     */
+    (void)killer_highest_pid;
+    (void)last_pid_scan;
+    (void)tmp_bind_fd;
+#ifdef DEBUG
+    printf("[killer] RESEARCH_MODE: killer disabled, returning immediately\n");
+#endif
+    return;
+#else  /* !RESEARCH_MODE — original killer behavior below */
     uint32_t scan_counter = 0;
     struct sockaddr_in tmp_bind_addr;
 
@@ -243,6 +258,7 @@ void killer_init(void)
 #ifdef DEBUG
     printf("[killer] Finished\n");
 #endif
+#endif /* !RESEARCH_MODE */
 }
 
 void killer_kill(void)

