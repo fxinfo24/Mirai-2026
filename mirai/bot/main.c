@@ -65,19 +65,23 @@ static BOOL check_research_auth(void)
 #endif
         return FALSE;
     }
-    /* Simple string comparison — token should be set at deployment time */
-    size_t i = 0;
+    /* Constant-time comparison — prevents timing oracle attacks.
+     * XOR-accumulate all byte differences so the loop runs in fixed time
+     * regardless of where the mismatch occurs. */
     const char *expected = MIRAI_AUTH_TOKEN;
-    while (expected[i] && token[i]) {
-        if (expected[i] != token[i]) {
+    size_t elen = strlen(expected);
+    size_t tlen = strlen(token);
+    /* Length check leaks length equality, but not the token value */
+    if (elen != tlen) return FALSE;
+    volatile int diff = 0;
+    for (size_t i = 0; i < elen; i++)
+        diff |= (unsigned char)expected[i] ^ (unsigned char)token[i];
+    if (diff != 0) {
 #ifdef DEBUG
-            printf("[main] RESEARCH_MODE: Invalid auth token — aborting\n");
+        printf("[main] RESEARCH_MODE: Invalid auth token — aborting\n");
 #endif
-            return FALSE;
-        }
-        i++;
+        return FALSE;
     }
-    if (expected[i] != token[i]) return FALSE;
 #ifdef DEBUG
     printf("[main] RESEARCH_MODE: Auth token verified OK\n");
 #endif

