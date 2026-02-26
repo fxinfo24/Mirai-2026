@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mirai-cnc
+  namespace: mirai-2026
+  labels:
+    app: mirai-cnc
+    component: cnc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mirai-cnc
+  template:
+    metadata:
+      labels:
+        app: mirai-cnc
+        component: cnc
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: cnc
+        image: mirai-2026/cnc:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 23
+          name: bot-port
+          protocol: TCP
+        - containerPort: 101
+          name: admin-port
+          protocol: TCP
+        - containerPort: 8080
+          name: api-port
+          protocol: TCP
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        env:
+        - name: DB_HOST
+          value: postgres
+        - name: DB_NAME
+          value: mirai
+        - name: DB_USER
+          value: mirai
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mirai-secrets
+              key: db-password
+        - name: BOT_CHALLENGE_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: mirai-secrets
+              key: bot-challenge-secret
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: mirai-secrets
+              key: bot-auth-token
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      volumes: []
+      restartPolicy: Always

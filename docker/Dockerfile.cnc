@@ -59,7 +59,8 @@ WORKDIR /app
 COPY --from=builder /build/cnc_server /app/cnc_server
 
 # Copy database initialization script (if present in the repo)
-COPY mirai/cnc/init-db.sql /app/init-db.sql 2>/dev/null || echo "No init-db.sql found"
+# Note: init-db.sql is optional and may not exist
+RUN if [ -f mirai/cnc/init-db.sql ]; then cp mirai/cnc/init-db.sql /app/init-db.sql; fi
 
 # Set executable permissions
 RUN chmod +x /app/cnc_server

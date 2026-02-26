@@ -6,8 +6,10 @@
  */
 
 import React, { useCallback, useMemo } from 'react';
-import { FixedSizeList, ListChildComponentProps } from 'react-window';
-import AutoSizer from 'react-virtualized-auto-sizer';
+import { List as _List, type RowComponentProps } from 'react-window';
+// Cast to any to avoid react-window v2 type conflicts with TS generics
+const List = _List as any; // eslint-disable-line
+import { AutoSizer } from 'react-virtualized-auto-sizer';
 import type { BotWithHealth } from '@/lib/botManagement';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -44,11 +46,11 @@ interface RowData {
   onSelectBot: (id: string, checked: boolean) => void;
 }
 
-const BotRow = React.memo(function BotRow({
-  index,
-  style,
-  data,
-}: ListChildComponentProps<RowData>) {
+const BotRow = React.memo(function BotRow(
+  props: RowComponentProps<RowData>
+): React.ReactElement | null {
+  const { index, style } = props;
+  const data = (props as any).rowProps as RowData;
   const { bots, selectedBots, onSelectBot } = data;
   const bot = bots[index];
   const isSelected = selectedBots.includes(bot.id);
@@ -182,20 +184,19 @@ export function VirtualBotList({
           No bots connected
         </div>
       ) : (
-        <AutoSizer disableHeight>
-          {({ width }) => (
-            <FixedSizeList
+        <AutoSizer
+          renderProp={({ width }) => (
+            <List
               height={listHeight}
-              width={width}
-              itemCount={bots.length}
-              itemSize={rowHeight}
-              itemData={itemData}
+              width={width || 0}
+              rowCount={bots.length}
+              rowHeight={rowHeight}
+              rowComponent={BotRow as any}
+              rowProps={itemData}
               overscanCount={5}
-            >
-              {BotRow}
-            </FixedSizeList>
+            />
           )}
-        </AutoSizer>
+        />
       )}
     </div>
   );

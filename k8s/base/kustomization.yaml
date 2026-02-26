@@ -5,9 +5,11 @@ namespace: mirai-2026
 
 resources:
   - namespace.yaml
+  - mirai-secrets.yaml
   - configmap.yaml
   - bot-deployment.yaml
   - ai-service-deployment.yaml
+  - cnc-deployment.yaml
   - postgres-statefulset.yaml
   - networkpolicy.yaml
   - monitoring.yaml

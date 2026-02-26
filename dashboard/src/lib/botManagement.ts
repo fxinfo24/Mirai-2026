@@ -28,6 +28,9 @@ export interface BotWithHealth {
   tags: BotTag[];
   health: BotHealth;
   commandHistory?: CommandHistoryItem[];
+  // Optional fields used by VirtualBotList for display
+  arch?: string;
+  lastSeen?: string;
 }
 
 export interface CommandHistoryItem {

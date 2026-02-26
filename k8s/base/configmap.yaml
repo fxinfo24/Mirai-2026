@@ -8,6 +8,11 @@ data:
   SCANNER_MAX_CONNECTIONS: "256"
   SCANNER_SCAN_RATE: "1000"
   AI_API_ENDPOINT: "http://ai-service:5000"
+  # Phase A-D Ethical Research Controls
+  SCANNER_AUTHORIZED_CIDR: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+  SCANNER_RATE_LIMIT: "100"
+  LOADER_REQUIRE_AUTH: "1"
+  LOADER_AUDIT_FILE: "/tmp/loader_audit.log"
   
   bot.json: |
     {

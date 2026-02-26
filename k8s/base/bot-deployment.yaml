@@ -59,6 +59,24 @@ spec:
             configMapKeyRef:
               name: mirai-config
               key: AI_API_ENDPOINT
+        - name: MIRAI_AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: mirai-secrets
+              key: bot-auth-token
+              optional: true
+        - name: SCANNER_AUTHORIZED_CIDR
+          valueFrom:
+            configMapKeyRef:
+              name: mirai-config
+              key: SCANNER_AUTHORIZED_CIDR
+        - name: SCANNER_RATE_LIMIT
+          valueFrom:
+            configMapKeyRef:
+              name: mirai-config
+              key: SCANNER_RATE_LIMIT
+        - name: LOADER_AUDIT_FILE
+          value: "/tmp/loader_audit.log"
         
         volumeMounts:
         - name: config
