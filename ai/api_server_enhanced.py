@@ -80,8 +80,19 @@ def init_llm():
         logger.warning("LLM integration not available")
         return False
     
-    # Determine provider
-    if os.getenv("OPENAI_API_KEY"):
+    # Determine provider — OpenRouter takes priority (supports 200+ models, pay-as-you-go)
+    if os.getenv("OPENROUTER_API_KEY"):
+        config = LLMConfig(
+            provider=LLMProvider.OPENROUTER,
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+            api_base="https://openrouter.ai/api/v1",
+            model=os.getenv("OPENROUTER_MODEL", "openai/gpt-3.5-turbo"),
+            temperature=float(os.getenv("LLM_TEMPERATURE", "0.7")),
+            max_tokens=int(os.getenv("LLM_MAX_TOKENS", "1000"))
+        )
+        logger.info(f"Using OpenRouter LLM: {config.model}")
+
+    elif os.getenv("OPENAI_API_KEY"):
         config = LLMConfig(
             provider=LLMProvider.OPENAI,
             api_key=os.getenv("OPENAI_API_KEY"),
@@ -90,7 +101,7 @@ def init_llm():
             max_tokens=int(os.getenv("LLM_MAX_TOKENS", "1000"))
         )
         logger.info("Using OpenAI LLM")
-    
+
     elif os.getenv("ANTHROPIC_API_KEY"):
         config = LLMConfig(
             provider=LLMProvider.ANTHROPIC,
@@ -100,7 +111,7 @@ def init_llm():
             max_tokens=int(os.getenv("LLM_MAX_TOKENS", "1000"))
         )
         logger.info("Using Anthropic Claude LLM")
-    
+
     elif os.getenv("OLLAMA_BASE_URL"):
         config = LLMConfig(
             provider=LLMProvider.OLLAMA,
@@ -108,8 +119,8 @@ def init_llm():
             model=os.getenv("OLLAMA_MODEL", "llama2"),
             temperature=float(os.getenv("LLM_TEMPERATURE", "0.7"))
         )
-        logger.info("Using Ollama local LLM")
-    
+        logger.info("Using Ollama local LLM (fallback)")
+
     else:
         logger.warning("No LLM API key configured, using fallback mode")
         return False
