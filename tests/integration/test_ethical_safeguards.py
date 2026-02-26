@@ -540,12 +540,22 @@ class TestBadbotSafeguards:
 # Running it last ensures all other live tests (which need valid logins) complete
 # first. After this test, restart the CNC to clear the lockout before re-running:
 #   docker-compose restart cnc
+#
+# Session 9 addition: test_rate_limit_survives_restart verifies that Redis
+# persistence is working — the lockout must survive a CNC process restart.
+# This test is only meaningful when run against a Docker stack where the CNC
+# can be restarted without losing Redis state.
 
 @pytest.mark.skipif(not HAS_REQUESTS, reason="requests not installed")
 class TestCNCRateLimitLockout:
     """
     Verifies that 5 consecutive bad-password attempts trigger HTTP 429.
     MUST be the last test class — it locks out the test runner IP for 5 minutes.
+
+    test_rate_limit_lockout_after_5_failures — core lockout test (always runs).
+    test_rate_limit_survives_restart          — Redis persistence test; requires
+        DOCKER_CNC_SERVICE env var to be set (e.g. "cnc") and docker-compose on PATH.
+        Skipped automatically when not in a Docker environment.
     """
 
     def test_rate_limit_lockout_after_5_failures(self):
@@ -567,6 +577,77 @@ class TestCNCRateLimitLockout:
             f"Expected 429 after 5 failed login attempts, "
             f"last status was {last_status}. "
             "Rate-limit lockout may not be wired into the REST login handler."
+        )
+
+    def test_rate_limit_survives_restart(self):
+        """
+        Redis persistence: after triggering a lockout, restart the CNC container
+        and verify the IP is still locked out (proving state was stored in Redis,
+        not just in-memory).
+
+        Requires:
+          - DOCKER_CNC_SERVICE env var set to the compose service name (default "cnc")
+          - docker-compose available on PATH
+          - CNC already locked out (run after test_rate_limit_lockout_after_5_failures)
+
+        Skipped when DOCKER_CNC_SERVICE is not set or docker-compose is unavailable.
+        """
+        import shutil
+
+        service = os.environ.get("DOCKER_CNC_SERVICE", "")
+        if not service:
+            pytest.skip("DOCKER_CNC_SERVICE not set — skipping Redis persistence check")
+
+        if not cnc_reachable():
+            pytest.skip(f"CNC not running at {CNC_API_URL}")
+
+        compose_bin = shutil.which("docker-compose") or shutil.which("docker")
+        if compose_bin is None:
+            pytest.skip("docker-compose / docker not found on PATH")
+
+        # First confirm we are currently locked out
+        r = requests.post(
+            f"{CNC_API_URL}/api/auth/login",
+            json={"username": "operator", "password": "WRONG-persistence-check"},
+            timeout=5,
+        )
+        if r.status_code != 429:
+            pytest.skip("IP not currently locked out — run after lockout test")
+
+        # Restart the CNC container (clears in-memory state, keeps Redis state)
+        if compose_bin.endswith("docker"):
+            restart_cmd = [compose_bin, "compose", "restart", service]
+        else:
+            restart_cmd = [compose_bin, "restart", service]
+
+        result = subprocess.run(restart_cmd, capture_output=True, text=True, timeout=30)
+        assert result.returncode == 0, (
+            f"docker-compose restart failed: {result.stderr}"
+        )
+
+        # Wait for CNC to come back up
+        deadline = time.time() + 20
+        while time.time() < deadline:
+            try:
+                health = requests.get(f"{CNC_API_URL}/api/health", timeout=2)
+                if health.status_code == 200:
+                    break
+            except Exception:
+                pass
+            time.sleep(1)
+        else:
+            pytest.fail("CNC did not come back up within 20 s after restart")
+
+        # Verify lockout persists (Redis kept the state across the restart)
+        r2 = requests.post(
+            f"{CNC_API_URL}/api/auth/login",
+            json={"username": "operator", "password": "WRONG-after-restart"},
+            timeout=5,
+        )
+        assert r2.status_code == 429, (
+            f"Expected 429 after CNC restart (Redis persistence), "
+            f"got {r2.status_code}. "
+            "Rate-limit state was not persisted to Redis — check REDIS_URL config."
         )
 
 

@@ -140,6 +140,81 @@ jobs:
           cd mirai/cnc
           go vet ./...
 
+  # ── Integration Tests (CNC ethical safeguards) ───────────────────────────────
+  integration-tests:
+    name: Integration Tests (CNC)
+    runs-on: ubuntu-22.04
+    needs: [ go-cnc ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      - name: Download Go dependencies
+        run: cd mirai/cnc && go mod download
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python test dependencies
+        run: pip install pytest requests
+
+      - name: Start CNC server (no Docker)
+        run: |
+          cd mirai/cnc
+          go run cnc_modern.go &
+          echo "CNC_PID=$!" >> $GITHUB_ENV
+
+      - name: Wait for CNC health endpoint
+        run: |
+          curl --retry 15 --retry-delay 1 --retry-connrefused \
+               -sf http://localhost:8080/api/health
+
+      - name: Run integration tests (skip lockout — poisons runner IP)
+        env:
+          CNC_API_URL: http://localhost:8080
+        run: |
+          python3 -m pytest tests/integration/test_ethical_safeguards.py \
+            -v --tb=short \
+            -k "not TestCNCRateLimitLockout"
+
+      - name: Stop CNC server
+        if: always()
+        run: kill $CNC_PID 2>/dev/null || true
+
+  # ── Jest Unit Tests ───────────────────────────────────────────────────────────
+  jest-tests:
+    name: Jest Unit Tests (Dashboard)
+    runs-on: ubuntu-22.04
+
+    defaults:
+      run:
+        working-directory: dashboard
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: dashboard/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Jest tests
+        run: npm test -- --no-coverage --passWithNoTests --forceExit
+
   # ── Docker Images ────────────────────────────────────────────────────────────
   docker:
     name: Docker Build

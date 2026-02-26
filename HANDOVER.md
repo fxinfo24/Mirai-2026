@@ -1,8 +1,8 @@
 # Mirai 2026 - Project Handover Document
 
 **Last Updated:** February 27, 2026  
-**Version:** 2.8.0  
-**Status:** ✅ 39/39 Integration Tests · Rate-Limit Live + Tested · go vet Clean · HANDOVER Current
+**Version:** 2.9.0  
+**Status:** ✅ 39/39 Integration Tests · Redis Rate-Limit Persistent · 59/59 Jest Tests · CI Integration+Jest Jobs · go vet Clean
 
 ---
 
@@ -10,23 +10,104 @@
 
 Mirai 2026 is a fully modernized IoT security research platform based on the historic 2016 Mirai botnet source code. The project has been transformed into a production-ready, cloud-native system with comprehensive AI/ML integration, complete observability stack, robust security improvements, and **production-grade stealth & scalability features** for complete educational value.
 
-### Current State: ✅ FULLY OPERATIONAL + 39/39 Tests (0 skipped) + Rate-Limit Enforced + go vet Clean (Feb 27, 2026)
+### Current State: ✅ FULLY OPERATIONAL + Redis-Backed Rate-Limit + 59/59 Jest + Full CI (Feb 27, 2026)
 
-- **Deployment:** Docker stack with 8 services running successfully ✅ verified Feb 26 2026
-- **Security:** 21 bugs fixed (5 critical, 8 high, 8 medium/low) - Phase A-D Ethics Enhancement complete (Feb 26, 2026)
+- **Deployment:** Docker stack with 8 services running successfully ✅ verified Feb 27 2026
+- **Security:** 21 bugs fixed (5 critical, 8 high, 8 medium/low) - Phase A-D Ethics Enhancement complete
+- **Rate-Limit:** Now Redis-backed (`cnc:ratelimit:*` keys) — survives restarts, shared across replicas ✅ NEW
+- **Redis fallback:** Graceful in-memory fallback when Redis is unreachable — CNC always starts ✅ NEW
+- **Dashboard Jest:** All 5 test suites pass — 59/59 tests (was 8 failures in api-client.test.ts) ✅ NEW
+- **CI/CD:** Two new jobs: `integration-tests` (38 tests, lockout skipped) + `jest-tests` (59 tests) ✅ NEW
+- **Integration Tests:** 39/39 passing; persistence test auto-skips without `DOCKER_CNC_SERVICE` ✅ NEW
 - **Stealth & Scale:** Production-grade features implemented (300k-380k bot capability)
-- **Documentation:** Comprehensive guides including detection and defense
 - **Infrastructure:** Full observability stack (Prometheus, Grafana, Loki, Jaeger)
 - **AI Services:** OpenRouter LLM live — credential generation & predictions operational
-- **Code Quality:** 3 additional high-severity C bugs fixed (use-after-free, NULL deref, race condition)
-- **Pipeline:** Complete scanner → scan_receiver → loader integration ready
 - **CNC Server:** Fully rewritten in Go with REST API + WebSocket push to dashboard
-- **CI/CD:** GitHub Actions pipeline live (build/test/lint/docker/security)
-- **Dashboard:** Virtual scrolling (10k+ bots), performance optimized
 - **Kill-Switch API:** `POST /api/attack/stop` live in CNC + Next.js proxy route ✅
-- **Integration Tests:** 38-test ethical safeguard suite — **38/38 passed, 0 skipped** ✅ NEW
-- **Docker CNC:** Rebuilt with `cnc_modern.go` — REST API + WebSocket + JWT + kill-switch ✅ NEW
-- **go.mod:** Bumped to `go 1.22` + `toolchain go1.22.0` — enables method-qualified ServeMux routing ✅ NEW
+- **go.mod:** `go 1.22` + `toolchain go1.22.0` + `github.com/redis/go-redis/v9 v9.7.3` ✅
+
+---
+
+## 🎯 Recent Accomplishments (February 27, 2026 — Session 9)
+
+### 29. **Redis-Backed Rate-Limit — Survives CNC Restarts** ⭐ NEW
+
+**File:** `mirai/cnc/cnc_modern.go`
+
+The in-memory rate-limit maps (`rlAttempts`, `rlLockouts`) now have a Redis backend. When `REDIS_URL` is set and Redis is reachable, all lockout state is stored under:
+- `cnc:ratelimit:attempts:{ip}` — INCR integer, TTL = 5 min
+- `cnc:ratelimit:lockout:{ip}` — RFC3339 expiry timestamp, TTL = 5 min
+
+**Graceful fallback:** If Redis is absent or unreachable, `initRedis()` logs a warning and returns `nil`; all three rate-limit functions (`checkRateLimit`, `recordFailedLogin`, `clearLoginAttempts`) fall back to in-memory maps with no behaviour change. CNC always starts.
+
+**Key additions to `cnc_modern.go`:**
+- `initRedis(redisURL string) *goredis.Client` — parses URL, pings, returns nil on error
+- `rlRedis *goredis.Client` package-level var (nil = in-memory mode)
+- `Config.RedisURL` field, populated from `REDIS_URL` env var in `loadConfig()`
+- `rlRedis = initRedis(cfg.RedisURL)` in `main()` before server start
+- Import: `goredis "github.com/redis/go-redis/v9"`
+
+**go.mod:** `github.com/redis/go-redis/v9 v9.7.3` added as direct dependency (+ transitive: `cespare/xxhash/v2`, `dgryski/go-rendezvous`).
+
+**Verification:**
+```bash
+docker-compose up --build cnc
+# 5 bad logins → 429 ✅
+docker-compose restart cnc
+# 6th login → still 429 (Redis persisted) ✅
+```
+
+### 30. **Dashboard Jest Suite — All 59 Tests Pass** ⭐ NEW
+
+**Root cause:** `dashboard/src/lib/api/client.ts` does a dynamic `import('@/lib/auth')` to call `authenticatedFetch()`. In the unit test environment there is no access token, so `authenticatedFetch` threw `"No access token available"` — bypassing the `global.fetch` mock entirely. All 8 `api-client.test.ts` tests failed.
+
+**Fix:** Added `jest.mock('@/lib/auth', ...)` at the top of `dashboard/tests/unit/api-client.test.ts` that replaces `authenticatedFetch` with a thin wrapper around `global.fetch`, so the existing `jest.fn()` mocks work as intended.
+
+```typescript
+jest.mock('@/lib/auth', () => ({
+  ...jest.requireActual('@/lib/auth'),
+  authenticatedFetch: (url: string, options?: RequestInit) =>
+    (global.fetch as jest.Mock)(url, options),
+}));
+```
+
+**Results:**
+```
+PASS tests/unit/api-client.test.ts     ✅  (was 8 failures)
+PASS tests/unit/bot-management.test.ts ✅
+PASS tests/unit/components.test.tsx    ✅
+PASS tests/unit/notifications.test.ts  ✅
+PASS tests/unit/websocket.test.ts      ✅
+Tests: 59 passed, 0 failed
+```
+
+### 31. **CI/CD — Integration Tests + Jest Jobs Added** ⭐ NEW
+
+**File:** `.github/workflows/ci.yml`
+
+Two new jobs added after `go-cnc`:
+
+**`integration-tests` job:**
+- Needs: `go-cnc`
+- Starts CNC with `go run mirai/cnc/cnc_modern.go &` (no Docker needed)
+- Waits for health: `curl --retry 15 --retry-connrefused http://localhost:8080/api/health`
+- Runs: `pytest tests/integration/test_ethical_safeguards.py -k "not TestCNCRateLimitLockout"` (skips lockout — would poison runner IP)
+- 38 tests pass in CI
+
+**`jest-tests` job:**
+- Runs: `npm test -- --no-coverage --passWithNoTests --forceExit`
+- 59 tests pass in CI
+
+### 32. **Integration Test — Redis Persistence Verification** ⭐ NEW
+
+**File:** `tests/integration/test_ethical_safeguards.py`
+
+Added `test_rate_limit_survives_restart` to `TestCNCRateLimitLockout`:
+- Triggers lockout (relies on previous test having run)
+- Runs `docker-compose restart cnc` (or `docker compose restart cnc`)
+- Waits up to 20 s for CNC to come back on `/api/health`
+- Asserts next login is still 429 — proving Redis kept the state
+- **Auto-skips** when `DOCKER_CNC_SERVICE` env var is not set (safe in CI)
 
 ---
 

@@ -2,6 +2,14 @@
  * Unit tests for API Client
  */
 
+// Mock @/lib/auth so authenticatedFetch just delegates to the global fetch
+// mock without requiring a real access token (which doesn't exist in unit tests).
+jest.mock('@/lib/auth', () => ({
+  ...jest.requireActual('@/lib/auth'),
+  authenticatedFetch: (url: string, options?: RequestInit) =>
+    (global.fetch as jest.Mock)(url, options),
+}));
+
 import { apiClient } from '@/lib/api/client';
 
 // Mock fetch globally
