@@ -210,6 +210,53 @@ sudo dnf install -y \
     libsodium-devel
 ```
 
+### 🔐 Authentication Setup (NEW - Production Ready)
+
+**Setup JWT-based authentication for dashboard:**
+
+```bash
+# 1. Install authentication dependencies
+cd ai
+pip install PyJWT bcrypt psycopg2-binary
+
+# 2. Initialize authentication database
+psql -U mirai -d mirai < ai/auth_schema.sql
+
+# 3. Configure dashboard environment
+cd dashboard
+cp .env.local.example .env.local
+# Edit NEXT_PUBLIC_API_URL if needed (default: http://localhost:8001)
+
+# 4. Start backend with authentication
+cd ai
+python api_server_enhanced.py
+# Should see: "✅ Authentication service registered at /api/auth/*"
+
+# 5. Start dashboard
+cd dashboard
+npm run dev
+# Open http://localhost:3002
+
+# 6. Login with default credentials
+# Username: admin, Password: admin
+# ⚠️ CHANGE DEFAULT PASSWORDS IN PRODUCTION!
+```
+
+**Authentication Features:**
+- ✅ JWT tokens (1h access, 7d refresh)
+- ✅ Role-Based Access Control (admin, operator, viewer)
+- ✅ Secure bcrypt password hashing
+- ✅ Automatic token refresh
+- ✅ Session management
+- ✅ Audit logging
+
+**Default Users:**
+- `admin / admin` - Full system access
+- `operator / operator` - Manage bots & attacks
+- `viewer / viewer` - Read-only access
+
+---
+
 ### 🔬 Ethical Research Quick Start
 
 **⚠️ MANDATORY BEFORE ANY RESEARCH:**

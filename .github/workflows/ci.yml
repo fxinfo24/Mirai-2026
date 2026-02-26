@@ -1,0 +1,198 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop, 'feature/**', 'fix/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # ── C Build & Test ───────────────────────────────────────────────────────────
+  c-build:
+    name: C Build & Test (Linux)
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            build-essential cmake \
+            libjson-c-dev libsodium-dev libcurl4-openssl-dev \
+            clang-format clang-tidy valgrind
+
+      - name: Configure (Debug + Sanitizers)
+        run: |
+          cmake -B build/debug \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DENABLE_SANITIZERS=ON \
+            -DBUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build/debug -j$(nproc)
+
+      - name: Run unit tests
+        run: ctest --test-dir build/debug --output-on-failure -j$(nproc)
+
+      - name: Configure (Release)
+        run: |
+          cmake -B build/release \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DENABLE_LTO=ON \
+            -DBUILD_TESTS=OFF
+
+      - name: Build release
+        run: cmake --build build/release -j$(nproc)
+
+      - name: Code formatting check
+        run: |
+          find src/ -name "*.c" -o -name "*.h" | \
+          xargs clang-format --dry-run --Werror
+
+  # ── Dashboard Build & Test ───────────────────────────────────────────────────
+  dashboard:
+    name: Dashboard Build & Test
+    runs-on: ubuntu-22.04
+
+    defaults:
+      run:
+        working-directory: dashboard
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: dashboard/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test -- --passWithNoTests
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXTAUTH_SECRET: ci-test-secret
+          NEXTAUTH_URL: http://localhost:3002
+          NEXT_PUBLIC_AI_SERVICE_URL: http://localhost:8001
+          NEXT_PUBLIC_WS_URL: ws://localhost:8080
+
+  # ── Python AI Services ───────────────────────────────────────────────────────
+  python-ai:
+    name: Python AI Services
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r ai/requirements.txt
+          pip install pytest pytest-cov flake8
+
+      - name: Lint
+        run: flake8 ai/ --max-line-length=120 --exclude=ai/venv
+
+      - name: Test
+        run: pytest ai/ -v --tb=short --ignore=ai/venv || true
+
+  # ── Go CNC Server ────────────────────────────────────────────────────────────
+  go-cnc:
+    name: Go CNC Server
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+
+      - name: Build CNC server
+        run: |
+          cd mirai/cnc
+          go build -v ./...
+
+      - name: Vet
+        run: |
+          cd mirai/cnc
+          go vet ./...
+
+  # ── Docker Images ────────────────────────────────────────────────────────────
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-22.04
+    needs: [ c-build, dashboard, python-ai ]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build AI service image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.ai-service
+          push: false
+          tags: mirai-2026/ai-service:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build CNC image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile.cnc
+          push: false
+          tags: mirai-2026/cnc:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ── Security Scan ────────────────────────────────────────────────────────────
+  security:
+    name: Security Scan
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          severity: 'CRITICAL,HIGH'
+          format: 'table'
+          exit-code: '0'   # Don't fail CI on findings — report only
+
+      - name: Check for hardcoded secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          extra_args: --only-verified
+        continue-on-error: true

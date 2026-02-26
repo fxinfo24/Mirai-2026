@@ -99,15 +99,7 @@ export default function LoginPage() {
               <div className="space-y-1 text-xs font-mono">
                 <div className="flex justify-between">
                   <span className="text-text-muted">Admin:</span>
-                  <span className="text-accent-primary">admin / admin123</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-text-muted">Operator:</span>
-                  <span className="text-accent-secondary">operator / operator123</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-text-muted">Viewer:</span>
-                  <span className="text-text-primary">viewer / viewer123</span>
+                  <span className="text-accent-primary">admin / admin</span>
                 </div>
               </div>
             </div>

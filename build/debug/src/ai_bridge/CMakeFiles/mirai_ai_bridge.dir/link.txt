@@ -1,0 +1,2 @@
+"/usr/bin/ar" qc libmirai_ai_bridge.a CMakeFiles/mirai_ai_bridge.dir/ai_bridge.c.o
+"/usr/bin/ranlib" libmirai_ai_bridge.a

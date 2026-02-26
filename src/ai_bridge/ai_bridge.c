@@ -323,16 +323,20 @@ static size_t http_write_callback(void *contents, size_t size, size_t nmemb, voi
     size_t realsize = size * nmemb;
     http_response_t *response = (http_response_t *)userp;
     
+    // BUG FIX: Use a temporary pointer so that on realloc failure we don't
+    // lose the original response->data pointer (use-after-free / memory leak).
     char *ptr = realloc(response->data, response->size + realsize + 1);
     if (ptr == NULL) {
-        log_error("Out of memory in HTTP callback");
-        return 0;
+        log_error("Out of memory in HTTP callback (requested %zu bytes)", 
+                  response->size + realsize + 1);
+        // response->data is still valid — caller must free it on error path
+        return 0;  // Signal CURL to abort the transfer
     }
     
     response->data = ptr;
     memcpy(&(response->data[response->size]), contents, realsize);
     response->size += realsize;
-    response->data[response->size] = 0;
+    response->data[response->size] = '\0';
     
     return realsize;
 }

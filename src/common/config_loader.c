@@ -65,6 +65,10 @@ static result_t load_credentials_config(json_object *jobj, credentials_config_t 
     if (json_object_object_get_ex(creds_obj, "list", &cred_list)) {
         size_t count = json_object_array_length(cred_list);
         config->credentials = calloc(count, sizeof(credential_t));
+        if (!config->credentials && count > 0) {
+            log_error("Failed to allocate credentials array");
+            return RESULT_ERROR("Memory allocation failed", 2);
+        }
         config->credential_count = count;
 
         for (size_t i = 0; i < count; i++) {
@@ -163,14 +167,50 @@ result_t config_load(const char *filepath, mirai_config_t *config)
     }
 
     // Get file size
-    fseek(fp, 0, SEEK_END);
+    if (fseek(fp, 0, SEEK_END) != 0) {
+        log_error("Failed to seek to end of file: %s", filepath);
+        fclose(fp);
+        return RESULT_ERROR("Failed to seek in config file", 10);
+    }
+    
     long fsize = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
+    if (fsize == -1) {
+        log_error("Failed to get file size: %s", filepath);
+        fclose(fp);
+        return RESULT_ERROR("Failed to determine config file size", 10);
+    }
+    
+    // Sanity check file size (max 10MB for config)
+    #define MAX_CONFIG_SIZE (10 * 1024 * 1024)
+    if (fsize > MAX_CONFIG_SIZE) {
+        log_error("Config file too large: %ld bytes (max %d)", fsize, MAX_CONFIG_SIZE);
+        fclose(fp);
+        return RESULT_ERROR("Config file exceeds size limit", 10);
+    }
+    
+    if (fseek(fp, 0, SEEK_SET) != 0) {
+        log_error("Failed to seek to start of file: %s", filepath);
+        fclose(fp);
+        return RESULT_ERROR("Failed to seek in config file", 10);
+    }
 
     // Read content
     char *content = malloc(fsize + 1);
-    fread(content, 1, fsize, fp);
-    content[fsize] = 0;
+    if (!content) {
+        log_error("Failed to allocate memory for config file");
+        fclose(fp);
+        return RESULT_ERROR("Memory allocation failed", 10);
+    }
+    
+    size_t bytes_read = fread(content, 1, fsize, fp);
+    if (bytes_read != (size_t)fsize) {
+        log_error("Failed to read config file: expected %ld, got %zu", fsize, bytes_read);
+        free(content);
+        fclose(fp);
+        return RESULT_ERROR("Failed to read config file completely", 10);
+    }
+    
+    content[bytes_read] = 0;
     fclose(fp);
 
     // Parse JSON

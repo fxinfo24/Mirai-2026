@@ -1,0 +1,18 @@
+
+> mirai-2026-dashboard@1.0.0 dev
+> next dev
+
+ ⚠ Port 3000 is in use, trying 3001 instead.
+ ⚠ Port 3001 is in use, trying 3002 instead.
+ ⚠ Port 3002 is in use, trying 3003 instead.
+ ⚠ Port 3003 is in use, trying 3004 instead.
+ ⚠ Port 3004 is in use, trying 3005 instead.
+ ⚠ Port 3005 is in use, trying 3006 instead.
+ ⚠ Port 3006 is in use, trying 3007 instead.
+   ▲ Next.js 14.1.0
+   - Local:        http://localhost:3007
+   - Environments: .env.local, .env
+
+<w> [webpack.cache.PackFileCacheStrategy] Restoring pack from /Volumes/ByteSmith/BuildLab/Mirai-2026/dashboard/.next/cache/webpack/server-development.pack.gz failed: TypeError: Cannot read properties of undefined (reading 'hasStartTime')
+ ✓ Ready in 9.2s
+[?25h

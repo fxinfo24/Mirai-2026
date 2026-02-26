@@ -2,6 +2,8 @@
 
 add_library(mirai_scanner STATIC
     scanner_modern.c
+    syn_scanner.c
+    telnet_state_machine.c
 )
 
 target_include_directories(mirai_scanner PUBLIC
@@ -11,6 +13,7 @@ target_include_directories(mirai_scanner PUBLIC
 
 target_link_libraries(mirai_scanner
     mirai_common
+    mirai_ai_bridge
     pthread
 )
 

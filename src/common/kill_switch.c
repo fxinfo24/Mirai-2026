@@ -6,16 +6,20 @@
 #include "logger.h"
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <curl/curl.h>
 #include <signal.h>
+
+void kill_switch_install_signal_handler(void);  // forward declaration
 
 // Global kill switch for signal handler
 static kill_switch_status_t *g_kill_switch_status = NULL;
 
 /**
  * CURL write callback (discard response body)
+ * Named with ks_ prefix to avoid collision with ai_bridge.c's callback.
  */
-static size_t curl_write_callback(void *contents, size_t size, size_t nmemb, void *userp) {
+static size_t ks_curl_write_callback(void *contents, size_t size, size_t nmemb, void *userp) {
     (void)contents;
     (void)userp;
     return size * nmemb;
@@ -63,7 +67,7 @@ bool kill_switch_check(kill_switch_t *ks) {
     }
 
     curl_easy_setopt(curl, CURLOPT_URL, ks->url);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, ks_curl_write_callback);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10L);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
@@ -229,7 +233,7 @@ static void kill_switch_signal_handler(int signum) {
  */
 void kill_switch_install_signal_handler(void) {
     signal(SIGUSR1, kill_switch_signal_handler);
-    log_info("Manual kill switch installed: kill -USR1 %d", getpid());
+    log_info("Manual kill switch installed: kill -USR1 %d", (int)getpid());
 }
 
 void kill_switch_destroy(kill_switch_t *ks) {

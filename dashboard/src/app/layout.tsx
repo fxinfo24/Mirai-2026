@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono, Orbitron } from 'next/font/google';
 import '../styles/globals.css';
 import { ToastProvider } from '@/components/ui/Toast';
+import { KeyboardShortcutsProvider } from '@/components/shared/KeyboardShortcutsProvider';
+import { CollaborationProvider, CursorTracker } from '@/components/collaboration';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
@@ -21,7 +23,11 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${inter.variable} ${jetbrainsMono.variable} ${orbitron.variable} font-sans antialiased`}>
         <ToastProvider>
-          {children}
+          <CollaborationProvider>
+            <KeyboardShortcutsProvider />
+            <CursorTracker />
+            {children}
+          </CollaborationProvider>
         </ToastProvider>
       </body>
     </html>

@@ -41,6 +41,19 @@ export function useKeyboardShortcuts() {
       description: 'Go to Attacks'
     },
     {
+      key: 'p',
+      ctrl: true,
+      action: () => router.push('/performance'),
+      description: 'Go to Performance'
+    },
+    {
+      key: 'a',
+      ctrl: true,
+      shift: true,
+      action: () => router.push('/admin'),
+      description: 'Go to Admin'
+    },
+    {
       key: ',',
       ctrl: true,
       action: () => router.push('/settings'),

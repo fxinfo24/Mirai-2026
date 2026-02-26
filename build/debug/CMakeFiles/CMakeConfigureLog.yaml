@@ -1,0 +1,2752 @@
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeDetermineSystem.cmake:12 (find_program)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_UNAME"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "uname"
+    candidate_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    searched_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/uname"
+      - "/Users/thesaint/.local/bin/uname"
+      - "/Users/thesaint/.antigravity/antigravity/bin/uname"
+      - "/usr/local/opt/php@8.1/bin/uname"
+      - "/usr/local/opt/php@8.1/sbin/uname"
+      - "/usr/local/bin/uname"
+      - "/opt/homebrew/bin/uname"
+      - "/usr/local/sbin/uname"
+      - "/System/Cryptexes/App/usr/bin/uname"
+    found: "/usr/bin/uname"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeDetermineSystem.cmake:212 (message)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      The system is: Darwin - 24.6.0 - x86_64
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeUnixFindMake.cmake:5 (find_program)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_MAKE_PROGRAM"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "gmake"
+      - "make"
+      - "smake"
+    candidate_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    searched_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/gmake"
+      - "/Users/thesaint/.local/bin/gmake"
+      - "/Users/thesaint/.antigravity/antigravity/bin/gmake"
+      - "/usr/local/opt/php@8.1/bin/gmake"
+      - "/usr/local/opt/php@8.1/sbin/gmake"
+      - "/usr/local/bin/gmake"
+      - "/opt/homebrew/bin/gmake"
+      - "/usr/local/sbin/gmake"
+      - "/System/Cryptexes/App/usr/bin/gmake"
+      - "/usr/bin/gmake"
+      - "/bin/gmake"
+      - "/usr/sbin/gmake"
+      - "/sbin/gmake"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/gmake"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/gmake"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/gmake"
+      - "/opt/X11/bin/gmake"
+      - "/Library/Apple/usr/bin/gmake"
+      - "/Applications/Little Snitch.app/Contents/Components/gmake"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/gmake"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/make"
+      - "/Users/thesaint/.local/bin/make"
+      - "/Users/thesaint/.antigravity/antigravity/bin/make"
+      - "/usr/local/opt/php@8.1/bin/make"
+      - "/usr/local/opt/php@8.1/sbin/make"
+      - "/usr/local/bin/make"
+      - "/opt/homebrew/bin/make"
+      - "/usr/local/sbin/make"
+      - "/System/Cryptexes/App/usr/bin/make"
+    found: "/usr/bin/make"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCompiler.cmake:73 (find_program)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:64 (_cmake_find_compiler)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_C_COMPILER"
+    description: "C compiler"
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "cc"
+      - "gcc"
+      - "cl"
+      - "bcc"
+      - "xlc"
+      - "icx"
+      - "clang"
+    candidate_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    searched_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/cc"
+      - "/Users/thesaint/.local/bin/cc"
+      - "/Users/thesaint/.antigravity/antigravity/bin/cc"
+      - "/usr/local/opt/php@8.1/bin/cc"
+      - "/usr/local/opt/php@8.1/sbin/cc"
+      - "/usr/local/bin/cc"
+      - "/opt/homebrew/bin/cc"
+      - "/usr/local/sbin/cc"
+      - "/System/Cryptexes/App/usr/bin/cc"
+    found: "/usr/bin/cc"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCompilerId.cmake:462 (find_file)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCompilerId.cmake:500 (CMAKE_DETERMINE_COMPILER_ID_WRITE)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:122 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "file"
+    variable: "src_in"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "CMakeCCompilerId.c.in"
+    candidate_directories:
+      - "/usr/local/share/cmake/Modules/"
+    found: "/usr/local/share/cmake/Modules/CMakeCCompilerId.c.in"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:122 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+      Compiler: /usr/bin/cc 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+      
+      The C compiler identification is AppleClang, found in:
+        /Volumes/ByteSmith/BuildLab/Mirai-2026/build/debug/CMakeFiles/4.2.3/CompilerIdC/a.out
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCompilerId.cmake:290 (message)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:122 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Detecting C compiler apple sysroot: "/usr/bin/cc" "-E" "apple-sdk.c"
+        # 1 "apple-sdk.c"
+        # 1 "<built-in>" 1
+        # 1 "<built-in>" 3
+        # 433 "<built-in>" 3
+        # 1 "<command line>" 1
+        # 1 "<built-in>" 2
+        # 1 "apple-sdk.c" 2
+        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h" 1 3 4
+        # 89 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h" 3 4
+        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h" 1 3 4
+        # 90 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h" 2 3 4
+        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/TargetConditionals.h" 1 3 4
+        # 91 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h" 2 3 4
+        # 207 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h" 3 4
+        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/Availability.h" 1 3 4
+        # 196 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/Availability.h" 3 4
+        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h" 1 3 4
+        # 197 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/Availability.h" 2 3 4
+        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternal.h" 1 3 4
+        # 33 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternal.h" 3 4
+        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityVersions.h" 1 3 4
+        # 34 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternal.h" 2 3 4
+        # 198 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/Availability.h" 2 3 4
+        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalLegacy.h" 1 3 4
+        # 34 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalLegacy.h" 3 4
+        # 1 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternal.h" 1 3 4
+        # 35 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityInternalLegacy.h" 2 3 4
+        # 199 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/Availability.h" 2 3 4
+        # 208 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/AvailabilityMacros.h" 2 3 4
+        # 2 "apple-sdk.c" 2
+        
+        
+      Found apple sysroot: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_AR"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ar"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    found: "/usr/bin/ar"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_RANLIB"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ranlib"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    found: "/usr/bin/ranlib"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_STRIP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "strip"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    found: "/usr/bin/strip"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_LINKER"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "ld"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    found: "/usr/bin/ld"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_NM"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "nm"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    found: "/usr/bin/nm"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_OBJDUMP"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "objdump"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    found: "/usr/bin/objdump"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_OBJCOPY"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "objcopy"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    searched_directories:
+      - "/usr/bin/objcopy"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/objcopy"
+      - "/Users/thesaint/.local/bin/objcopy"
+      - "/Users/thesaint/.antigravity/antigravity/bin/objcopy"
+      - "/usr/local/opt/php@8.1/bin/objcopy"
+      - "/usr/local/opt/php@8.1/sbin/objcopy"
+      - "/usr/local/bin/objcopy"
+      - "/opt/homebrew/bin/objcopy"
+      - "/usr/local/sbin/objcopy"
+      - "/System/Cryptexes/App/usr/bin/objcopy"
+      - "/bin/objcopy"
+      - "/usr/sbin/objcopy"
+      - "/sbin/objcopy"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/objcopy"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/objcopy"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/objcopy"
+      - "/opt/X11/bin/objcopy"
+      - "/Library/Apple/usr/bin/objcopy"
+      - "/Applications/Little Snitch.app/Contents/Components/objcopy"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/objcopy"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_READELF"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "readelf"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    searched_directories:
+      - "/usr/bin/readelf"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/readelf"
+      - "/Users/thesaint/.local/bin/readelf"
+      - "/Users/thesaint/.antigravity/antigravity/bin/readelf"
+      - "/usr/local/opt/php@8.1/bin/readelf"
+      - "/usr/local/opt/php@8.1/sbin/readelf"
+      - "/usr/local/bin/readelf"
+      - "/opt/homebrew/bin/readelf"
+      - "/usr/local/sbin/readelf"
+      - "/System/Cryptexes/App/usr/bin/readelf"
+      - "/bin/readelf"
+      - "/usr/sbin/readelf"
+      - "/sbin/readelf"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/readelf"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/readelf"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/readelf"
+      - "/opt/X11/bin/readelf"
+      - "/Library/Apple/usr/bin/readelf"
+      - "/Applications/Little Snitch.app/Contents/Components/readelf"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/readelf"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_DLLTOOL"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "dlltool"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    searched_directories:
+      - "/usr/bin/dlltool"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/dlltool"
+      - "/Users/thesaint/.local/bin/dlltool"
+      - "/Users/thesaint/.antigravity/antigravity/bin/dlltool"
+      - "/usr/local/opt/php@8.1/bin/dlltool"
+      - "/usr/local/opt/php@8.1/sbin/dlltool"
+      - "/usr/local/bin/dlltool"
+      - "/opt/homebrew/bin/dlltool"
+      - "/usr/local/sbin/dlltool"
+      - "/System/Cryptexes/App/usr/bin/dlltool"
+      - "/bin/dlltool"
+      - "/usr/sbin/dlltool"
+      - "/sbin/dlltool"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/dlltool"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/dlltool"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/dlltool"
+      - "/opt/X11/bin/dlltool"
+      - "/Library/Apple/usr/bin/dlltool"
+      - "/Applications/Little Snitch.app/Contents/Components/dlltool"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/dlltool"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_ADDR2LINE"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "addr2line"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    searched_directories:
+      - "/usr/bin/addr2line"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/addr2line"
+      - "/Users/thesaint/.local/bin/addr2line"
+      - "/Users/thesaint/.antigravity/antigravity/bin/addr2line"
+      - "/usr/local/opt/php@8.1/bin/addr2line"
+      - "/usr/local/opt/php@8.1/sbin/addr2line"
+      - "/usr/local/bin/addr2line"
+      - "/opt/homebrew/bin/addr2line"
+      - "/usr/local/sbin/addr2line"
+      - "/System/Cryptexes/App/usr/bin/addr2line"
+      - "/bin/addr2line"
+      - "/usr/sbin/addr2line"
+      - "/sbin/addr2line"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/addr2line"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/addr2line"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/addr2line"
+      - "/opt/X11/bin/addr2line"
+      - "/Library/Apple/usr/bin/addr2line"
+      - "/Applications/Little Snitch.app/Contents/Components/addr2line"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/addr2line"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeFindBinUtils.cmake:243 (find_program)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCCompiler.cmake:200 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_TAPI"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: false
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: false
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "tapi"
+    candidate_directories:
+      - "/usr/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    searched_directories:
+      - "/usr/bin/tapi"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/tapi"
+      - "/Users/thesaint/.local/bin/tapi"
+      - "/Users/thesaint/.antigravity/antigravity/bin/tapi"
+      - "/usr/local/opt/php@8.1/bin/tapi"
+      - "/usr/local/opt/php@8.1/sbin/tapi"
+      - "/usr/local/bin/tapi"
+      - "/opt/homebrew/bin/tapi"
+      - "/usr/local/sbin/tapi"
+      - "/System/Cryptexes/App/usr/bin/tapi"
+      - "/bin/tapi"
+      - "/usr/sbin/tapi"
+      - "/sbin/tapi"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/tapi"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/tapi"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/tapi"
+      - "/opt/X11/bin/tapi"
+      - "/Library/Apple/usr/bin/tapi"
+      - "/Applications/Little Snitch.app/Contents/Components/tapi"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/tapi"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/Platform/Darwin.cmake:76 (find_program)"
+      - "/usr/local/share/cmake/Modules/CMakeSystemSpecificInformation.cmake:32 (include)"
+      - "CMakeLists.txt:2 (project)"
+    mode: "program"
+    variable: "CMAKE_INSTALL_NAME_TOOL"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "install_name_tool"
+    candidate_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    searched_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/install_name_tool"
+      - "/Users/thesaint/.local/bin/install_name_tool"
+      - "/Users/thesaint/.antigravity/antigravity/bin/install_name_tool"
+      - "/usr/local/opt/php@8.1/bin/install_name_tool"
+      - "/usr/local/opt/php@8.1/sbin/install_name_tool"
+      - "/usr/local/bin/install_name_tool"
+      - "/opt/homebrew/bin/install_name_tool"
+      - "/usr/local/sbin/install_name_tool"
+      - "/System/Cryptexes/App/usr/bin/install_name_tool"
+    found: "/usr/bin/install_name_tool"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:83 (try_compile)"
+      - "/usr/local/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    checks:
+      - "Detecting C compiler ABI info"
+    directories:
+      source: "/Volumes/ByteSmith/BuildLab/Mirai-2026/build/debug/CMakeFiles/CMakeScratch/TryCompile-KMkJtN"
+      binary: "/Volumes/ByteSmith/BuildLab/Mirai-2026/build/debug/CMakeFiles/CMakeScratch/TryCompile-KMkJtN"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: ""
+    buildResult:
+      variable: "CMAKE_C_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: '/Volumes/ByteSmith/BuildLab/Mirai-2026/build/debug/CMakeFiles/CMakeScratch/TryCompile-KMkJtN'
+        
+        Run Build Command(s): /usr/local/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_b780e/fast
+        /Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_b780e.dir/build.make CMakeFiles/cmTC_b780e.dir/build
+        Building C object CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o
+        /usr/bin/cc   -v -Wl,-v -MD -MT CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o -c /usr/local/share/cmake/Modules/CMakeCCompilerABI.c
+        Apple clang version 17.0.0 (clang-1700.6.4.2)
+        Target: x86_64-apple-darwin24.6.0
+        Thread model: posix
+        InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+        clang: warning: -Wl,-v: 'linker' input unused [-Wunused-command-line-argument]
+         "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple x86_64-apple-macosx15.0.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -mframe-pointer=all -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=2 -target-sdk-version=26.2 -fvisibility-inlines-hidden-static-local-var -fdefine-target-os-macros -fno-assume-unique-vtables -fno-modulemap-allow-subdirectory-search -target-cpu penryn -tune-cpu generic -debugger-tuning=lldb -fdebug-compilation-dir=/Volumes/ByteSmith/BuildLab/Mirai-2026/build/debug/CMakeFiles/CMakeScratch/TryCompile-KMkJtN -target-linker-version 1230.1 -v -fcoverage-compilation-dir=/Volumes/ByteSmith/BuildLab/Mirai-2026/build/debug/CMakeFiles/CMakeScratch/TryCompile-KMkJtN -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17 -dependency-file CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o -sys-header-deps -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -I/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -internal-iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -internal-iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/SubFrameworks -internal-iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks -Wno-reorder-init-list -Wno-implicit-int-float-conversion -Wno-c99-designator -Wno-final-dtor-non-final-class -Wno-extra-semi-stmt -Wno-misleading-indentation -Wno-quoted-include-in-framework-header -Wno-implicit-fallthrough -Wno-enum-enum-conversion -Wno-enum-float-conversion -Wno-elaborated-enum-base -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -clang-vendor-feature=+disableAtImportPrivateFrameworkInImplementationError -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o -x c /usr/local/share/cmake/Modules/CMakeCCompilerABI.c
+        clang -cc1 version 17.0.0 (clang-1700.6.4.2) default target x86_64-apple-darwin24.6.0
+        ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include"
+        ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /usr/local/include
+         /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include
+         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
+         /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
+         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks (framework directory)
+         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/SubFrameworks (framework directory)
+        End of search list.
+        Linking C executable cmTC_b780e
+        /usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b780e.dir/link.txt --verbose=1
+        Apple clang version 17.0.0 (clang-1700.6.4.2)
+        Target: x86_64-apple-darwin24.6.0
+        Thread model: posix
+        InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+         "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch x86_64 -platform_version macos 15.0.0 26.2 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -mllvm -enable-linkonceodr-outlining -o cmTC_b780e -L/usr/local/lib -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/lib/darwin/libclang_rt.osx.a
+        @(#)PROGRAM:ld PROJECT:ld-1230.1
+        BUILD 10:12:58 Jan  9 2026
+        configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em armv8m.main armv8.1m.main
+        will use ld-classic for: armv6 armv7 armv7s i386 armv6m armv7k armv7m armv7em
+        LTO support using: LLVM version 17.0.0 (static support for 29, runtime is 29)
+        TAPI support using: Apple TAPI version 17.0.0 (tapi-1700.3.8)
+        Library search paths:
+        	/usr/local/lib
+        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib
+        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/swift
+        Framework search paths:
+        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks
+        /usr/bin/cc -Wl,-search_paths_first -Wl,-headerpad_max_install_names  -v -Wl,-v CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o -o cmTC_b780e
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:122 (message)"
+      - "/usr/local/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Effective list of requested architectures (possibly empty)  : ""
+      Effective list of architectures found in the ABI info binary: "x86_64"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:217 (message)"
+      - "/usr/local/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Parsed C implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/usr/local/include]
+          add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include]
+          add: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
+          add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+        end of search list found
+        collapse include dir [/usr/local/include] ==> [/usr/local/include]
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include]
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+        implicit include dirs: [/usr/local/include;/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include;/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:253 (message)"
+      - "/usr/local/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Parsed C implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|"|[0-9]+>[ 	-]*Build:[ 	0-9]+ ms[ 	]*)?[ 	]*(([^"]*[/\\])?(ld[0-9]*(|\\.[a-rt-z][a-z]*|\\.s[a-np-z][a-z]*|\\.so[a-z]+)))("|,| |$)]
+        ignore line: [Change Dir: '/Volumes/ByteSmith/BuildLab/Mirai-2026/build/debug/CMakeFiles/CMakeScratch/TryCompile-KMkJtN']
+        ignore line: []
+        ignore line: [Run Build Command(s): /usr/local/bin/cmake -E env VERBOSE=1 /usr/bin/make -f Makefile cmTC_b780e/fast]
+        ignore line: [/Applications/Xcode.app/Contents/Developer/usr/bin/make  -f CMakeFiles/cmTC_b780e.dir/build.make CMakeFiles/cmTC_b780e.dir/build]
+        ignore line: [Building C object CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o]
+        ignore line: [/usr/bin/cc   -v -Wl -v -MD -MT CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o -c /usr/local/share/cmake/Modules/CMakeCCompilerABI.c]
+        ignore line: [Apple clang version 17.0.0 (clang-1700.6.4.2)]
+        ignore line: [Target: x86_64-apple-darwin24.6.0]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
+        ignore line: [clang: warning: -Wl -v: 'linker' input unused [-Wunused-command-line-argument]]
+        ignore line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple x86_64-apple-macosx15.0.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -mframe-pointer=all -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=2 -target-sdk-version=26.2 -fvisibility-inlines-hidden-static-local-var -fdefine-target-os-macros -fno-assume-unique-vtables -fno-modulemap-allow-subdirectory-search -target-cpu penryn -tune-cpu generic -debugger-tuning=lldb -fdebug-compilation-dir=/Volumes/ByteSmith/BuildLab/Mirai-2026/build/debug/CMakeFiles/CMakeScratch/TryCompile-KMkJtN -target-linker-version 1230.1 -v -fcoverage-compilation-dir=/Volumes/ByteSmith/BuildLab/Mirai-2026/build/debug/CMakeFiles/CMakeScratch/TryCompile-KMkJtN -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17 -dependency-file CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o -sys-header-deps -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -I/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -internal-iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks -internal-iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/SubFrameworks -internal-iframework /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks -Wno-reorder-init-list -Wno-implicit-int-float-conversion -Wno-c99-designator -Wno-final-dtor-non-final-class -Wno-extra-semi-stmt -Wno-misleading-indentation -Wno-quoted-include-in-framework-header -Wno-implicit-fallthrough -Wno-enum-enum-conversion -Wno-enum-float-conversion -Wno-elaborated-enum-base -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -clang-vendor-feature=+disableAtImportPrivateFrameworkInImplementationError -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o -x c /usr/local/share/cmake/Modules/CMakeCCompilerABI.c]
+        ignore line: [clang -cc1 version 17.0.0 (clang-1700.6.4.2) default target x86_64-apple-darwin24.6.0]
+        ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include"]
+        ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /usr/local/include]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/include]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks (framework directory)]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/SubFrameworks (framework directory)]
+        ignore line: [End of search list.]
+        ignore line: [Linking C executable cmTC_b780e]
+        ignore line: [/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b780e.dir/link.txt --verbose=1]
+        ignore line: [Apple clang version 17.0.0 (clang-1700.6.4.2)]
+        ignore line: [Target: x86_64-apple-darwin24.6.0]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
+        link line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch x86_64 -platform_version macos 15.0.0 26.2 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -mllvm -enable-linkonceodr-outlining -o cmTC_b780e -L/usr/local/lib -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/lib/darwin/libclang_rt.osx.a]
+          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld] ==> ignore
+          arg [-demangle] ==> ignore
+          arg [-lto_library] ==> ignore, skip following value
+          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib] ==> skip value of -lto_library
+          arg [-dynamic] ==> ignore
+          arg [-arch] ==> ignore
+          arg [x86_64] ==> ignore
+          arg [-platform_version] ==> ignore
+          arg [macos] ==> ignore
+          arg [15.0.0] ==> ignore
+          arg [26.2] ==> ignore
+          arg [-syslibroot] ==> ignore
+          arg [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk] ==> ignore
+          arg [-mllvm] ==> ignore
+          arg [-enable-linkonceodr-outlining] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_b780e] ==> ignore
+          arg [-L/usr/local/lib] ==> dir [/usr/local/lib]
+          arg [-search_paths_first] ==> ignore
+          arg [-headerpad_max_install_names] ==> ignore
+          arg [-v] ==> ignore
+          arg [CMakeFiles/cmTC_b780e.dir/CMakeCCompilerABI.c.o] ==> ignore
+          arg [-lSystem] ==> lib [System]
+          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/lib/darwin/libclang_rt.osx.a] ==> lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/lib/darwin/libclang_rt.osx.a]
+        linker tool for 'C': /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
+        Library search paths: [;/usr/local/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/swift]
+        Framework search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks]
+        remove lib [System]
+        remove lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/17/lib/darwin/libclang_rt.osx.a]
+        collapse library dir [/usr/local/lib] ==> [/usr/local/lib]
+        collapse library dir [/usr/local/lib] ==> [/usr/local/lib]
+        collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib]
+        collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/swift] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/swift]
+        collapse framework dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks]
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: [/usr/local/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/swift]
+        implicit fwks: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/Internal/CMakeDetermineLinkerId.cmake:38 (message)"
+      - "/usr/local/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:299 (cmake_determine_linker_id)"
+      - "/usr/local/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Running the C compiler's linker: "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" "-v"
+      @(#)PROGRAM:ld PROJECT:ld-1230.1
+      BUILD 10:12:58 Jan  9 2026
+      configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em armv8m.main armv8.1m.main
+      will use ld-classic for: armv6 armv7 armv7s i386 armv6m armv7k armv7m armv7em
+      LTO support using: LLVM version 17.0.0 (static support for 29, runtime is 29)
+      TAPI support using: Apple TAPI version 17.0.0 (tapi-1700.3.8)
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:517 (find_program)"
+      - "CMakeLists.txt:36 (find_package)"
+    mode: "program"
+    variable: "PKG_CONFIG_EXECUTABLE"
+    description: "pkg-config executable"
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "pkg-config"
+      - "pkgconf"
+    candidate_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/bin/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/sbin/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/"
+      - "/usr/local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/"
+      - "/usr/bin/"
+      - "/usr/sbin/"
+      - "/usr/"
+      - "/bin/"
+      - "/sbin/"
+      - "/usr/X11R6/bin/"
+      - "/usr/X11R6/sbin/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/bin/"
+      - "/usr/pkg/sbin/"
+      - "/usr/pkg/"
+      - "/opt/bin/"
+      - "/opt/sbin/"
+      - "/opt/"
+      - "/sw/bin/"
+      - "/sw/sbin/"
+      - "/sw/"
+      - "/opt/local/bin/"
+      - "/opt/local/sbin/"
+      - "/opt/local/"
+      - "/Users/thesaint/Applications/"
+      - "/Applications/"
+      - "/Applications/Xcode.app/Contents/Applications/"
+      - "/Applications/Xcode.app/Contents/Developer/Applications/"
+    searched_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/pkg-config"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/pkgconf"
+      - "/Users/thesaint/.local/bin/pkg-config"
+      - "/Users/thesaint/.local/bin/pkgconf"
+      - "/Users/thesaint/.antigravity/antigravity/bin/pkg-config"
+      - "/Users/thesaint/.antigravity/antigravity/bin/pkgconf"
+      - "/usr/local/opt/php@8.1/bin/pkg-config"
+      - "/usr/local/opt/php@8.1/bin/pkgconf"
+      - "/usr/local/opt/php@8.1/sbin/pkg-config"
+      - "/usr/local/opt/php@8.1/sbin/pkgconf"
+    found: "/usr/local/bin/pkg-config"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+        - "/sw"
+        - "/opt/local"
+      CMAKE_SYSTEM_APPBUNDLE_PATH:
+        - "/Users/thesaint/Applications"
+        - "/Applications"
+        - "/Applications/Xcode.app/Contents/Applications"
+        - "/Applications/Xcode.app/Contents/Developer/Applications"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:761 (find_library)"
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:811 (_pkg_find_libs)"
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:1149 (_pkg_recalculate)"
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:1166 (_pkg_check_modules_internal)"
+      - "CMakeLists.txt:37 (pkg_check_modules)"
+    mode: "library"
+    variable: "pkgcfg_lib_JSON_C_json-c"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "json-c"
+    candidate_directories:
+      - "/usr/local/Cellar/json-c/0.18/lib/"
+    found: "/usr/local/Cellar/json-c/0.18/lib/libjson-c.dylib"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+        - "/sw"
+        - "/opt/local"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+      CMAKE_SYSTEM_FRAMEWORK_PATH:
+        - "~/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Network/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks"
+        - "/Library/Frameworks"
+        - "/Network/Library/Frameworks"
+        - "/System/Library/Frameworks"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:761 (find_library)"
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:811 (_pkg_find_libs)"
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:1149 (_pkg_recalculate)"
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:1166 (_pkg_check_modules_internal)"
+      - "CMakeLists.txt:38 (pkg_check_modules)"
+    mode: "library"
+    variable: "pkgcfg_lib_SODIUM_sodium"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "sodium"
+    candidate_directories:
+      - "/usr/local/Cellar/libsodium/1.0.20/lib/"
+    found: "/usr/local/Cellar/libsodium/1.0.20/lib/libsodium.dylib"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+        - "/sw"
+        - "/opt/local"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+      CMAKE_SYSTEM_FRAMEWORK_PATH:
+        - "~/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Network/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks"
+        - "/Library/Frameworks"
+        - "/Network/Library/Frameworks"
+        - "/System/Library/Frameworks"
+...
+
+---
+events:
+  -
+    kind: "find_package-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/FindCURL.cmake:174 (find_package)"
+      - "src/ai_bridge/CMakeLists.txt:4 (find_package)"
+    name: "CURL"
+    configs:
+      -
+        filename: "CURLConfig.cmake"
+        kind: "cmake"
+      -
+        filename: "curl-config.cmake"
+        kind: "cmake"
+    version_request:
+      exact: false
+    settings:
+      required: "optional"
+      quiet: true
+      global: false
+      policy_scope: true
+      bypass_provider: false
+      names:
+        - "CURL"
+      path_suffixes:
+        - ""
+      paths:
+        CMAKE_FIND_USE_CMAKE_PATH: true
+        CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+        CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+        CMAKE_FIND_USE_INSTALL_PREFIX: true
+        CMAKE_FIND_USE_PACKAGE_ROOT_PATH: true
+        CMAKE_FIND_USE_CMAKE_PACKAGE_REGISTRY: true
+        CMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY: true
+        CMAKE_FIND_ROOT_PATH_MODE: "BOTH"
+    candidates:
+      -
+        path: "/Volumes/ByteSmith/BuildLab/Mirai-2026/build/debug/CMakeFiles/pkgRedirects/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Volumes/ByteSmith/BuildLab/Mirai-2026/build/debug/CMakeFiles/pkgRedirects/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Users/thesaint/.nvm/versions/node/v22.17.1/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Users/thesaint/.nvm/versions/node/v22.17.1/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Users/thesaint/.local/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Users/thesaint/.local/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Users/thesaint/.antigravity/antigravity/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Users/thesaint/.antigravity/antigravity/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/usr/local/opt/php@8.1/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/usr/local/opt/php@8.1/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/usr/local/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/usr/local/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/System/Cryptexes/App/usr/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/System/Cryptexes/App/usr/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/usr/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/usr/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/opt/X11/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/opt/X11/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Library/Apple/usr/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Library/Apple/usr/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Little Snitch.app/Contents/Components/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Little Snitch.app/Contents/Components/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Visual Studio Code.app/Contents/Resources/app/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Visual Studio Code.app/Contents/Resources/app/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/usr/X11R6/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/usr/X11R6/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/opt/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/opt/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/opt/local/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/opt/local/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Library/Frameworks/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Library/Frameworks/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/System/Library/Frameworks/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/System/Library/Frameworks/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Users/thesaint/Applications/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Users/thesaint/Applications/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Xcode.app/Contents/Applications/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Xcode.app/Contents/Applications/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Xcode.app/Contents/Developer/Applications/CURLConfig.cmake"
+        mode: "config"
+        reason: "no_exist"
+      -
+        path: "/Applications/Xcode.app/Contents/Developer/Applications/curl-config.cmake"
+        mode: "config"
+        reason: "no_exist"
+    found: null
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+        - "/sw"
+        - "/opt/local"
+      CMAKE_SYSTEM_FRAMEWORK_PATH:
+        - "~/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Network/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks"
+        - "/Library/Frameworks"
+        - "/Network/Library/Frameworks"
+        - "/System/Library/Frameworks"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:761 (find_library)"
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:811 (_pkg_find_libs)"
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:1149 (_pkg_recalculate)"
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:1166 (_pkg_check_modules_internal)"
+      - "/usr/local/share/cmake/Modules/FindCURL.cmake:191 (pkg_check_modules)"
+      - "src/ai_bridge/CMakeLists.txt:4 (find_package)"
+    mode: "library"
+    variable: "pkgcfg_lib_PC_CURL_curl"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "curl"
+    candidate_directories:
+      - "/usr/lib/"
+    searched_directories:
+      - "/usr/lib/"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+        - "/sw"
+        - "/opt/local"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+      CMAKE_SYSTEM_FRAMEWORK_PATH:
+        - "~/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Network/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks"
+        - "/Library/Frameworks"
+        - "/Network/Library/Frameworks"
+        - "/System/Library/Frameworks"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:765 (find_library)"
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:811 (_pkg_find_libs)"
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:1149 (_pkg_recalculate)"
+      - "/usr/local/share/cmake/Modules/FindPkgConfig.cmake:1166 (_pkg_check_modules_internal)"
+      - "/usr/local/share/cmake/Modules/FindCURL.cmake:191 (pkg_check_modules)"
+      - "src/ai_bridge/CMakeLists.txt:4 (find_package)"
+    mode: "library"
+    variable: "pkgcfg_lib_PC_CURL_curl"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "curl"
+    candidate_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/"
+      - "/usr/local/lib/"
+      - "/usr/local/"
+      - "/usr/lib/"
+      - "/usr/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/"
+      - "/opt/"
+      - "/opt/local/lib/"
+      - "/opt/local/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/"
+      - "/Library/Frameworks/"
+      - "/System/Library/Frameworks/"
+    searched_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    found: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libcurl.tbd"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+        - "/sw"
+        - "/opt/local"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+      CMAKE_SYSTEM_FRAMEWORK_PATH:
+        - "~/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Network/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks"
+        - "/Library/Frameworks"
+        - "/Network/Library/Frameworks"
+        - "/System/Library/Frameworks"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/FindCURL.cmake:201 (find_path)"
+      - "src/ai_bridge/CMakeLists.txt:4 (find_package)"
+    mode: "path"
+    variable: "CURL_INCLUDE_DIR"
+    description: "Path to a file."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "curl/curl.h"
+    candidate_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/opt/homebrew/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/"
+      - "/usr/local/include/"
+      - "/usr/local/"
+      - "/usr/include/"
+      - "/usr/"
+      - "/include/"
+      - "/usr/X11R6/include/"
+      - "/usr/X11R6/"
+      - "/usr/pkg/include/"
+      - "/usr/pkg/"
+      - "/opt/include/"
+      - "/opt/"
+      - "/sw/include/"
+      - "/sw/"
+      - "/opt/local/include/"
+      - "/opt/local/"
+      - "/usr/include/X11/"
+      - "/Users/thesaint/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Network/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/"
+      - "/Library/Frameworks/"
+      - "/Network/Library/Frameworks/"
+      - "/System/Library/Frameworks/"
+    searched_directories:
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/curl.framework/Headers/curl.h"
+      - "/Users/thesaint/.local/bin/curl.framework/Headers/curl.h"
+      - "/Users/thesaint/.antigravity/antigravity/bin/curl.framework/Headers/curl.h"
+      - "/usr/local/opt/php@8.1/bin/curl.framework/Headers/curl.h"
+      - "/usr/local/opt/php@8.1/sbin/curl.framework/Headers/curl.h"
+      - "/usr/local/bin/curl.framework/Headers/curl.h"
+      - "/opt/homebrew/bin/curl.framework/Headers/curl.h"
+      - "/usr/local/sbin/curl.framework/Headers/curl.h"
+      - "/System/Cryptexes/App/usr/bin/curl.framework/Headers/curl.h"
+      - "/usr/bin/curl.framework/Headers/curl.h"
+      - "/bin/curl.framework/Headers/curl.h"
+      - "/usr/sbin/curl.framework/Headers/curl.h"
+      - "/sbin/curl.framework/Headers/curl.h"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/curl.framework/Headers/curl.h"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/curl.framework/Headers/curl.h"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/curl.framework/Headers/curl.h"
+      - "/opt/X11/bin/curl.framework/Headers/curl.h"
+      - "/Library/Apple/usr/bin/curl.framework/Headers/curl.h"
+      - "/Applications/Little Snitch.app/Contents/Components/curl.framework/Headers/curl.h"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/curl.framework/Headers/curl.h"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/curl.framework/Headers/curl.h"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/curl.framework/Headers/curl.h"
+      - "/usr/local/include/curl.framework/Headers/curl.h"
+      - "/usr/local/curl.framework/Headers/curl.h"
+      - "/usr/include/curl.framework/Headers/curl.h"
+      - "/usr/curl.framework/Headers/curl.h"
+      - "/include/curl.framework/Headers/curl.h"
+      - "/usr/X11R6/include/curl.framework/Headers/curl.h"
+      - "/usr/X11R6/curl.framework/Headers/curl.h"
+      - "/usr/pkg/include/curl.framework/Headers/curl.h"
+      - "/usr/pkg/curl.framework/Headers/curl.h"
+      - "/opt/include/curl.framework/Headers/curl.h"
+      - "/opt/curl.framework/Headers/curl.h"
+      - "/sw/include/curl.framework/Headers/curl.h"
+      - "/sw/curl.framework/Headers/curl.h"
+      - "/opt/local/include/curl.framework/Headers/curl.h"
+      - "/opt/local/curl.framework/Headers/curl.h"
+      - "/usr/include/X11/curl.framework/Headers/curl.h"
+      - "/Users/thesaint/Library/Frameworks/curl.framework/Headers/curl.h"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks/curl.framework/Headers/curl.h"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Network/Library/Frameworks/curl.framework/Headers/curl.h"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/curl.framework/Headers/curl.h"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/curl.framework/Headers/curl.h"
+      - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/curl.framework/Headers/curl.h"
+      - "/Library/Frameworks/curl.framework/Headers/curl.h"
+      - "/Network/Library/Frameworks/curl.framework/Headers/curl.h"
+      - "/System/Library/Frameworks/curl.framework/Headers/curl.h"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/curl/curl.h"
+      - "/Users/thesaint/.local/bin/curl/curl.h"
+      - "/Users/thesaint/.antigravity/antigravity/bin/curl/curl.h"
+      - "/usr/local/opt/php@8.1/bin/curl/curl.h"
+      - "/usr/local/opt/php@8.1/sbin/curl/curl.h"
+      - "/usr/local/bin/curl/curl.h"
+      - "/opt/homebrew/bin/curl/curl.h"
+      - "/usr/local/sbin/curl/curl.h"
+      - "/System/Cryptexes/App/usr/bin/curl/curl.h"
+      - "/usr/bin/curl/curl.h"
+      - "/bin/curl/curl.h"
+      - "/usr/sbin/curl/curl.h"
+      - "/sbin/curl/curl.h"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin/curl/curl.h"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin/curl/curl.h"
+      - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin/curl/curl.h"
+      - "/opt/X11/bin/curl/curl.h"
+      - "/Library/Apple/usr/bin/curl/curl.h"
+      - "/Applications/Little Snitch.app/Contents/Components/curl/curl.h"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/curl/curl.h"
+    found: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+        - "/sw"
+        - "/opt/local"
+      CMAKE_SYSTEM_INCLUDE_PATH:
+        - "/usr/include/X11"
+      CMAKE_SYSTEM_FRAMEWORK_PATH:
+        - "~/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Network/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks"
+        - "/Library/Frameworks"
+        - "/Network/Library/Frameworks"
+        - "/System/Library/Frameworks"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/FindCURL.cmake:208 (find_library)"
+      - "src/ai_bridge/CMakeLists.txt:4 (find_package)"
+    mode: "library"
+    variable: "CURL_LIBRARY_RELEASE"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "curl"
+      - "curllib"
+      - "libcurl_imp"
+      - "curllib_static"
+      - "libcurl"
+      - "libcurl_a"
+    candidate_directories:
+      - "/usr/lib/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/"
+      - "/usr/local/lib/"
+      - "/usr/local/"
+      - "/usr/lib/"
+      - "/usr/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/"
+      - "/opt/"
+      - "/opt/local/lib/"
+      - "/opt/local/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/"
+      - "/Library/Frameworks/"
+      - "/System/Library/Frameworks/"
+    searched_directories:
+      - "/usr/lib/"
+      - "/usr/lib/"
+      - "/usr/lib/"
+      - "/usr/lib/"
+      - "/usr/lib/"
+      - "/usr/lib/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/local/bin/"
+      - "/usr/local/bin/"
+      - "/usr/local/bin/"
+      - "/usr/local/bin/"
+      - "/usr/local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/bin/"
+      - "/bin/"
+      - "/bin/"
+      - "/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/usr/sbin/"
+      - "/usr/sbin/"
+      - "/usr/sbin/"
+      - "/usr/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/sbin/"
+      - "/sbin/"
+      - "/sbin/"
+      - "/sbin/"
+      - "/sbin/"
+      - "/opt/X11/bin/"
+      - "/opt/X11/bin/"
+      - "/opt/X11/bin/"
+      - "/opt/X11/bin/"
+      - "/opt/X11/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+    found: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libcurl.tbd"
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+        - "/sw"
+        - "/opt/local"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+      CMAKE_SYSTEM_FRAMEWORK_PATH:
+        - "~/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Network/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks"
+        - "/Library/Frameworks"
+        - "/Network/Library/Frameworks"
+        - "/System/Library/Frameworks"
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/local/share/cmake/Modules/FindCURL.cmake:223 (find_library)"
+      - "src/ai_bridge/CMakeLists.txt:4 (find_package)"
+    mode: "library"
+    variable: "CURL_LIBRARY_DEBUG"
+    description: "Path to a library."
+    settings:
+      SearchFramework: "FIRST"
+      SearchAppBundle: "FIRST"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "libcurl-d_imp"
+      - "libcurl-d"
+    candidate_directories:
+      - "/usr/lib/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/"
+      - "/usr/local/lib/"
+      - "/usr/local/"
+      - "/usr/lib/"
+      - "/usr/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/"
+      - "/opt/"
+      - "/opt/local/lib/"
+      - "/opt/local/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/"
+      - "/Library/Frameworks/"
+      - "/System/Library/Frameworks/"
+    searched_directories:
+      - "/usr/lib/"
+      - "/usr/lib/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.local/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/Users/thesaint/.antigravity/antigravity/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/bin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/opt/php@8.1/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/local/bin/"
+      - "/usr/local/sbin/"
+      - "/usr/local/sbin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/System/Cryptexes/App/usr/bin/"
+      - "/usr/bin/"
+      - "/usr/bin/"
+      - "/bin/"
+      - "/bin/"
+      - "/usr/sbin/"
+      - "/usr/sbin/"
+      - "/sbin/"
+      - "/sbin/"
+      - "/opt/X11/bin/"
+      - "/opt/X11/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Library/Apple/usr/bin/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Little Snitch.app/Contents/Components/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/"
+      - "/usr/local/lib/"
+      - "/usr/local/lib/"
+      - "/usr/local/"
+      - "/usr/local/"
+      - "/usr/lib/"
+      - "/usr/lib/"
+      - "/usr/"
+      - "/usr/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/lib/"
+      - "/usr/X11R6/"
+      - "/usr/X11R6/"
+      - "/opt/"
+      - "/opt/"
+      - "/opt/local/lib/"
+      - "/opt/local/lib/"
+      - "/opt/local/"
+      - "/opt/local/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/"
+      - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks/"
+      - "/Library/Frameworks/"
+      - "/Library/Frameworks/"
+      - "/System/Library/Frameworks/"
+      - "/System/Library/Frameworks/"
+    found: false
+    search_context:
+      ENV{PATH}:
+        - "/Users/thesaint/.nvm/versions/node/v22.17.1/bin"
+        - "/Users/thesaint/.local/bin"
+        - "/Users/thesaint/.antigravity/antigravity/bin"
+        - "/usr/local/opt/php@8.1/bin"
+        - "/usr/local/opt/php@8.1/sbin"
+        - "/usr/local/bin"
+        - "/opt/homebrew/bin"
+        - "/usr/local/sbin"
+        - "/System/Cryptexes/App/usr/bin"
+        - "/usr/bin"
+        - "/bin"
+        - "/usr/sbin"
+        - "/sbin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin"
+        - "/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin"
+        - "/opt/X11/bin"
+        - "/Library/Apple/usr/bin"
+        - "/Applications/Little Snitch.app/Contents/Components"
+        - "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+      CMAKE_INSTALL_PREFIX: "/usr/local"
+      CMAKE_SYSTEM_PREFIX_PATH:
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr"
+        - "/"
+        - "/usr/local"
+        - "/usr/local"
+        - "/usr/X11R6"
+        - "/usr/pkg"
+        - "/opt"
+        - "/sw"
+        - "/opt/local"
+      CMAKE_SYSTEM_LIBRARY_PATH:
+        - "/usr/lib/X11"
+      CMAKE_SYSTEM_FRAMEWORK_PATH:
+        - "~/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Network/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks"
+        - "/Applications/Xcode.app/Contents/Developer/Library/Frameworks"
+        - "/Library/Frameworks"
+        - "/Network/Library/Frameworks"
+        - "/System/Library/Frameworks"
+...

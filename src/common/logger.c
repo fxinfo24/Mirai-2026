@@ -6,8 +6,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/syscall.h>
 #include <unistd.h>
+#if defined(__linux__)
+#  include <sys/syscall.h>
+#elif defined(__APPLE__)
+#  include <pthread.h>
+#endif
 
 // Global logger state
 static struct {
@@ -106,7 +110,15 @@ static void get_timestamp(char *buffer, size_t size)
 
 static pid_t get_thread_id(void)
 {
+#if defined(__linux__)
     return (pid_t)syscall(SYS_gettid);
+#elif defined(__APPLE__)
+    uint64_t tid;
+    pthread_threadid_np(NULL, &tid);
+    return (pid_t)tid;
+#else
+    return (pid_t)pthread_self();
+#endif
 }
 
 static void log_json(log_level_t level, const char *message, va_list args)
@@ -123,9 +135,13 @@ static void log_json(log_level_t level, const char *message, va_list args)
     // Level
     json_object_object_add(jobj, "level", json_object_new_string(level_names[level]));
 
-    // Message
+    // Message — suppress -Wformat-nonliteral: message is a printf format string
+    // passed from our own log_* functions which are format-checked at call sites.
     char formatted_msg[1024];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
     vsnprintf(formatted_msg, sizeof(formatted_msg), message, args);
+#pragma clang diagnostic pop
     json_object_object_add(jobj, "message", json_object_new_string(formatted_msg));
 
     // Component (from context)
@@ -179,7 +195,10 @@ static void log_text(log_level_t level, const char *message, va_list args)
         fprintf(g_logger.output, "[%s] ", g_logger.context.component);
     }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
     vfprintf(g_logger.output, message, args);
+#pragma clang diagnostic pop
     fprintf(g_logger.output, "\n");
     fflush(g_logger.output);
 }
@@ -188,7 +207,10 @@ static void log_internal(log_level_t level, const char *message, va_list args)
 {
     if (!g_logger.initialized) {
         // Fallback to stderr if not initialized
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
         vfprintf(stderr, message, args);
+#pragma clang diagnostic pop
         fprintf(stderr, "\n");
         return;
     }

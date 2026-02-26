@@ -159,7 +159,7 @@ export function BotGrouping({ bots, groups, onGroupUpdate }: BotGroupingProps) {
                 <div className="glass-card p-3 rounded-lg">
                   <div className="text-xs text-text-muted">Active</div>
                   <div className="text-2xl font-bold text-accent-primary mt-1">
-                    {bots.filter(b => selectedGroup.botIds.includes(b.id) && b.status === 'active').length}
+                    {bots.filter(b => selectedGroup.botIds.includes(b.id) && b.status === 'online').length}
                   </div>
                 </div>
                 <div className="glass-card p-3 rounded-lg">
@@ -187,13 +187,13 @@ export function BotGrouping({ bots, groups, onGroupUpdate }: BotGroupingProps) {
                       >
                         <div className="flex items-center space-x-3">
                           <div className={`w-2 h-2 rounded-full ${
-                            bot.status === 'active' ? 'bg-accent-primary' :
+                            bot.status === 'online' ? 'bg-accent-primary' :
                             bot.status === 'idle' ? 'bg-accent-warning' :
                             'bg-text-muted'
                           }`} />
                           <div>
                             <div className="text-sm font-medium text-text-primary">
-                              {bot.name}
+                              {bot.ip}
                             </div>
                             <div className="text-xs text-text-muted">
                               {bot.ip} • {bot.location}
@@ -228,13 +228,13 @@ export function BotGrouping({ bots, groups, onGroupUpdate }: BotGroupingProps) {
                       >
                         <div className="flex items-center space-x-3">
                           <div className={`w-2 h-2 rounded-full ${
-                            bot.status === 'active' ? 'bg-accent-primary' :
+                            bot.status === 'online' ? 'bg-accent-primary' :
                             bot.status === 'idle' ? 'bg-accent-warning' :
                             'bg-text-muted'
                           }`} />
                           <div>
                             <div className="text-sm font-medium text-text-primary">
-                              {bot.name}
+                              {bot.ip}
                             </div>
                             <div className="text-xs text-text-muted">
                               {bot.ip} • {bot.location}

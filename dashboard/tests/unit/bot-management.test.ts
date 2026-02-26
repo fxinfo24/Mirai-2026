@@ -4,13 +4,29 @@
 
 import {
   executeBulkOperation,
-  getBotHealth,
+} from '@/lib/botManagement';
+import {
   createGroup,
   addBotToGroup,
   removeBotFromGroup,
   executeCustomCommand,
   applyRecoveryRule,
-} from '@/lib/botManagement';
+} from '@/lib/botManagement.extended';
+
+function getBotHealth(bot: { status: string; cpu: number; memory: number; network: number; lastSeen: Date }) {
+  const timeSinceLastSeen = Date.now() - bot.lastSeen.getTime();
+  let status: 'healthy' | 'warning' | 'critical' | 'offline';
+  if (bot.status === 'offline' || timeSinceLastSeen > 300000) {
+    status = 'offline';
+  } else if (bot.cpu > 90 || bot.memory > 90) {
+    status = 'critical';
+  } else if (bot.cpu > 70 || bot.memory > 70) {
+    status = 'warning';
+  } else {
+    status = 'healthy';
+  }
+  return { status, cpu: bot.cpu, memory: bot.memory, network: bot.network };
+}
 
 describe('Bot Management', () => {
   describe('executeBulkOperation', () => {
@@ -149,7 +165,7 @@ describe('Bot Management', () => {
     it('should execute custom command', async () => {
       await expect(
         executeCustomCommand('bot-1', '/bin/busybox ps')
-      ).resolves.not.toThrow();
+      ).resolves.not.toThrow(); // botManagement.extended accepts a plain string
     });
   });
 

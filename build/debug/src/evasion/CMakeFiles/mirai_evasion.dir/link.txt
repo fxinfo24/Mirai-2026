@@ -1,0 +1,2 @@
+"/usr/bin/ar" qc libmirai_evasion.a CMakeFiles/mirai_evasion.dir/detection_engine.c.o
+"/usr/bin/ranlib" libmirai_evasion.a

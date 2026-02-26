@@ -17,7 +17,7 @@ export function useBots() {
     const response = await apiClient.getBots();
     
     if (response.success) {
-      setBots(response.data || []);
+      setBots((response.data as any[]) || []);
     } else {
       setError(response.error || 'Failed to fetch bots');
     }
@@ -49,7 +49,7 @@ export function useBotGroups() {
     const response = await apiClient.getGroups();
     
     if (response.success) {
-      setGroups(response.data || []);
+      setGroups((response.data as any[]) || []);
     } else {
       setError(response.error || 'Failed to fetch groups');
     }
@@ -76,7 +76,7 @@ export function useAttacks() {
     const response = await apiClient.getAttacks();
     
     if (response.success) {
-      setAttacks(response.data || []);
+      setAttacks((response.data as any[]) || []);
     } else {
       setError(response.error || 'Failed to fetch attacks');
     }
@@ -108,7 +108,7 @@ export function useAttackHistory() {
     const response = await apiClient.getAttackHistory();
     
     if (response.success) {
-      setHistory(response.data || []);
+      setHistory((response.data as any[]) || []);
     } else {
       setError(response.error || 'Failed to fetch attack history');
     }
@@ -135,7 +135,7 @@ export function useWebhooks() {
     const response = await apiClient.getWebhooks();
     
     if (response.success) {
-      setWebhooks(response.data || []);
+      setWebhooks((response.data as any[]) || []);
     } else {
       setError(response.error || 'Failed to fetch webhooks');
     }

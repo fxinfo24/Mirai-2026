@@ -31,12 +31,7 @@ export interface CommandArg {
   options?: string[];
 }
 
-export interface CommandHistoryItem {
-  command: string;
-  executedAt: Date;
-  status: 'success' | 'failed' | 'pending';
-  output?: string;
-}
+// CommandHistoryItem moved to botManagement.ts to avoid duplication
 
 export interface RecoveryRule {
   id: string;

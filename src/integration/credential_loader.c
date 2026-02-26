@@ -59,19 +59,48 @@ int credential_loader_load_from_json(const char *json_file) {
     }
     
     // Read entire file
-    fseek(fp, 0, SEEK_END);
-    long fsize = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    
-    char *content = malloc(fsize + 1);
-    if (!content) {
+    if (fseek(fp, 0, SEEK_END) != 0) {
+        log_error("Failed to seek to end of file");
         fclose(fp);
         return -1;
     }
     
-    fread(content, 1, fsize, fp);
+    long fsize = ftell(fp);
+    if (fsize == -1) {
+        log_error("Failed to get file size");
+        fclose(fp);
+        return -1;
+    }
+    
+    if (fsize > 10 * 1024 * 1024) { // Max 10MB
+        log_error("Credential file too large: %ld bytes", fsize);
+        fclose(fp);
+        return -1;
+    }
+    
+    if (fseek(fp, 0, SEEK_SET) != 0) {
+        log_error("Failed to seek to start of file");
+        fclose(fp);
+        return -1;
+    }
+    
+    char *content = malloc(fsize + 1);
+    if (!content) {
+        log_error("Failed to allocate memory");
+        fclose(fp);
+        return -1;
+    }
+    
+    size_t bytes_read = fread(content, 1, fsize, fp);
+    if (bytes_read != (size_t)fsize) {
+        log_error("Failed to read file: expected %ld, got %zu", fsize, bytes_read);
+        free(content);
+        fclose(fp);
+        return -1;
+    }
+    
     fclose(fp);
-    content[fsize] = '\0';
+    content[bytes_read] = '\0';
     
     // Parse JSON
     struct json_object *root = json_tokener_parse(content);

@@ -101,9 +101,19 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.ai
+    command: python /app/ai/api_server_enhanced.py --host 0.0.0.0 --port 8000
     environment:
       REDIS_URL: redis://redis:6379
       DATABASE_URL: postgresql://mirai:${POSTGRES_PASSWORD:-research_default_dev_only}@postgres:5432/mirai
+      # LLM Integration — OpenRouter (primary)
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-openai/gpt-3.5-turbo}
+      OPENROUTER_REFERER: ${OPENROUTER_REFERER:-http://localhost:3002}
+      # Fallback providers
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
     volumes:
       - ./ai:/app/ai
       - ai_models:/models

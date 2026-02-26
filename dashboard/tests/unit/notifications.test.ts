@@ -1,5 +1,6 @@
 /**
  * Unit tests for Notification System
+ * @jest-environment jsdom
  */
 
 import { renderHook, act } from '@testing-library/react';
@@ -26,6 +27,11 @@ const localStorageMock = (() => {
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 });
+
+// Mock Audio API (not implemented in jsdom)
+window.Audio = jest.fn().mockImplementation(() => ({
+  play: jest.fn().mockResolvedValue(undefined),
+})) as any;
 
 describe('Notification System', () => {
   beforeEach(() => {
@@ -100,7 +106,7 @@ describe('Notification System', () => {
         result.current.markAllAsRead();
       });
 
-      expect(result.current.notifications.every(n => n.read)).toBe(true);
+      expect(result.current.notifications.every((n: any) => n.read)).toBe(true);
     });
 
     it('should clear all notifications', () => {
@@ -132,7 +138,7 @@ describe('Notification System', () => {
         result.current.toggleRule(initialRule.id);
       });
 
-      const updatedRule = result.current.rules.find(r => r.id === initialRule.id);
+      const updatedRule = result.current.rules.find((r: any) => r.id === initialRule.id);
       expect(updatedRule?.enabled).toBe(!initialState);
     });
 

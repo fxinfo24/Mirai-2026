@@ -10,9 +10,19 @@ Provides RESTful API endpoints with real LLM support for:
 """
 
 from flask import Flask, request, jsonify
+from flask_socketio import SocketIO, emit
+from datetime import datetime
 import logging
 import sys
 import os
+
+# Import authentication service
+try:
+    from auth_service import auth_bp, require_auth, require_permission, require_role
+    AUTH_ENABLED = True
+except ImportError:
+    AUTH_ENABLED = False
+    print("Warning: Authentication service not available - install dependencies: pip install PyJWT bcrypt")
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -45,6 +55,14 @@ except ImportError:
     SignatureEvader = None
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'mirai-2026-dev-secret')
+socketio = SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
+
+# Register authentication blueprint if available
+if AUTH_ENABLED:
+    app.register_blueprint(auth_bp)
+    print("✅ Authentication service registered at /api/auth/*")
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -331,6 +349,46 @@ def test_llm():
         return jsonify({'error': str(e)}), 500
 
 
+@socketio.on('connect')
+def handle_connect():
+    print(f'Client connected: {request.sid}')
+    emit('welcome', {'status': 'connected', 'server': 'Mirai-2026 AI Service'})
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print(f'Client disconnected: {request.sid}')
+
+@socketio.on('subscribe')
+def handle_subscribe(data):
+    room = data.get('room', 'general')
+    from flask_socketio import join_room
+    join_room(room)
+    emit('subscribed', {'room': room})
+
+def broadcast_bot_event(event_type: str, bot_data: dict):
+    """Broadcast bot events to all connected clients."""
+    socketio.emit('bot_event', {
+        'type': event_type,
+        'bot': bot_data,
+        'timestamp': datetime.utcnow().isoformat()
+    })
+
+def broadcast_attack_event(event_type: str, attack_data: dict):
+    """Broadcast attack events to all connected clients."""
+    socketio.emit('attack_event', {
+        'type': event_type,
+        'attack': attack_data,
+        'timestamp': datetime.utcnow().isoformat()
+    })
+
+def broadcast_metrics(metrics: dict):
+    """Broadcast system metrics to all connected clients."""
+    socketio.emit('metrics', {
+        **metrics,
+        'timestamp': datetime.utcnow().isoformat()
+    })
+
+
 if __name__ == '__main__':
     import argparse
     
@@ -349,4 +407,4 @@ if __name__ == '__main__':
         logger.warning("⚠️  LLM services not available - using fallback mode")
         logger.info("To enable LLM: Set OPENAI_API_KEY, ANTHROPIC_API_KEY, or start Ollama")
     
-    app.run(host=args.host, port=args.port, debug=args.debug)
+    socketio.run(app, host=args.host, port=args.port, debug=args.debug)

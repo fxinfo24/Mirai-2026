@@ -228,7 +228,7 @@ export function BenchmarkDashboard() {
                 <CardTitle>Overall Performance Score</CardTitle>
               </CardHeader>
               <CardContent className="flex items-center justify-center py-8">
-                <GaugeChart value={87} max={100} label="87%" size={200} />
+                <GaugeChart value={87} max={100} label="Performance Score" />
               </CardContent>
             </Card>
 
@@ -346,13 +346,48 @@ export function BenchmarkDashboard() {
               <CardContent>
                 <div className="h-48">
                   <TimelineChart
-                    data={[{
-                      name: resource.name,
-                      data: resource.data,
-                      color: resource.color,
-                    }]}
-                    categories={resourceMetrics.timestamps}
-                    height={192}
+                    events={[
+                      {
+                        id: '1',
+                        timestamp: new Date(Date.now() - 5 * 60 * 1000),
+                        type: 'system',
+                        title: 'Peak Load Detected',
+                        description: `${resource.name} usage spiked above 90%`,
+                        severity: 'high',
+                      },
+                      {
+                        id: '2',
+                        timestamp: new Date(Date.now() - 15 * 60 * 1000),
+                        type: 'system',
+                        title: 'Benchmark Started',
+                        description: `${resource.name} benchmark run initiated`,
+                        severity: 'low',
+                      },
+                      {
+                        id: '3',
+                        timestamp: new Date(Date.now() - 30 * 60 * 1000),
+                        type: 'system',
+                        title: 'Threshold Warning',
+                        description: `${resource.name} exceeded warning threshold`,
+                        severity: 'medium',
+                      },
+                      {
+                        id: '4',
+                        timestamp: new Date(Date.now() - 45 * 60 * 1000),
+                        type: 'system',
+                        title: 'Stress Test Complete',
+                        description: `${resource.name} stress test finished successfully`,
+                        severity: 'low',
+                      },
+                      {
+                        id: '5',
+                        timestamp: new Date(Date.now() - 60 * 60 * 1000),
+                        type: 'system',
+                        title: 'Baseline Recorded',
+                        description: `${resource.name} baseline metrics captured`,
+                        severity: 'low',
+                      },
+                    ]}
                   />
                 </div>
                 <div className="mt-4 flex items-center justify-between">

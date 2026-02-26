@@ -2,6 +2,7 @@
 
 add_library(mirai_attack STATIC
     attack_modern.c
+    checksum.c
 )
 
 target_include_directories(mirai_attack PUBLIC

@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, Input } from '@/components/ui';
+import jsPDF from 'jspdf';
+import { utils, writeFile } from 'xlsx';
 
 interface ReportSection {
   id: string;
@@ -30,81 +32,54 @@ export function ReportBuilder() {
     ));
   };
 
-  const generateReport = async (format: 'pdf' | 'excel') => {
+  const generateReport = (format: 'pdf' | 'excel') => {
     const enabledSections = sections.filter(s => s.enabled);
-    
+
     if (enabledSections.length === 0) {
       alert('Please select at least one section to include in the report');
       return;
     }
 
-    // Import export functions dynamically
-    const { exportToPDF, exportToExcel, exportDashboardToPDF } = await import('@/lib/export');
-    
-    // Mock data for demonstration (in production, fetch real data)
-    const mockData = {
-      overview: [
-        { metric: 'Total Bots', value: 1234, status: 'Active' },
-        { metric: 'Active Attacks', value: 45, status: 'Running' },
-        { metric: 'Success Rate', value: '87%', status: 'Good' },
-      ],
-      bot_stats: [
-        { region: 'US-East', count: 450, status: 'Healthy' },
-        { region: 'EU-West', count: 320, status: 'Healthy' },
-        { region: 'Asia-Pacific', count: 464, status: 'Degraded' },
-      ],
-      attack_history: [
-        { timestamp: '2026-02-25 10:30', target: '192.168.1.1', type: 'UDP Flood', status: 'Success' },
-        { timestamp: '2026-02-25 09:15', target: '10.0.0.50', type: 'TCP SYN', status: 'Success' },
-        { timestamp: '2026-02-25 08:00', target: '172.16.0.100', type: 'HTTP Flood', status: 'Failed' },
-      ],
-      performance: [
-        { time: '00:00', cpu: 45, memory: 62, network: 78 },
-        { time: '06:00', cpu: 52, memory: 68, network: 85 },
-        { time: '12:00', cpu: 71, memory: 75, network: 92 },
-      ],
-      security: [
-        { event: 'Unauthorized Access', severity: 'High', count: 3 },
-        { event: 'Rate Limit Exceeded', severity: 'Medium', count: 15 },
-        { event: 'Invalid Credentials', severity: 'Low', count: 42 },
-      ],
-      bandwidth: [
-        { interface: 'eth0', in: '1.2 GB', out: '3.4 GB', utilization: '45%' },
-        { interface: 'eth1', in: '0.8 GB', out: '2.1 GB', utilization: '32%' },
-      ],
-    };
+    const filename = `${reportName.toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}`;
 
-    try {
-      if (format === 'pdf') {
-        // Prepare sections for PDF export
-        const pdfSections = enabledSections.map(section => ({
-          title: section.title,
-          data: mockData[section.id as keyof typeof mockData] || []
-        }));
+    if (format === 'pdf') {
+      const doc = new jsPDF();
 
-        exportDashboardToPDF(
-          reportName,
-          pdfSections,
-          `${reportName.toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}`
-        );
-      } else if (format === 'excel') {
-        // Prepare sheets for Excel export
-        const { exportMultiSheetExcel } = await import('@/lib/export');
-        const excelSheets = enabledSections.map(section => ({
-          name: section.title,
-          data: mockData[section.id as keyof typeof mockData] || []
-        }));
+      // Title
+      doc.setFontSize(20);
+      doc.text(reportName, 14, 20);
 
-        exportMultiSheetExcel(
-          excelSheets,
-          `${reportName.toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}`
-        );
-      }
+      // Generated date
+      doc.setFontSize(10);
+      doc.setTextColor(120);
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
 
-      alert(`${format.toUpperCase()} report generated successfully!`);
-    } catch (error) {
-      console.error(`Error generating ${format} report:`, error);
-      alert(`Failed to generate ${format} report. Please try again.`);
+      // Sections list
+      doc.setFontSize(13);
+      doc.setTextColor(0);
+      doc.text('Included Sections:', 14, 45);
+
+      doc.setFontSize(11);
+      enabledSections.forEach((section, index) => {
+        doc.text(`• ${section.title} (${section.type})`, 18, 55 + index * 8);
+      });
+
+      doc.save(`${filename}.pdf`);
+    } else {
+      const wb = utils.book_new();
+
+      // Summary sheet with report name and enabled sections
+      const summaryData = [
+        ['Report Name', reportName],
+        ['Generated', new Date().toLocaleString()],
+        [''],
+        ['Included Sections', 'Type'],
+        ...enabledSections.map(s => [s.title, s.type]),
+      ];
+      const ws = utils.aoa_to_sheet(summaryData);
+      utils.book_append_sheet(wb, ws, 'Report Summary');
+
+      writeFile(wb, `${filename}.xlsx`);
     }
   };
 

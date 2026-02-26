@@ -87,7 +87,7 @@ void crypto_generate_key(uint8_t *key, size_t key_len)
     randombytes_buf(key, key_len);
 }
 
-void crypto_hash(const uint8_t *data, size_t data_len, uint8_t *hash, size_t hash_len)
+void mirai_crypto_hash(const uint8_t *data, size_t data_len, uint8_t *hash, size_t hash_len)
 {
     crypto_generichash(hash, hash_len, data, data_len, NULL, 0);
 }

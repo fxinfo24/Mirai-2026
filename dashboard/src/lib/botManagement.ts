@@ -27,6 +27,14 @@ export interface BotWithHealth {
   bandwidth: string;
   tags: BotTag[];
   health: BotHealth;
+  commandHistory?: CommandHistoryItem[];
+}
+
+export interface CommandHistoryItem {
+  command: string;
+  executedAt: Date;
+  status: 'success' | 'failed' | 'pending';
+  output?: string;
 }
 
 // Bot Tags Management

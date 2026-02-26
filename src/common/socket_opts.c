@@ -71,7 +71,7 @@ int socket_set_reuseport(int sockfd) {
     }
     return 0;
 #else
-    log_warning("SO_REUSEPORT not supported on this system");
+    log_warn("SO_REUSEPORT not supported on this system");
     return -1;
 #endif
 }
@@ -80,7 +80,7 @@ int socket_set_reuseport(int sockfd) {
  * Enable TCP keep-alive
  * Detects dead connections and reclaims resources
  */
-int socket_set_keepalive(int sockfd, int idle_sec, int interval_sec, int count) {
+int socket_set_keepalive(int sockfd, int idle_sec __attribute__((unused)), int interval_sec, int count) {
     int opt = 1;
     if (setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &opt, sizeof(opt)) < 0) {
         log_error("SO_KEEPALIVE failed: %s", strerror(errno));
@@ -136,7 +136,7 @@ int socket_set_fastopen(int sockfd, int queue_len) {
     }
     return 0;
 #else
-    log_warning("TCP_FASTOPEN not supported on this system");
+    log_warn("TCP_FASTOPEN not supported on this system");
     return -1;
 #endif
 }
@@ -232,7 +232,7 @@ int socket_optimize_server(int sockfd) {
     socket_set_fastopen(sockfd, 1024);  // May fail on some systems
     
     if (errors > 0) {
-        log_warning("Socket optimization completed with %d errors", errors);
+        log_warn("Socket optimization completed with %d errors", errors);
     } else {
         log_debug("Socket fully optimized for high-performance server");
     }
@@ -276,7 +276,7 @@ int socket_optimize_client(int sockfd) {
     }
     
     if (errors > 0) {
-        log_warning("Client socket optimization completed with %d errors", errors);
+        log_warn("Client socket optimization completed with %d errors", errors);
     } else {
         log_debug("Client socket fully optimized");
     }
@@ -320,7 +320,7 @@ int socket_optimize_scanner(int sockfd) {
     }
     
     if (errors > 0) {
-        log_warning("Scanner socket optimization completed with %d errors", errors);
+        log_warn("Scanner socket optimization completed with %d errors", errors);
     } else {
         log_debug("Scanner socket fully optimized");
     }

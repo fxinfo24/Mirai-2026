@@ -41,6 +41,8 @@ export const Navbar = () => {
             <NavLink href="/bots">Bots</NavLink>
             <NavLink href="/attacks">Attacks</NavLink>
             <NavLink href="/analytics">Analytics</NavLink>
+            <NavLink href="/performance">Performance</NavLink>
+            <NavLink href="/admin">Admin</NavLink>
             <NavLink href="/settings">Settings</NavLink>
           </div>
 
@@ -112,6 +114,8 @@ export const Navbar = () => {
             <MobileNavLink href="/bots">Bots</MobileNavLink>
             <MobileNavLink href="/attacks">Attacks</MobileNavLink>
             <MobileNavLink href="/analytics">Analytics</MobileNavLink>
+            <MobileNavLink href="/performance">Performance</MobileNavLink>
+            <MobileNavLink href="/admin">Admin</MobileNavLink>
             <MobileNavLink href="/settings">Settings</MobileNavLink>
           </div>
         </div>

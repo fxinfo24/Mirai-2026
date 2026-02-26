@@ -49,5 +49,5 @@ EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD python -c "import requests; requests.get('http://localhost:5000/health')"
 
-ENTRYPOINT ["python", "api_server.py"]
+ENTRYPOINT ["python", "api_server_enhanced.py"]
 CMD ["--host", "0.0.0.0", "--port", "5000"]

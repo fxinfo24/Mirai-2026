@@ -57,7 +57,14 @@ update_context_t *update_init(const char *cnc_url, const char *public_key_path) 
     if (public_key_path) {
         FILE *fp = fopen(public_key_path, "rb");
         if (fp) {
-            fread(ctx->public_key, 1, crypto_sign_PUBLICKEYBYTES, fp);
+            size_t key_bytes = fread(ctx->public_key, 1, crypto_sign_PUBLICKEYBYTES, fp);
+        if (key_bytes != crypto_sign_PUBLICKEYBYTES) {
+            log_error("Failed to read public key: expected %d bytes, got %zu", 
+                     crypto_sign_PUBLICKEYBYTES, key_bytes);
+            fclose(fp);
+            free(ctx);
+            return NULL;
+        }
             fclose(fp);
         } else {
             log_warn("Could not load public key from %s", public_key_path);
@@ -218,18 +225,52 @@ bool update_verify_signature(update_context_t *ctx,
         return false;
     }
     
-    fseek(fp, 0, SEEK_END);
-    long file_size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    
-    unsigned char *file_data = malloc(file_size);
-    if (file_data == NULL) {
+    if (fseek(fp, 0, SEEK_END) != 0) {
+        log_error("Failed to seek to end of file");
         fclose(fp);
         ctx->status = UPDATE_STATUS_FAILED;
         return false;
     }
     
-    fread(file_data, 1, file_size, fp);
+    long file_size = ftell(fp);
+    if (file_size == -1) {
+        log_error("Failed to get file size");
+        fclose(fp);
+        ctx->status = UPDATE_STATUS_FAILED;
+        return false;
+    }
+    
+    if (file_size > 100 * 1024 * 1024) { // Max 100MB for update file
+        log_error("Update file too large: %ld bytes", file_size);
+        fclose(fp);
+        ctx->status = UPDATE_STATUS_FAILED;
+        return false;
+    }
+    
+    if (fseek(fp, 0, SEEK_SET) != 0) {
+        log_error("Failed to seek to start of file");
+        fclose(fp);
+        ctx->status = UPDATE_STATUS_FAILED;
+        return false;
+    }
+    
+    unsigned char *file_data = malloc(file_size);
+    if (file_data == NULL) {
+        log_error("Failed to allocate memory for update file");
+        fclose(fp);
+        ctx->status = UPDATE_STATUS_FAILED;
+        return false;
+    }
+    
+    size_t bytes_read = fread(file_data, 1, file_size, fp);
+    if (bytes_read != (size_t)file_size) {
+        log_error("Failed to read update file: expected %ld, got %zu", file_size, bytes_read);
+        free(file_data);
+        fclose(fp);
+        ctx->status = UPDATE_STATUS_FAILED;
+        return false;
+    }
+    
     fclose(fp);
     
     // Verify Ed25519 signature

@@ -1,36 +1,31 @@
 # Bot component CMakeLists.txt
+# Uses modern modular architecture: scanner, attack, ai_bridge, evasion
 
-set(BOT_SOURCES
+add_executable(mirai_bot
     main.c
-    scanner.c
-    attack.c
-    killer.c
-    resolv.c
-    rand.c
-    checksum.c
-)
-
-set(BOT_HEADERS
-    scanner.h
-    attack.h
-    killer.h
-    resolv.h
-    rand.h
-    checksum.h
-    protocol.h
-)
-
-add_executable(mirai_bot ${BOT_SOURCES})
-
-target_link_libraries(mirai_bot
-    mirai_common
-    pthread
-    ${JSON_C_LIBRARIES}
-    ${SODIUM_LIBRARIES}
 )
 
 target_include_directories(mirai_bot PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src/common
+    ${CMAKE_SOURCE_DIR}/src/scanner
+    ${CMAKE_SOURCE_DIR}/src/attack
+    ${CMAKE_SOURCE_DIR}/src/ai_bridge
+    ${CMAKE_SOURCE_DIR}/src/evasion
+    ${JSON_C_INCLUDE_DIRS}
+    ${SODIUM_INCLUDE_DIRS}
+)
+
+target_link_libraries(mirai_bot
+    mirai_scanner
+    mirai_attack
+    mirai_ai_bridge
+    mirai_evasion
+    mirai_common
+    pthread
+    curl
+    ${JSON_C_LIBRARIES}
+    ${SODIUM_LIBRARIES}
 )
 
 # Install

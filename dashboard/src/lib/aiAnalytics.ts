@@ -98,9 +98,10 @@ export async function suggestOptimalTime(attackType?: string): Promise<OptimalTi
       const response = await apiClient.getOptimalTiming(attackType || 'udp');
       
       if (response.success && response.data) {
+        const data = response.data as OptimalTimePrediction;
         return {
-          ...response.data,
-          timestamp: new Date(response.data.timestamp),
+          ...data,
+          timestamp: new Date(data.timestamp),
         } as OptimalTimePrediction;
       }
     } catch (error) {

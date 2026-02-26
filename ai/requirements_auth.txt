@@ -1,0 +1,16 @@
+# Authentication dependencies for Mirai 2026
+
+# JWT handling
+PyJWT==2.8.0
+
+# Password hashing
+bcrypt==4.1.2
+
+# PostgreSQL adapter
+psycopg2-binary==2.9.9
+
+# Database ORM (optional - for easier queries)
+SQLAlchemy==2.0.25
+
+# Flask extensions
+Flask-CORS==4.0.0

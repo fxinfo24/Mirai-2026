@@ -48,7 +48,7 @@ export function CollaborationProvider({ children }: CollaborationProviderProps) 
   const [activeUsers, setActiveUsers] = useState<User[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   
-  const { isConnected, sendMessage } = useWebSocket('ws://localhost:8000/ws/collaboration');
+  const { isConnected, wsService } = useWebSocket();
 
   // Initialize current user
   useEffect(() => {
@@ -68,7 +68,7 @@ export function CollaborationProvider({ children }: CollaborationProviderProps) 
     
     // Send user joined event
     if (isConnected) {
-      sendMessage({
+      wsService.emit('collaboration', {
         type: 'user_joined',
         user,
       });
@@ -83,7 +83,7 @@ export function CollaborationProvider({ children }: CollaborationProviderProps) 
     setCurrentUser(updatedUser);
     
     if (isConnected) {
-      sendMessage({
+      wsService.emit('collaboration', {
         type: 'cursor_move',
         userId: currentUser.id,
         cursor: { x, y },
@@ -106,7 +106,7 @@ export function CollaborationProvider({ children }: CollaborationProviderProps) 
     setChatMessages(prev => [...prev, chatMessage]);
     
     if (isConnected) {
-      sendMessage({
+      wsService.emit('collaboration', {
         type: 'chat_message',
         message: chatMessage,
       });

@@ -222,19 +222,3 @@ export interface AttackHistoryItem {
     targetDowntime: number;
   };
 }
-
-// Predict attack success based on historical data
-export async function predictAttackSuccess(attack: AttackHistoryItem): Promise<number> {
-  // Simulate ML prediction
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Base prediction on attack type and previous success rate
-  let prediction = attack.successRate;
-  
-  // Adjust based on factors
-  if (attack.botsUsed > 100) prediction += 5;
-  if (attack.type === 'udp') prediction += 10;
-  if (attack.duration > 300) prediction -= 5;
-  
-  return Math.min(Math.max(prediction, 0), 100);
-}

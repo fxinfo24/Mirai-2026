@@ -5,7 +5,7 @@ class WebSocketService {
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
 
-  connect(url: string = 'http://localhost:8888') {
+  connect(url: string = process.env.NEXT_PUBLIC_WS_URL?.replace('ws://', 'http://').replace('wss://', 'https://') || 'http://localhost:8080') {
     if (this.socket?.connected) {
       console.log('WebSocket already connected');
       return this.socket;

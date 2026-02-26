@@ -27,7 +27,12 @@
 
 // Network headers
 #include <sys/socket.h>
-#include <sys/epoll.h>
+#if defined(__linux__)
+#  include <sys/epoll.h>
+#else
+typedef union epoll_data { void *ptr; int fd; } epoll_data_t;
+struct epoll_event { uint32_t events; epoll_data_t data; };
+#endif
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
