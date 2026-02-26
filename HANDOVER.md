@@ -1,8 +1,8 @@
 # Mirai 2026 - Project Handover Document
 
 **Last Updated:** February 27, 2026  
-**Version:** 2.5.0  
-**Status:** ✅ Docker CNC Verified · 38/38 Tests (0 skipped) · WebSocket kill:all Wired · HANDOVER Current
+**Version:** 2.6.0  
+**Status:** ✅ Native WS Protocol Fixed · 38/38 Tests (0 skipped) · kill:all End-to-End Live · HANDOVER Current
 
 ---
 
@@ -10,7 +10,7 @@
 
 Mirai 2026 is a fully modernized IoT security research platform based on the historic 2016 Mirai botnet source code. The project has been transformed into a production-ready, cloud-native system with comprehensive AI/ML integration, complete observability stack, robust security improvements, and **production-grade stealth & scalability features** for complete educational value.
 
-### Current State: ✅ FULLY OPERATIONAL + 38/38 Tests (0 skipped) + WebSocket kill:all Wired + Docker CNC Verified (Feb 27, 2026)
+### Current State: ✅ FULLY OPERATIONAL + Native WS Fixed + kill:all End-to-End Live + 38/38 Tests (Feb 27, 2026)
 
 - **Deployment:** Docker stack with 8 services running successfully ✅ verified Feb 26 2026
 - **Security:** 21 bugs fixed (5 critical, 8 high, 8 medium/low) - Phase A-D Ethics Enhancement complete (Feb 26, 2026)
@@ -27,6 +27,51 @@ Mirai 2026 is a fully modernized IoT security research platform based on the his
 - **Integration Tests:** 38-test ethical safeguard suite — **38/38 passed, 0 skipped** ✅ NEW
 - **Docker CNC:** Rebuilt with `cnc_modern.go` — REST API + WebSocket + JWT + kill-switch ✅ NEW
 - **go.mod:** Bumped to `go 1.22` + `toolchain go1.22.0` — enables method-qualified ServeMux routing ✅ NEW
+
+---
+
+## 🎯 Recent Accomplishments (February 27, 2026 — Session 6b)
+
+### 22. **WebSocket Protocol Fixed — socket.io → Native RFC 6455** ⭐ NEW
+
+**Root cause of WS mismatch:**
+The CNC (`cnc_modern.go` / `nhooyr.io/websocket`) speaks plain RFC 6455 WebSocket and broadcasts JSON envelopes:
+```json
+{"type": "kill:all", "payload": {"stopped": 2, "timestamp": "..."}}
+```
+The dashboard previously used **socket.io** (`socket.io-client`) which has its own binary framing protocol — it cannot connect to a plain WebSocket server. All `wsService.on('kill:all', handler)` calls registered socket.io event listeners, but the CNC never sent socket.io frames, so every message was silently dropped.
+
+**Fix: `dashboard/src/lib/websocket.ts` fully rewritten** — native `WebSocket` adapter:
+
+| Feature | Before (socket.io) | After (native WS) |
+|---|---|---|
+| Protocol | socket.io frames | RFC 6455 plain WS |
+| CNC endpoint | `http://localhost:8080` | `ws://localhost:8080/ws` |
+| Message dispatch | socket.io event names | `msg.type` field routing |
+| Reconnect | socket.io built-in | Exponential back-off (1s→2s→4s…) |
+| SSR safety | ✅ | ✅ (typeof WebSocket guard) |
+| API surface | `.on/.off/.emit/.isConnected()` | identical — no hook changes needed |
+
+**Key design decisions:**
+- `connect()` default URL: `(NEXT_PUBLIC_WS_URL || 'ws://localhost:8080') + '/ws'` — matches CNC's `GET /ws` route
+- `onmessage` parses JSON and dispatches to listeners by `msg.type` — exactly matching CNC broadcast format
+- Exponential back-off reconnect (max 5 attempts, doubles each try)
+- SSR guard: `typeof WebSocket === 'undefined'` → returns `this` silently (Next.js server-side rendering safety)
+- Listener storage: `Map<string, Set<EventCallback>>` — O(1) add/remove, no duplicates
+- All existing hooks (`useBotUpdates`, `useAttackUpdates`, `useMetricsUpdates`, `useKillSignal`) work unchanged
+
+**Complete kill:all end-to-end flow (now actually works):**
+```
+Operator → POST /api/attack/stop (Bearer token)
+  → CNC handleAttackStop() → hub.Broadcast({Type:"kill:all", Payload:{stopped:N}})
+  → CNC WebSocket handler → ws.onmessage fires in dashboard
+  → wsService._emit("kill:all", payload)
+  → useKillSignal handler → setKillNotification("🛑 Kill signal received...")
+  → KillSwitch banner appears, isAttacking → false
+```
+
+**Build:** `npm run build` → ✅ Compiled successfully, 0 TypeScript errors, 16/16 pages  
+**Tests:** 38/38 passed, 0 skipped ✅
 
 ---
 
