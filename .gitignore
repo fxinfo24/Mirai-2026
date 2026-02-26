@@ -25,6 +25,12 @@ scripts/
 build/
 dist/
 *.o
+
+# Go compiled binaries in source directories
+mirai/cnc/cnc
+mirai/cnc/cnc_modern_server
+src/**/*_server
+src/**/*_binary
 *.a
 *.so
 *.dylib

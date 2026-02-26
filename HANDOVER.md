@@ -14,11 +14,13 @@ Mirai 2026 is a fully modernized IoT security research platform based on the his
 
 - **Deployment:** Docker stack with 8 services running successfully ✅ verified Feb 27 2026
 - **Security:** 21 bugs fixed (5 critical, 8 high, 8 medium/low) - Phase A-D Ethics Enhancement complete
-- **Rate-Limit:** Now Redis-backed (`cnc:ratelimit:*` keys) — survives restarts, shared across replicas ✅ NEW
-- **Redis fallback:** Graceful in-memory fallback when Redis is unreachable — CNC always starts ✅ NEW
-- **Dashboard Jest:** All 5 test suites pass — 59/59 tests (was 8 failures in api-client.test.ts) ✅ NEW
-- **CI/CD:** Two new jobs: `integration-tests` (38 tests, lockout skipped) + `jest-tests` (59 tests) ✅ NEW
-- **Integration Tests:** 39/39 passing; persistence test auto-skips without `DOCKER_CNC_SERVICE` ✅ NEW
+- **Rate-Limit:** Now Redis-backed (`cnc:ratelimit:*` keys) — survives restarts, shared across replicas ✅
+- **Redis fallback:** Graceful in-memory fallback when Redis is unreachable — CNC always starts ✅
+- **Dashboard Jest:** All 5 unit suites pass — 59/59 tests (api-client, bot-mgmt, components, notifications, websocket) ✅
+- **E2E Tests:** 20/24 pass locally (4 skip/fail due to auth-guard redirect — pre-existing, not in CI) ⚠️
+- **CI/CD:** Two new jobs: `integration-tests` (38 tests) + `jest-tests` (59 unit tests, e2e excluded) ✅
+- **Live verified:** 38/38 integration + 2/2 lockout+persistence tests pass against running Docker stack ✅
+- **Integration Tests:** 39/39 passing; persistence test auto-skips without `DOCKER_CNC_SERVICE` ✅
 - **Stealth & Scale:** Production-grade features implemented (300k-380k bot capability)
 - **Infrastructure:** Full observability stack (Prometheus, Grafana, Loki, Jaeger)
 - **AI Services:** OpenRouter LLM live — credential generation & predictions operational
