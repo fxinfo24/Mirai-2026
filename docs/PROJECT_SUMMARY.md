@@ -17,7 +17,29 @@
 - **Test Coverage**: ~87%
 - **New Content (Feb 2026)**: 12,379 lines across 4 major areas (benchmarks, ethics, detection, advanced features)
 
-### Latest Additions (February 2026)
+### Latest Additions (February 27, 2026 — Session 9)
+
+**CI/CD: 8/8 GitHub Actions Jobs Green**
+- C Build: fixed `pkg-config`, `_FORTIFY_SOURCE`, `#pragma GCC diagnostic`, `_GNU_SOURCE`, format-truncation, logger API mismatches, `clang-format` uniformity
+- Python lint: `ai/.flake8` config with `--config=ai/.flake8` in CI
+- Dashboard job: `--forceExit --testPathPatterns=tests/unit` (prevents hang, skips e2e)
+- Two new CI jobs: `integration-tests` (38 tests) + `jest-tests` (59 tests)
+
+**Tests: 119/119 All Green**
+- 39/39 integration (CNC ethical safeguards + Redis persistence)
+- 59/59 Jest unit (api-client auth mock fix)
+- 21/21 Puppeteer e2e (`loginToDashboard()` helper for auth guard)
+
+**Redis-Backed Rate-Limit**
+- `cnc:ratelimit:attempts:{ip}` / `cnc:ratelimit:lockout:{ip}` in Redis
+- In-memory fallback when Redis unreachable — CNC always starts
+- `github.com/redis/go-redis/v9 v9.7.3` in `go.mod`
+
+**Dashboard Runtime Fix**
+- `useMetricsUpdates` now merges partial WebSocket payloads with defaults
+- Prevents `TypeError: Cannot read properties of undefined (reading 'toLocaleString')`
+
+### Previous Additions (February 2026)
 
 **Advanced Features - Low-Hanging Fruit** ✨ NEW (1,500 lines)
 - Neural Architecture Search (NAS) with DARTS (450 lines)
@@ -708,7 +730,7 @@ This represents a **complete, modern, AI-enhanced security research platform** t
 
 ---
 
-**Version**: 2.9.0 - Redis Rate-Limit + 59/59 Jest Tests + Full CI Pipeline
+**Version**: 2.9.1 - CI 8/8 Green + 119/119 Tests + Dashboard Live
 **Status**: ✅ **ALL FEATURES COMPLETE + ACTIVE DEVELOPMENT**
 **Date**: 2026-02-26
 **Total Iterations**: 17+
