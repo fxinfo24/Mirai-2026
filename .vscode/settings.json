@@ -15,7 +15,9 @@
     "**/ai/**/venv/**": true,
     "**/.mypy_cache/**": true,
     "**/observability/**": true,
-    "**/loader/bins/**": true
+    "**/loader/bins/**": true,
+    "**/.vscode/.intellisense-cache/**": true,
+    "**/dashboard/coverage/**": true
   },
 
   // ─── Search Exclusions ────────────────────────────────────────────────────────
@@ -46,16 +48,20 @@
   // ─── TypeScript / JavaScript ──────────────────────────────────────────────────
   // Use the workspace's own TypeScript version (faster, avoids version mismatches).
   "typescript.tsdk": "dashboard/node_modules/typescript/lib",
-  // Disable TS suggestions for node_modules to reduce memory usage.
   "typescript.disableAutomaticTypeAcquisition": false,
-  // Only validate open files (not the whole project) — huge speed win.
   "typescript.validate.enable": true,
   "javascript.validate.enable": true,
-  // Don't show TS errors in JS files.
   "javascript.implicitProjectConfig.checkJs": false,
+  // Limit TS server memory to 4GB (default is uncapped — can cause swap thrashing).
+  "typescript.tsserver.maxTsServerMemory": 4096,
+  // Use fsevents (macOS native) instead of polling — massive watcher reduction.
+  "typescript.tsserver.watchOptions": {
+    "watchFile": "useFsEventsOnParentDirectory",
+    "watchDirectory": "useFsEvents",
+    "fallbackPolling": "dynamicPriorityPolling"
+  },
 
   // ─── Editor Performance ────────────────────────────────────────────────────────
-  // Reduce editor overhead.
   "editor.minimap.enabled": false,
   "editor.renderWhitespace": "none",
   "editor.renderControlCharacters": false,
@@ -65,11 +71,18 @@
   "editor.hover.delay": 500,
   "editor.quickSuggestionsDelay": 100,
   "editor.suggest.snippetsPreventQuickSuggestions": false,
+  "editor.lightbulb.enabled": "off",
+  "editor.parameterHints.enabled": false,
+  "editor.largeFileOptimizations": true,
+  "files.maxMemoryForLargeFilesMB": 512,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
 
   // ─── Extension: ESLint ────────────────────────────────────────────────────────
-  // Only lint files in the dashboard (not the whole workspace).
   "eslint.workingDirectories": [{ "directory": "dashboard", "changeProcessCWD": true }],
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.run": "onSave",
 
   // ─── Extension: Python ────────────────────────────────────────────────────────
   "python.defaultInterpreterPath": "${workspaceFolder}/ai/venv/bin/python3",
@@ -82,11 +95,10 @@
     "editor.defaultFormatter": "ms-vscode.cpptools"
   },
   "C_Cpp.intelliSenseCachePath": "${workspaceFolder}/.vscode/.intellisense-cache",
-  "C_Cpp.intelliSenseCacheSize": 1024,
+  "C_Cpp.intelliSenseCacheSize": 2048,
   "C_Cpp.loggingLevel": "Warning",
 
   // ─── Git ──────────────────────────────────────────────────────────────────────
-  // Don't auto-fetch (reduces background network/CPU activity).
   "git.autofetch": false,
   "git.decorations.enabled": true,
 
@@ -104,55 +116,9 @@
     "Dockerfile.*": "dockerfile"
   },
 
-  // ─── Terminal ─────────────────────────────────────────────────────────────────
-  "terminal.integrated.inheritEnv": true,
-
-  // ─── C/C++ IntelliSense Cache ─────────────────────────────────────────────────
-  // Store IntelliSense cache inside .vscode (excluded from watcher above).
-  "C_Cpp.intelliSenseCachePath": "${workspaceFolder}/.vscode/.intellisense-cache",
-  "C_Cpp.intelliSenseCacheSize": 2048,
-
-  // ─── TypeScript Server ────────────────────────────────────────────────────────
-  // Limit TS server memory to 4GB (default is uncapped — can cause swap thrashing).
-  "typescript.tsserver.maxTsServerMemory": 4096,
-  // Don't watch node_modules for TS changes — massive watcher reduction.
-  "typescript.tsserver.watchOptions": {
-    "watchFile": "useFsEventsOnParentDirectory",
-    "watchDirectory": "useFsEvents",
-    "fallbackPolling": "dynamicPriority"
-  },
-
-  // ─── Extra file watcher exclusions ────────────────────────────────────────────
-  "files.watcherExclude": {
-    "**/.git/**": true,
-    "**/node_modules/**": true,
-    "**/dashboard/.next/**": true,
-    "**/dashboard/node_modules/**": true,
-    "**/build/**": true,
-    "**/dist/**": true,
-    "**/__pycache__/**": true,
-    "**/.pytest_cache/**": true,
-    "**/ai/venv/**": true,
-    "**/.mypy_cache/**": true,
-    "**/observability/**": true,
-    "**/loader/bins/**": true,
-    "**/.vscode/.intellisense-cache/**": true,
-    "**/dashboard/coverage/**": true
-  },
-
-  // ─── Reduce extension overhead ────────────────────────────────────────────────
-  // Only run ESLint on save, not on type.
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
-  },
-  "eslint.run": "onSave",
-
   // ─── Breadcrumbs / UI chrome ─────────────────────────────────────────────────
   "breadcrumbs.enabled": false,
-  "editor.lightbulb.enabled": "off",
-  "editor.parameterHints.enabled": false,
 
-  // ─── Large file handling ──────────────────────────────────────────────────────
-  "editor.largeFileOptimizations": true,
-  "files.maxMemoryForLargeFilesMB": 512
+  // ─── Terminal ─────────────────────────────────────────────────────────────────
+  "terminal.integrated.inheritEnv": true
 }
