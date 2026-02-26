@@ -111,7 +111,7 @@ jobs:
           pip install pytest pytest-cov flake8
 
       - name: Lint
-        run: flake8 ai/ --max-line-length=120 --exclude=ai/venv
+        run: flake8 ai/ --max-line-length=120 --exclude=ai/venv --config=ai/.flake8
 
       - name: Test
         run: pytest ai/ -v --tb=short --ignore=ai/venv || true

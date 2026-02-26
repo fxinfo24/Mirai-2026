@@ -109,8 +109,10 @@ void test_key_export_import() {
     remove(filename);
 }
 
-int main() {
-    log_init(LOG_INFO);
+int main(void) {
+    logger_config_t cfg = {0};
+    cfg.min_level = LOG_LEVEL_INFO;
+    logger_init(&cfg);
     
     printf("========================================\n");
     printf("Post-Quantum Cryptography Tests\n");
