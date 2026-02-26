@@ -8,19 +8,23 @@
 #include <string.h>
 #include <assert.h>
 #include <unistd.h>
+#include <inttypes.h>
 #include <arpa/inet.h>
 
 #include "../../src/attack/attack_modern.h"
 #include "../../src/common/logger.h"
 
 static void setup(void) {
-    logger_init(LOG_LEVEL_DEBUG, NULL);
+    logger_config_t cfg = {0};
+    cfg.min_level = LOG_LEVEL_DEBUG;
+    cfg.output_file  = NULL;
+    logger_init(&cfg);
     attack_modern_init();
 }
 
 static void teardown(void) {
     attack_modern_cleanup();
-    logger_cleanup();
+    logger_shutdown();
 }
 
 // Test: Attack module initialization
@@ -69,7 +73,7 @@ static void test_udp_flood(void) {
     attack_stats_t stats;
     attack_modern_get_stats(handle, &stats);
     
-    printf("\n  Packets sent: %lu, Bytes: %lu, Errors: %lu\n",
+    printf("\n  Packets sent: %" PRIu64 ", Bytes: %" PRIu64 ", Errors: %" PRIu64 "\n",
            stats.packets_sent, stats.bytes_sent, stats.errors);
     
     assert(stats.packets_sent > 0);

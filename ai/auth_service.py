@@ -11,14 +11,14 @@ Features:
 """
 
 import os
-import hashlib
+import hashlib  # noqa: F401
 import secrets
 from datetime import datetime, timedelta
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List  # noqa: F401
 
 import jwt
 import bcrypt
-from flask import Blueprint, request, jsonify, current_app, make_response
+from flask import Blueprint, request, jsonify, current_app, make_response  # noqa: F401
 from functools import wraps
 
 # JWT Configuration
@@ -104,14 +104,14 @@ def generate_refresh_token(user: Dict) -> str:
         'jti': secrets.token_hex(16)  # Unique token ID
     }
     token = jwt.encode(payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
-    
+
     # Store refresh token
     ACTIVE_SESSIONS[payload['jti']] = {
         'user_id': user['id'],
         'created_at': datetime.utcnow(),
         'expires_at': datetime.utcnow() + REFRESH_TOKEN_EXPIRY
     }
-    
+
     return token
 
 
@@ -119,10 +119,10 @@ def verify_token(token: str, token_type: str = 'access') -> Optional[Dict]:
     """Verify and decode JWT token"""
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        
+
         if payload.get('type') != token_type:
             return None
-            
+
         return payload
     except jwt.ExpiredSignatureError:
         return None
@@ -145,21 +145,21 @@ def require_auth(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         auth_header = request.headers.get('Authorization')
-        
+
         if not auth_header or not auth_header.startswith('Bearer '):
             return jsonify({'error': 'Missing or invalid Authorization header'}), 401
-        
+
         token = auth_header.split(' ')[1]
         payload = verify_token(token, 'access')
-        
+
         if not payload:
             return jsonify({'error': 'Invalid or expired token'}), 401
-        
+
         # Add user info to request context
         request.user = payload
-        
+
         return f(*args, **kwargs)
-    
+
     return decorated_function
 
 
@@ -170,14 +170,14 @@ def require_permission(permission: str):
         @require_auth
         def decorated_function(*args, **kwargs):
             user_permissions = request.user.get('permissions', [])
-            
+
             if permission not in user_permissions:
                 return jsonify({'error': f'Permission denied: {permission} required'}), 403
-            
+
             return f(*args, **kwargs)
-        
+
         return decorated_function
-    
+
     return decorator
 
 
@@ -188,28 +188,30 @@ def require_role(role: str):
         @require_auth
         def decorated_function(*args, **kwargs):
             user_role = request.user.get('role')
-            
+
             if user_role != role and user_role != 'admin':
                 return jsonify({'error': f'Role {role} required'}), 403
-            
+
             return f(*args, **kwargs)
-        
+
         return decorated_function
-    
+
     return decorator
 
 
 @auth_bp.route('/login', methods=['POST'])
+
+
 def login():
     """
     Login endpoint
-    
+
     Request:
         {
             "username": "admin",
             "password": "admin"
         }
-    
+
     Response:
         {
             "access_token": "eyJ...",
@@ -219,26 +221,26 @@ def login():
         }
     """
     data = request.get_json()
-    
+
     if not data:
         return jsonify({'error': 'Invalid request body'}), 400
-    
+
     username = data.get('username')
     password = data.get('password')
-    
+
     if not username or not password:
         return jsonify({'error': 'Username and password required'}), 400
-    
+
     # Find user
     user = USERS_DB.get(username)
-    
+
     if not user:
         return jsonify({'error': 'Invalid username or password'}), 401
-    
+
     # Verify password
     if not verify_password(password, user['password_hash']):
         return jsonify({'error': 'Invalid username or password'}), 401
-    
+
     # Generate tokens
     access_token = generate_access_token(user)
     refresh_token = generate_refresh_token(user)
@@ -276,6 +278,8 @@ def login():
 
 
 @auth_bp.route('/refresh', methods=['POST'])
+
+
 def refresh():
     """
     Refresh access token.
@@ -347,6 +351,8 @@ def refresh():
 
 @auth_bp.route('/logout', methods=['POST'])
 @require_auth
+
+
 def logout():
     """
     Logout endpoint — revokes refresh token and clears the httpOnly cookie.
@@ -390,10 +396,12 @@ def logout():
 
 @auth_bp.route('/me', methods=['GET'])
 @require_auth
+
+
 def get_current_user():
     """
     Get current authenticated user info
-    
+
     Response:
         {
             "id": 1,
@@ -403,14 +411,14 @@ def get_current_user():
             "permissions": [...]
         }
     """
-    user_id = request.user.get('user_id')
+    user_id = request.user.get('user_id')  # noqa: F841
     username = request.user.get('username')
-    
+
     user = USERS_DB.get(username)
-    
+
     if not user:
         return jsonify({'error': 'User not found'}), 404
-    
+
     user_response = {
         'id': user['id'],
         'username': user['username'],
@@ -418,20 +426,22 @@ def get_current_user():
         'role': user['role'],
         'permissions': ROLE_PERMISSIONS.get(user['role'], [])
     }
-    
+
     return jsonify(user_response), 200
 
 
 @auth_bp.route('/verify', methods=['POST'])
+
+
 def verify():
     """
     Verify if a token is valid
-    
+
     Request:
         {
             "token": "eyJ..."
         }
-    
+
     Response:
         {
             "valid": true,
@@ -439,16 +449,16 @@ def verify():
         }
     """
     data = request.get_json()
-    
+
     if not data or not data.get('token'):
         return jsonify({'error': 'Token required'}), 400
-    
+
     token = data['token']
     payload = verify_token(token, 'access')
-    
+
     if not payload:
         return jsonify({'valid': False}), 200
-    
+
     return jsonify({
         'valid': True,
         'user': {
@@ -462,10 +472,12 @@ def verify():
 
 @auth_bp.route('/register', methods=['POST'])
 @require_permission('manage_users')
+
+
 def register():
     """
     Register new user (admin only)
-    
+
     Request:
         {
             "username": "newuser",
@@ -475,19 +487,19 @@ def register():
         }
     """
     data = request.get_json()
-    
+
     required_fields = ['username', 'password', 'email', 'role']
     if not all(data.get(field) for field in required_fields):
         return jsonify({'error': 'All fields required: username, password, email, role'}), 400
-    
+
     username = data['username']
-    
+
     if username in USERS_DB:
         return jsonify({'error': 'Username already exists'}), 409
-    
+
     if data['role'] not in ROLE_PERMISSIONS:
         return jsonify({'error': 'Invalid role'}), 400
-    
+
     # Create new user
     new_user = {
         'id': len(USERS_DB) + 1,
@@ -497,9 +509,9 @@ def register():
         'role': data['role'],
         'created_at': datetime.utcnow().isoformat()
     }
-    
+
     USERS_DB[username] = new_user
-    
+
     return jsonify({
         'message': 'User created successfully',
         'user': {

@@ -18,7 +18,9 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wpedantic -Werror")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wformat=2 -Wformat-security")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wstrict-prototypes -Wmissing-prototypes")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fstack-protector-strong")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_FORTIFY_SOURCE=2")
+# Undefine first to avoid redefinition warning (-Werror treats this as an error
+# on GCC 12+ / Clang which define _FORTIFY_SOURCE automatically in some modes)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2")
 
 # Position Independent Execution
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)

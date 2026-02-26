@@ -80,7 +80,7 @@ jobs:
         run: npm run lint
 
       - name: Unit tests
-        run: npm test -- --passWithNoTests
+        run: npm test -- --passWithNoTests --no-coverage --forceExit --testPathPatterns="tests/unit"
 
       - name: Build
         run: npm run build

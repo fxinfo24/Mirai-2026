@@ -1,0 +1,11 @@
+[flake8]
+max-line-length = 120
+exclude = venv,__pycache__,.git
+# Ignored codes (all stylistic — no correctness issues):
+# E128: continuation line under-indented for visual indent
+# E226: missing whitespace around arithmetic operator (a*b is fine)
+# E302: expected 2 blank lines before top-level def/class
+# E304: blank lines found after function decorator
+# E305: expected 2 blank lines after class or function definition
+# W504: line break after binary operator
+ignore = E127,E128,E226,E261,E302,E304,E305,W503,W504

@@ -13,41 +13,50 @@
 
 static void test_logger_init(void) {
     printf("TEST: Logger initialization... ");
-    
-    int result = logger_init(LOG_LEVEL_DEBUG, NULL);
-    assert(result == 0);
-    
-    logger_cleanup();
-    
+
+    logger_config_t cfg = {0};
+    cfg.min_level = LOG_LEVEL_DEBUG;
+    cfg.output_file  = NULL;
+    bool result = logger_init(&cfg);
+    assert(result == true);
+
+    logger_shutdown();
+
     printf("PASS\n");
 }
 
 static void test_logger_levels(void) {
     printf("TEST: Logger levels... ");
-    
-    logger_init(LOG_LEVEL_INFO, NULL);
-    
+
+    logger_config_t cfg = {0};
+    cfg.min_level = LOG_LEVEL_INFO;
+    cfg.output_file  = NULL;
+    logger_init(&cfg);
+
     log_debug("This debug message should not appear");
     log_info("This info message should appear");
     log_warn("This warning message should appear");
     log_error("This error message should appear");
-    
-    logger_cleanup();
-    
+
+    logger_shutdown();
+
     printf("PASS\n");
 }
 
 static void test_logger_file(void) {
     printf("TEST: Logger file output... ");
-    
+
     const char *log_file = "/tmp/test_mirai.log";
     unlink(log_file);
-    
-    logger_init(LOG_LEVEL_DEBUG, log_file);
-    
+
+    logger_config_t cfg = {0};
+    cfg.min_level = LOG_LEVEL_DEBUG;
+    cfg.output_file  = log_file;
+    logger_init(&cfg);
+
     log_info("Test message to file");
-    
-    logger_cleanup();
+
+    logger_shutdown();
     
     // Check file exists
     FILE *f = fopen(log_file, "r");

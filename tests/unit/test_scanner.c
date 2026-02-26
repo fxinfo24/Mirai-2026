@@ -8,18 +8,22 @@
 #include <string.h>
 #include <assert.h>
 #include <unistd.h>
+#include <pthread.h>
 
 #include "../../src/scanner/scanner_modern.h"
 #include "../../src/common/logger.h"
 
 // Test fixture setup
 static void setup(void) {
-    logger_init(LOG_LEVEL_DEBUG, NULL);
+    logger_config_t cfg = {0};
+    cfg.min_level = LOG_LEVEL_DEBUG;
+    cfg.output_file  = NULL;
+    logger_init(&cfg);
 }
 
 static void teardown(void) {
     scanner_modern_cleanup();
-    logger_cleanup();
+    logger_shutdown();
 }
 
 // Test: Scanner initialization

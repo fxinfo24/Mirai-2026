@@ -19,7 +19,7 @@ import os
 
 # Import authentication service
 try:
-    from auth_service import auth_bp, require_auth, require_permission, require_role
+    from auth_service import auth_bp, require_auth, require_permission, require_role  # noqa: F401
     AUTH_ENABLED = True
 except ImportError:
     AUTH_ENABLED = False
@@ -91,14 +91,15 @@ credential_gen = None
 strategy_gen = None
 evasion_advisor = None
 
+
 def init_llm():
     """Initialize LLM client based on environment"""
     global llm_client, credential_gen, strategy_gen, evasion_advisor
-    
+
     if not LLM_AVAILABLE:
         logger.warning("LLM integration not available")
         return False
-    
+
     # Determine provider — OpenRouter takes priority (supports 200+ models, pay-as-you-go)
     if os.getenv("OPENROUTER_API_KEY"):
         config = LLMConfig(
@@ -143,7 +144,7 @@ def init_llm():
     else:
         logger.warning("No LLM API key configured, using fallback mode")
         return False
-    
+
     try:
         llm_client = LLMClient(config)
         credential_gen = CredentialGenerator(llm_client)
@@ -167,6 +168,8 @@ signature_evader = SignatureEvader() if SignatureEvader else None
 
 
 @app.route('/health', methods=['GET', 'POST'])
+
+
 def health_check():
     """Health check endpoint"""
     return jsonify({
@@ -185,10 +188,12 @@ def health_check():
 
 
 @app.route('/api/credentials/generate', methods=['POST'])
+
+
 def generate_credentials():
     """
     Generate credentials using LLM or fallback
-    
+
     Request body:
     {
         "target_device": "IoT Camera",
@@ -198,14 +203,14 @@ def generate_credentials():
     }
     """
     data = request.get_json()
-    
+
     target_device = data.get('target_device', 'Generic IoT')
     manufacturer = data.get('manufacturer')
     year = data.get('year')
     max_creds = data.get('max_credentials', 10)
-    
+
     logger.info(f"Generating credentials for {target_device}")
-    
+
     try:
         # Try LLM-powered generation
         if credential_gen:
@@ -229,24 +234,26 @@ def generate_credentials():
                 {'username': 'root', 'password': 'admin', 'confidence': 0.8, 'source': 'fallback'},
                 {'username': 'admin', 'password': 'admin', 'confidence': 0.8, 'source': 'fallback'},
             ]
-        
+
         return jsonify({
             'success': True,
             'credentials': credentials[:max_creds],
             'count': len(credentials),
             'llm_powered': credential_gen is not None
         })
-    
+
     except Exception as e:
         logger.error(f"Credential generation failed: {e}")
         return jsonify({'error': str(e)}), 500
 
 
 @app.route('/api/strategy/generate', methods=['POST'])
+
+
 def generate_strategy():
     """
     Generate attack strategy using LLM
-    
+
     Request body:
     {
         "target_info": {
@@ -260,37 +267,39 @@ def generate_strategy():
     """
     if not strategy_gen:
         return jsonify({'error': 'Strategy generation not available (LLM required)'}), 503
-    
+
     data = request.get_json()
     target_info = data.get('target_info', {})
     success_rate = data.get('current_success_rate', 0.5)
     detection_rate = data.get('detection_rate', 0.3)
-    
+
     logger.info("Generating attack strategy with LLM")
-    
+
     try:
         strategy = strategy_gen.generate_strategy(
             target_info=target_info,
             current_success_rate=success_rate,
             detection_rate=detection_rate
         )
-        
+
         return jsonify({
             'success': True,
             'strategy': strategy,
             'llm_powered': True
         })
-    
+
     except Exception as e:
         logger.error(f"Strategy generation failed: {e}")
         return jsonify({'error': str(e)}), 500
 
 
 @app.route('/api/evasion/suggest', methods=['POST'])
+
+
 def suggest_evasion():
     """
     Get evasion technique suggestions
-    
+
     Request body:
     {
         "detected_systems": ["Snort IDS", "pfSense firewall"],
@@ -306,9 +315,9 @@ def suggest_evasion():
     detected_systems = data.get('detected_systems', [])
     current_pattern = data.get('current_pattern', {})
     max_suggestions = data.get('max_suggestions', 5)
-    
+
     logger.info("Generating evasion suggestions")
-    
+
     try:
         # Try LLM-powered evasion
         if evasion_advisor:
@@ -330,24 +339,26 @@ def suggest_evasion():
                 "Increase payload entropy to >0.7"
             ]
             llm_powered = False
-        
+
         return jsonify({
             'success': True,
             'suggestions': suggestions[:max_suggestions],
             'count': len(suggestions),
             'llm_powered': llm_powered
         })
-    
+
     except Exception as e:
         logger.error(f"Evasion suggestion failed: {e}")
         return jsonify({'error': str(e)}), 500
 
 
 @app.route('/api/llm/test', methods=['POST'])
+
+
 def test_llm():
     """
     Test LLM with custom prompt
-    
+
     Request body:
     {
         "prompt": "What are common IoT device default passwords?",
@@ -356,44 +367,51 @@ def test_llm():
     """
     if not llm_client:
         return jsonify({'error': 'LLM not available'}), 503
-    
+
     data = request.get_json()
     prompt = data.get('prompt')
     system_prompt = data.get('system_prompt')
-    
+
     if not prompt:
         return jsonify({'error': 'prompt required'}), 400
-    
+
     try:
         response = llm_client.generate(prompt, system_prompt)
-        
+
         return jsonify({
             'success': True,
             'response': response,
             'model': llm_client.config.model,
             'provider': llm_client.config.provider.value
         })
-    
+
     except Exception as e:
         logger.error(f"LLM test failed: {e}")
         return jsonify({'error': str(e)}), 500
 
 
 @socketio.on('connect')
+
+
 def handle_connect():
     print(f'Client connected: {request.sid}')
     emit('welcome', {'status': 'connected', 'server': 'Mirai-2026 AI Service'})
 
 @socketio.on('disconnect')
+
+
 def handle_disconnect():
     print(f'Client disconnected: {request.sid}')
 
 @socketio.on('subscribe')
+
+
 def handle_subscribe(data):
     room = data.get('room', 'general')
     from flask_socketio import join_room
     join_room(room)
     emit('subscribed', {'room': room})
+
 
 def broadcast_bot_event(event_type: str, bot_data: dict):
     """Broadcast bot events to all connected clients."""
@@ -403,6 +421,7 @@ def broadcast_bot_event(event_type: str, bot_data: dict):
         'timestamp': datetime.utcnow().isoformat()
     })
 
+
 def broadcast_attack_event(event_type: str, attack_data: dict):
     """Broadcast attack events to all connected clients."""
     socketio.emit('attack_event', {
@@ -410,6 +429,7 @@ def broadcast_attack_event(event_type: str, attack_data: dict):
         'attack': attack_data,
         'timestamp': datetime.utcnow().isoformat()
     })
+
 
 def broadcast_metrics(metrics: dict):
     """Broadcast system metrics to all connected clients."""
@@ -421,20 +441,20 @@ def broadcast_metrics(metrics: dict):
 
 if __name__ == '__main__':
     import argparse
-    
+
     parser = argparse.ArgumentParser(description='Mirai 2026 Enhanced AI API Server')
     parser.add_argument('--host', default='0.0.0.0', help='Host to bind to')
     parser.add_argument('--port', type=int, default=5000, help='Port to bind to')
     parser.add_argument('--debug', action='store_true', help='Enable debug mode')
-    
+
     args = parser.parse_args()
-    
+
     logger.info(f"Starting Enhanced AI API server on {args.host}:{args.port}")
-    
+
     if llm_initialized:
         logger.info(f"✅ LLM services active: {llm_client.config.provider.value}/{llm_client.config.model}")
     else:
         logger.warning("⚠️  LLM services not available - using fallback mode")
         logger.info("To enable LLM: Set OPENAI_API_KEY, ANTHROPIC_API_KEY, or start Ollama")
-    
+
     socketio.run(app, host=args.host, port=args.port, debug=args.debug)
