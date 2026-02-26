@@ -299,8 +299,6 @@ func initRedis(redisURL string) *goredis.Client {
 
 // checkRateLimit returns false if the IP is currently locked out.
 func checkRateLimit(ip string) bool {
-	lockoutDur := rlLockoutMinutes * time.Minute
-
 	if rlRedis != nil {
 		ctx := context.Background()
 		val, err := rlRedis.Get(ctx, rlKeyLockout+ip).Result()
