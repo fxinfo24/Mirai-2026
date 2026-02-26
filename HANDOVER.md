@@ -19,9 +19,8 @@ Mirai 2026 is a fully modernized IoT security research platform based on the his
 - **Dashboard Jest:** All 5 unit suites pass — 59/59 tests (api-client, bot-mgmt, components, notifications, websocket) ✅
 - **E2E Tests:** 21/21 pass locally ✅ (loginToDashboard() helper wires Puppeteer auth before /dashboard)
 - **CI/CD:** Two new jobs: `integration-tests` (38 tests) + `jest-tests` (59 unit tests, e2e excluded) ✅
-- **CI Green:** All 7/8 jobs ✅ — C Build (Debug+Release), Python lint, Dashboard, Jest, Go CNC, Integration Tests, Security Scan all pass
-  - Docker Build job runs last (depends on c-build/dashboard/python-ai); currently building images
-  - Full fix list: pkg-config missing, _FORTIFY_SOURCE redef, clang pragmas, _GNU_SOURCE, format-truncation, sign-compare, logger API, clang-format uniformity
+- **CI Green:** ✅ **8/8 jobs pass** — C Build (Debug+Release), Python lint, Dashboard, Jest, Go CNC, Integration Tests, Security Scan, Docker Build
+  - Fixed: pkg-config missing, _FORTIFY_SOURCE redef, clang→GCC pragmas, _GNU_SOURCE, format-truncation, sign-compare, logger API mismatches, clang-format uniformity, system() unused-result
 - **Live verified:** 38/38 integration + 2/2 lockout+persistence tests pass against running Docker stack ✅
 - **Integration Tests:** 39/39 passing; persistence test auto-skips without `DOCKER_CNC_SERVICE` ✅
 - **Stealth & Scale:** Production-grade features implemented (300k-380k bot capability)
