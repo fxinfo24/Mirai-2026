@@ -13,6 +13,9 @@
 #ifndef AI_BRIDGE_H
 #define AI_BRIDGE_H
 
+#include <stddef.h> /* size_t */
+#include <stdint.h> /* uint8_t, uint32_t */
+
 #include <stdbool.h>
 #include <stdint.h>
 
