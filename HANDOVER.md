@@ -1,7 +1,7 @@
 # Mirai 2026 - Project Handover Document
 
 **Last Updated:** February 26, 2026  
-**Version:** 2.2.0  
+**Version:** 2.3.0  
 **Status:** ✅ Production Ready + CNC Rewrite + CI/CD + Dashboard Performance
 
 ---
@@ -10,10 +10,10 @@
 
 Mirai 2026 is a fully modernized IoT security research platform based on the historic 2016 Mirai botnet source code. The project has been transformed into a production-ready, cloud-native system with comprehensive AI/ML integration, complete observability stack, robust security improvements, and **production-grade stealth & scalability features** for complete educational value.
 
-### Current State: ✅ FULLY OPERATIONAL + CNC REWRITTEN + CI/CD LIVE
+### Current State: ✅ FULLY OPERATIONAL + CNC REWRITTEN + CI/CD LIVE + Phase A-D ETHICS ENHANCEMENT (Feb 26, 2026)
 
 - **Deployment:** Docker stack with 8 services running successfully
-- **Security:** 21 bugs fixed (5 critical, 8 high, 8 medium/low) - Feb 26, 2026
+- **Security:** 21 bugs fixed (5 critical, 8 high, 8 medium/low) - Phase A-D Ethics Enhancement complete (Feb 26, 2026)
 - **Stealth & Scale:** Production-grade features implemented (300k-380k bot capability)
 - **Documentation:** Comprehensive guides including detection and defense
 - **Infrastructure:** Full observability stack (Prometheus, Grafana, Loki, Jaeger)
@@ -27,6 +27,47 @@ Mirai 2026 is a fully modernized IoT security research platform based on the his
 ---
 
 ## 🎯 Recent Accomplishments (February 26, 2026)
+
+### 10. **Phase A-D Full Ethics Enhancement Run** ⭐ NEW
+
+**Phase A — Bot Agent (`mirai/bot/`) — 5 files enhanced:**
+- `attack_tcp.c`: All 4 outer `while(TRUE)` → `attack_should_continue()` — SIGUSR1 kill switch now halts all TCP SYN/ACK/stomp floods
+- `attack_gre.c`: Both GRE flood outer loops → `attack_should_continue()`
+- `attack_app.c`: Both outer HTTP application loops → `attack_should_continue()` (inner connection loops preserved TRUE)
+- `killer.c`: Entire `killer_init()` body wrapped in `#ifndef RESEARCH_MODE` — research builds disable process killing; original code preserved verbatim
+- `main.c`: `SIGUSR1` kill switch handler (`kill_switch_handler` sets `attack_running=0`), `RESEARCH_MODE` auth gate (`MIRAI_AUTH_TOKEN` env var checked via constant-time comparison), audit hook logs attack command dispatch
+
+**Phase B — C&C Server (`mirai/cnc/`) — 4 files enhanced:**
+- `database.go`: bcrypt password hashing (`TryLogin`/`CreateUser`) with legacy plaintext fallback + auto-promotion; `auditLog()` on all auth events: `LOGIN_OK`, `LOGIN_FAIL`, `ATTACK_ALLOW`, `ATTACK_DENY`, `WHITELIST_BLOCK`, `API_AUTH_OK`
+- `admin.go`: Per-IP login rate limiting (5 failures → 5-minute lockout via `loginLockouts` map); Cyrillic social-engineering prompts (пользователь/пароль) replaced with honest English labels; `LOGIN_OK`/`LOGIN_FAIL`/`LOGIN_LOCKOUT` audit events
+- `bot.go`: HMAC-SHA256 challenge-response bot authentication gate — bots send `HMAC(BOT_CHALLENGE_SECRET, nonce)` on connect; unauthorized bots rejected before joining `clientList`
+- `go.mod`: Added `golang.org/x/crypto` for bcrypt support
+
+**Phase C — Loader (`loader/src/`) — 1 file enhanced:**
+- `main.c`: Operator auth gate (`LOADER_REQUIRE_AUTH=1` + `LOADER_AUTH_TOKEN` + `LOADER_AUTH_PROVIDED` env vars, constant-time compare); authorized CIDR scope check (`AUTHORIZED_CIDR` env var, comma-separated CIDRs) — targets outside scope rejected and logged; structured audit log (`LOADER_AUDIT_FILE` env var, default `/tmp/loader_audit.log`) with timestamped JSON-style events
+
+**Phase D — Tools (`mirai/tools/`) — 3 files enhanced:**
+- `enc.c`: Optional ChaCha20-Poly1305 AEAD encryption via libsodium (`-DUSE_SODIUM -lsodium`); new `chacha20` data type argument; original XOR encoding 100% preserved
+- `nogdb.c`: `RESEARCH_MODE` compile flag disables ELF corruption so researchers can attach debuggers; original ptrace anti-debug preserved for production builds
+- `single_load.c`: Same auth gate (`single_load_check_auth`) + CIDR scope check (`single_load_check_scope`) as loader/src/main.c
+
+**Key Operator Environment Variables:**
+```
+MIRAI_AUTH_TOKEN        Bot authorization token (RESEARCH_MODE builds)
+BOT_CHALLENGE_SECRET    CNC bot HMAC challenge secret
+LOADER_REQUIRE_AUTH     Set to 1 to enforce loader auth
+LOADER_AUTH_TOKEN       Expected loader auth token
+LOADER_AUTH_PROVIDED    Provided loader auth token
+AUTHORIZED_CIDR         Comma-separated CIDRs e.g. 10.0.0.0/8,192.168.0.0/16
+LOADER_AUDIT_FILE       Audit log path (default /tmp/loader_audit.log)
+```
+
+**Kill Switch Usage:**
+```bash
+# Stop all active bot attacks immediately
+kill -SIGUSR1 <bot_pid>
+# Or via the C&C — broadcast SIGUSR1 to all bots
+```
 
 ### 1. **C Bug Fixes — High Severity** ⭐ NEW
 ✅ 3 additional high-severity bugs fixed
@@ -2566,6 +2607,14 @@ ai/
 
 ## 📜 Version History
 
+**v2.3.0 (Feb 26, 2026) - Phase A-D Ethics Enhancement Run**
+- Phase A: attack_should_continue() wired across all attack modules (TCP/GRE/APP)
+- Phase A: killer.c RESEARCH_MODE guard, main.c kill switch + auth gate
+- Phase B: bcrypt password hashing, rate limiting, HMAC bot auth, audit logging
+- Phase C: Loader auth gate, CIDR scope enforcement, structured audit log
+- Phase D: enc.c ChaCha20-Poly1305, nogdb.c research mode, single_load.c auth+scope
+- git commit a869890: 14 files changed, 631 insertions, 48 deletions
+
 **v2.1.0 (Feb 25, 2026) - Stealth & Scale + Bug Fixes**
 - Complete bug audit (18 bugs found, critical ones fixed)
 - Stealth & scale implementation (SYN scanner, multi-IP loader, pipeline)
@@ -2611,6 +2660,6 @@ Offense (How it works) + Defense (How to stop it) = Complete Understanding
 
 **End of Handover Document**
 
-*Last updated: February 25, 2026*  
+*Last updated: February 26, 2026*  
 *Maintainer: Mirai 2026 Research Team*  
-*Version: 2.1.0*
+*Version: 2.3.0*

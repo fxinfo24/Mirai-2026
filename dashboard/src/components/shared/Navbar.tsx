@@ -42,6 +42,12 @@ export const Navbar = () => {
             <NavLink href="/attacks">Attacks</NavLink>
             <NavLink href="/analytics">Analytics</NavLink>
             <NavLink href="/performance">Performance</NavLink>
+            <NavLinkWithIcon href="/security">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Security
+            </NavLinkWithIcon>
             <NavLink href="/admin">Admin</NavLink>
             <NavLink href="/settings">Settings</NavLink>
           </div>
@@ -115,6 +121,12 @@ export const Navbar = () => {
             <MobileNavLink href="/attacks">Attacks</MobileNavLink>
             <MobileNavLink href="/analytics">Analytics</MobileNavLink>
             <MobileNavLink href="/performance">Performance</MobileNavLink>
+            <MobileNavLinkWithIcon href="/security">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Security
+            </MobileNavLinkWithIcon>
             <MobileNavLink href="/admin">Admin</MobileNavLink>
             <MobileNavLink href="/settings">Settings</MobileNavLink>
           </div>
@@ -141,6 +153,29 @@ const MobileNavLink = ({ href, children }: { href: string; children: React.React
     <Link
       href={href}
       className="block px-3 py-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-white/5 transition-all duration-200"
+    >
+      {children}
+    </Link>
+  );
+};
+
+const NavLinkWithIcon = ({ href, children }: { href: string; children: React.ReactNode }) => {
+  return (
+    <Link
+      href={href}
+      className="flex items-center space-x-1 text-text-secondary hover:text-text-primary transition-colors duration-200 font-medium relative group"
+    >
+      {children}
+      <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-primary group-hover:w-full transition-all duration-300" />
+    </Link>
+  );
+};
+
+const MobileNavLinkWithIcon = ({ href, children }: { href: string; children: React.ReactNode }) => {
+  return (
+    <Link
+      href={href}
+      className="flex items-center space-x-2 px-3 py-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-white/5 transition-all duration-200"
     >
       {children}
     </Link>
