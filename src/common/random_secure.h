@@ -6,8 +6,8 @@
 #ifndef RANDOM_SECURE_H
 #define RANDOM_SECURE_H
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 /**
  * Initialize secure random number generator
@@ -17,7 +17,7 @@ void random_secure_init(void);
 
 /**
  * Get cryptographically secure random bytes
- * 
+ *
  * @param buf Buffer to fill
  * @param len Number of bytes
  * @return 0 on success, -1 on error
@@ -41,7 +41,7 @@ uint32_t random_secure_range(uint32_t min, uint32_t max);
 
 /**
  * Generate random alphanumeric string
- * 
+ *
  * @param buf Output buffer
  * @param len Buffer length (including null terminator)
  */

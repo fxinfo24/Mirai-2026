@@ -23,7 +23,7 @@ int socket_set_reuseport(int sockfd);
 
 /**
  * Enable TCP keep-alive
- * 
+ *
  * @param sockfd Socket file descriptor
  * @param idle_sec Seconds before sending first probe
  * @param interval_sec Seconds between probes

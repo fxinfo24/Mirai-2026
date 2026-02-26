@@ -1,8 +1,8 @@
 #pragma once
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 // Memory utilities (safer than standard functions)
 void *util_malloc(size_t size);
@@ -18,7 +18,7 @@ int util_strcmp(const char *s1, const char *s2);
 char *util_strdup(const char *str);
 
 // Memory search
-int util_memsearch(const void *haystack, size_t haystack_len, 
+int util_memsearch(const void *haystack, size_t haystack_len,
                    const void *needle, size_t needle_len);
 
 // Network utilities

@@ -6,9 +6,9 @@
 #ifndef CREDENTIAL_LOADER_H
 #define CREDENTIAL_LOADER_H
 
-#include <stddef.h>
-#include <stdbool.h>
 #include "pipeline.h"
+#include <stdbool.h>
+#include <stddef.h>
 
 /**
  * Initialize credential loader
@@ -17,7 +17,7 @@ int credential_loader_init(void);
 
 /**
  * Load credentials from JSON file (from ai/credential_intel/generate.py)
- * 
+ *
  * Expected JSON format:
  * {
  *   "credentials": [
@@ -59,7 +59,8 @@ size_t credential_loader_count(void);
  * Update credential success/failure statistics
  * Automatically adjusts weight based on success rate
  */
-void credential_loader_update_result(const char *username, const char *password, bool success);
+void credential_loader_update_result(const char *username, const char *password,
+                                     bool success);
 
 /**
  * Print credential statistics

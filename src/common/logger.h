@@ -7,30 +7,30 @@
 
 // Log levels
 typedef enum {
-    LOG_LEVEL_TRACE = 0,
-    LOG_LEVEL_DEBUG = 1,
-    LOG_LEVEL_INFO = 2,
-    LOG_LEVEL_WARN = 3,
-    LOG_LEVEL_ERROR = 4,
-    LOG_LEVEL_FATAL = 5
+  LOG_LEVEL_TRACE = 0,
+  LOG_LEVEL_DEBUG = 1,
+  LOG_LEVEL_INFO = 2,
+  LOG_LEVEL_WARN = 3,
+  LOG_LEVEL_ERROR = 4,
+  LOG_LEVEL_FATAL = 5
 } log_level_t;
 
 // Log context for structured logging
 typedef struct {
-    const char *component;
-    const char *trace_id;
-    uint64_t request_id;
+  const char *component;
+  const char *trace_id;
+  uint64_t request_id;
 } log_context_t;
 
 // Logger configuration
 typedef struct {
-    log_level_t min_level;
-    bool json_format;
-    bool colorized;
-    const char *output_file;
-    bool include_timestamp;
-    bool include_thread_id;
-    bool include_source_location;
+  log_level_t min_level;
+  bool json_format;
+  bool colorized;
+  const char *output_file;
+  bool include_timestamp;
+  bool include_thread_id;
+  bool include_source_location;
 } logger_config_t;
 
 // Initialize logger
