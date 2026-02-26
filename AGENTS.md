@@ -3,7 +3,7 @@
 > **Purpose:** Comprehensive guide for AI assistants working on the Mirai 2026 security research platform.
 >
 > **Last Updated:** 2026-02-24
-> **Project Version:** 2.0.0
+> **Project Version:** 2.9.0
 
 ---
 
@@ -790,7 +790,7 @@ python ai/test_openrouter.py
 
 ## Changelog & Versioning
 
-### Current Version: 2.0.0
+### Current Version: 2.9.0
 
 **Semantic Versioning:**
 - MAJOR: Breaking changes
@@ -853,7 +853,7 @@ python ai/test_openrouter.py
 ---
 
 **Last Updated:** 2026-02-24  
-**Version:** 2.0.0  
+**Version:** 2.9.0  
 **Maintained By:** Project maintainers
 
 *"Build secure systems by understanding insecure ones"*

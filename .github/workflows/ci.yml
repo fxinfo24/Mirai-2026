@@ -191,6 +191,9 @@ jobs:
         run: kill $CNC_PID 2>/dev/null || true
 
   # ── Jest Unit Tests ───────────────────────────────────────────────────────────
+  # Runs only the fast unit tests (tests/unit/**). The e2e tests (tests/e2e/**)
+  # require a running browser + Puppeteer and are excluded here to keep CI fast.
+  # Run e2e locally with: cd dashboard && npx jest --testPathPatterns="e2e"
   jest-tests:
     name: Jest Unit Tests (Dashboard)
     runs-on: ubuntu-22.04
@@ -212,8 +215,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Jest tests
-        run: npm test -- --no-coverage --passWithNoTests --forceExit
+      - name: Run Jest unit tests (exclude e2e)
+        run: npm test -- --no-coverage --passWithNoTests --forceExit --testPathPatterns="tests/unit"
 
   # ── Docker Images ────────────────────────────────────────────────────────────
   docker:

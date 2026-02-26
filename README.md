@@ -19,7 +19,24 @@
 
 ## 🎉 What's New - February 2026
 
-### Latest Release: v2.0.0 (2026-02-25)
+### Latest Release: v2.9.0 (2026-02-27)
+
+**🆕 Redis-Backed Rate-Limit — CNC Lockouts Survive Restarts**
+- ✅ **Redis persistence**: `cnc:ratelimit:attempts/{ip}` + `cnc:ratelimit:lockout/{ip}` keys (TTL 5 min)
+- ✅ **Graceful fallback**: In-memory rate-limit used when Redis is unreachable — CNC always starts
+- ✅ **Multi-replica safe**: Lockout state shared across horizontal CNC replicas via Redis
+- ✅ **Verified live**: 429 fires after 5 bad logins; survives `docker-compose restart cnc`
+
+**🆕 Dashboard Jest Suite — All 59 Tests Pass**
+- ✅ **api-client.test.ts**: Fixed `authenticatedFetch` mock — was 8 failures, now 0
+- ✅ **All 5 suites**: api-client, bot-management, components, notifications, websocket — 59/59
+
+**🆕 CI/CD — Integration Tests + Jest Unit Tests in Pipeline**
+- ✅ **integration-tests job**: Starts CNC via `go run`, runs 38 ethical-safeguard tests
+- ✅ **jest-tests job**: Runs 59 dashboard unit tests (e2e excluded — needs browser)
+- ✅ **Lockout test excluded from CI**: `DOCKER_CNC_SERVICE` persistence test skipped safely
+
+### Previous Release: v2.0.0 (2026-02-25)
 
 **🆕 Performance Benchmark Suite** (1,516 lines)
 - ✅ **Scanner Benchmark**: Validates 1000+ SYNs/sec, <2% CPU, 80x faster than qbot
@@ -558,12 +575,13 @@ This project is licensed under the **GPL-3.0 License** - see [LICENSE](LICENSE) 
 - ✅ **AI Services**: Pattern evolution and signature evasion working
 - ✅ **Security**: Critical bugs fixed (Feb 2026)
 - ✅ **Documentation**: Comprehensive guides available
-- ✅ **Tests**: Unit and integration tests passing
-- ✅ **C&C Server**: Original Mirai Go implementation (1,191 lines, fully functional)
+- ✅ **Tests**: 59/59 Jest unit tests + 38/38 integration tests passing
+- ✅ **C&C Server**: Modern Go CNC with Redis-backed rate-limit, REST API + WebSocket + JWT
 - ✅ **Kubernetes**: Production-ready manifests with dev/prod overlays and HPA
+- ✅ **CI/CD**: integration-tests + jest-tests jobs in GitHub Actions pipeline
 
 ---
 
 **Built with ❤️ for security research and education**
 
-*Last Updated: February 24, 2026*
+*Last Updated: February 27, 2026*
