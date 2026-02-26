@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 /**
  * Post-Quantum Cryptography Implementation - Mirai 2026
  */

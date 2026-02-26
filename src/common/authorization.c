@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 /**
  * Authorization Framework Implementation - Mirai 2026
  */
@@ -268,10 +269,13 @@ const char *auth_get_status(auth_config_t *auth) {
     time_t now = time(NULL);
     time_t remaining = auth->expires_at - now;
     
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
     snprintf(status, sizeof(status),
              "Researcher: %s | Project: %s | Expires in: %ld hours | Operations: %d | Networks: %d",
              auth->researcher_id, auth->project_id,
              remaining / 3600, auth->num_operations, auth->num_networks);
+#pragma GCC diagnostic pop
     
     return status;
 }

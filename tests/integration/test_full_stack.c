@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <arpa/inet.h>
 
 #include "../../src/scanner/scanner_modern.h"
 #include "../../src/attack/attack_modern.h"
@@ -17,7 +18,7 @@
 static void test_full_initialization(void) {
     printf("TEST: Full stack initialization... ");
     
-    logger_init(LOG_LEVEL_INFO, NULL);
+    { logger_config_t _lcfg = {0}; _lcfg.min_level = LOG_LEVEL_INFO; logger_init(&_lcfg); }
     
     // Initialize all modules
     int result = attack_modern_init();
@@ -26,14 +27,14 @@ static void test_full_initialization(void) {
     if (scanner_modern_init(NULL, 64) < 0) {
         printf("SKIP (requires privileges)\n");
         attack_modern_cleanup();
-        logger_cleanup();
+        logger_shutdown();
         return;
     }
     
     // Cleanup
     scanner_modern_cleanup();
     attack_modern_cleanup();
-    logger_cleanup();
+    logger_shutdown();
     
     printf("PASS\n");
 }
@@ -41,13 +42,13 @@ static void test_full_initialization(void) {
 static void test_scanner_and_attack_concurrent(void) {
     printf("TEST: Scanner and attack running concurrently... ");
     
-    logger_init(LOG_LEVEL_INFO, NULL);
+    { logger_config_t _lcfg = {0}; _lcfg.min_level = LOG_LEVEL_INFO; logger_init(&_lcfg); }
     attack_modern_init();
     
     if (scanner_modern_init(NULL, 32) < 0) {
         printf("SKIP (requires privileges)\n");
         attack_modern_cleanup();
-        logger_cleanup();
+        logger_shutdown();
         return;
     }
     
@@ -78,7 +79,7 @@ static void test_scanner_and_attack_concurrent(void) {
     
     scanner_modern_cleanup();
     attack_modern_cleanup();
-    logger_cleanup();
+    logger_shutdown();
     
     printf("PASS\n");
 }

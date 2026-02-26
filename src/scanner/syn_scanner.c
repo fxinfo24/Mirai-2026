@@ -35,8 +35,8 @@ struct epoll_event { uint32_t events; epoll_data_t data; };
 #endif
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <netinet/ip.h>
+/* Use linux/ headers only — they supersede the netinet/ versions for raw sockets.
+ * Including both causes struct redefinition errors on Linux. */
 #include <linux/ip.h>
 #include <linux/tcp.h>
 #include <fcntl.h>

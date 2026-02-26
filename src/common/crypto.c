@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include "crypto.h"
 #include "logger.h"
 #include "util.h"

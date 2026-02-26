@@ -14,22 +14,21 @@
 static void test_config_load(void) {
     printf("TEST: Config load... ");
 
-    logger_config_t cfg = {0};
-    cfg.min_level = LOG_LEVEL_DEBUG;
-    logger_init(&cfg);
+    logger_config_t lcfg = {0};
+    lcfg.min_level = LOG_LEVEL_DEBUG;
+    logger_init(&lcfg);
 
     // Test with example config
-    config_t *config = config_load("../../config/bot.example.json");
+    mirai_config_t config = {0};
+    result_t res = config_load("../../config/bot.example.json", &config);
 
-    if (config == NULL) {
-        printf("SKIP (config file not found)\n");
+    if (!res.success) {
+        printf("SKIP (config file not found or invalid)\n");
         logger_shutdown();
         return;
     }
 
-    assert(config != NULL);
-
-    config_free(config);
+    config_free(&config);
     logger_shutdown();
 
     printf("PASS\n");
@@ -38,12 +37,13 @@ static void test_config_load(void) {
 static void test_config_invalid(void) {
     printf("TEST: Config invalid file... ");
 
-    logger_config_t cfg = {0};
-    cfg.min_level = LOG_LEVEL_DEBUG;
-    logger_init(&cfg);
+    logger_config_t lcfg = {0};
+    lcfg.min_level = LOG_LEVEL_DEBUG;
+    logger_init(&lcfg);
 
-    config_t *config = config_load("/nonexistent/file.json");
-    assert(config == NULL);
+    mirai_config_t config = {0};
+    result_t res = config_load("/nonexistent/file.json", &config);
+    assert(!res.success);
 
     logger_shutdown();
 

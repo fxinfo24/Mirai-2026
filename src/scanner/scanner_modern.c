@@ -163,6 +163,7 @@ static scanner_context_t *g_scanner = NULL;
 static int scanner_init_epoll(scanner_context_t *ctx);
 static int scanner_init_raw_socket(scanner_context_t *ctx);
 static int scanner_load_credentials(scanner_context_t *ctx, const char *config_path);
+static int scanner_load_credentials_from_ai(scanner_context_t *ctx);
 static void scanner_send_syns(scanner_context_t *ctx);
 static void scanner_handle_synack(scanner_context_t *ctx);
 static int scanner_create_connection(scanner_context_t *ctx, struct sockaddr_in *target);
@@ -300,6 +301,7 @@ static int scanner_init_raw_socket(scanner_context_t *ctx) {
  * In production, this would integrate with the AI credential generator
  */
 static int scanner_load_credentials(scanner_context_t *ctx, const char *config_path) {
+    (void)config_path;  /* unused until AI credential integration is complete */
     // For now, load some default credentials
     // TODO: Integrate with ai/credential_intel/generate.py
     
@@ -764,7 +766,7 @@ static scanner_credential_t *scanner_get_random_credential(scanner_context_t *ct
 /**
  * Generate random target IP (avoiding reserved ranges)
  */
-static uint32_t scanner_get_random_target_ip(void) {
+static uint32_t __attribute__((unused)) scanner_get_random_target_ip(void) {
     uint32_t ip;
     do {
         ip = (uint32_t)rand();

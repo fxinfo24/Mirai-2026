@@ -40,9 +40,9 @@
 /**
  * Helper: Check if we can consume 'amount' bytes from buffer
  */
-static inline bool can_consume(telnet_conn_t *conn, char *ptr, int amount)
+static inline bool can_consume(telnet_conn_t *conn, uint8_t *ptr, int amount)
 {
-    char *end = conn->rdbuf + conn->rdbuf_pos;
+    uint8_t *end = (uint8_t *)conn->rdbuf + conn->rdbuf_pos;
     return (ptr + amount) < end;
 }
 
@@ -75,7 +75,7 @@ static ssize_t recv_strip_null(int sock, void *buf, size_t len, int flags)
 int telnet_consume_iacs(telnet_conn_t *conn)
 {
     int consumed = 0;
-    char *ptr = conn->rdbuf;
+    uint8_t *ptr = (uint8_t *)conn->rdbuf;
     
     while (consumed < conn->rdbuf_pos) {
         if (*ptr != TELNET_IAC) {

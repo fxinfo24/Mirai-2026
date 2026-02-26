@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 /**
  * Kill Switch Implementation - Mirai 2026
  */

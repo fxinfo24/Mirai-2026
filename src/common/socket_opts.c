@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 /**
  * @file socket_opts.c
  * @brief Network socket optimizations for high-performance I/O

@@ -96,8 +96,11 @@ int ai_bridge_generate_credentials(
     // Send HTTP request
     http_response_t response = {0};
     char endpoint[512];
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
     snprintf(endpoint, sizeof(endpoint), "%s/api/credentials/generate", g_ai_config.api_endpoint);
-    
+#pragma GCC diagnostic pop
+
     int result = ai_bridge_http_post(endpoint, json_str, &response);
     json_object_put(jreq);
     
@@ -174,7 +177,10 @@ int ai_bridge_get_evasion_techniques(
     // Send request
     http_response_t response = {0};
     char endpoint[512];
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
     snprintf(endpoint, sizeof(endpoint), "%s/api/evasion/suggest", g_ai_config.api_endpoint);
+#pragma GCC diagnostic pop
     
     int result = ai_bridge_http_post(endpoint, json_str, &response);
     json_object_put(jreq);
@@ -248,7 +254,10 @@ int ai_bridge_prioritize_targets(
     // Send request
     http_response_t response = {0};
     char endpoint[512];
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
     snprintf(endpoint, sizeof(endpoint), "%s/api/targets/prioritize", g_ai_config.api_endpoint);
+#pragma GCC diagnostic pop
     
     int result = ai_bridge_http_post(endpoint, json_str, &response);
     json_object_put(jreq);
@@ -290,7 +299,10 @@ bool ai_bridge_is_available(void) {
     
     // Try a simple health check
     char endpoint[512];
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
     snprintf(endpoint, sizeof(endpoint), "%s/health", g_ai_config.api_endpoint);
+#pragma GCC diagnostic pop
     
     http_response_t response = {0};
     int result = ai_bridge_http_post(endpoint, "{}", &response);

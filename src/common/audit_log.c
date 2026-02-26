@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 /**
  * Audit Logging Implementation - Mirai 2026
  */

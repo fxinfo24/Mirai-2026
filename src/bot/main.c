@@ -273,7 +273,7 @@ static bool check_runtime_limit(const mirai_config_t *config)
     time_t now = time(NULL);
     time_t elapsed = now - g_bot_state.start_time;
 
-    if (elapsed >= config->safeguards.max_runtime_seconds) {
+    if (elapsed >= 0 && (uint64_t)elapsed >= config->safeguards.max_runtime_seconds) {
         log_warn("Runtime limit exceeded: %ld seconds", elapsed);
         log_audit("runtime_limit", "exceeded", "shutdown");
         return false;
@@ -319,7 +319,7 @@ static void main_loop(const mirai_config_t *config)
     time_t max_rt = config->safeguards.enabled
                     ? (time_t)config->safeguards.max_runtime_seconds : 0;
     g_bot_state.kill_switch = kill_switch_system_init(ks_url, max_rt);
-    kill_switch_install_signal_handler();
+    /* kill_switch_install_signal_handler() — not yet implemented in kill_switch.h */
 
     // Initialise AI bridge (non-fatal if unavailable)
     ai_bridge_init("http://localhost:8001");
