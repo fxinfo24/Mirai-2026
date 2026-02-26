@@ -322,5 +322,4 @@ func (this *Admin) ReadLine(masked bool) (string, error) {
         }
         bufPos++
     }
-    return string(buf), nil
 }

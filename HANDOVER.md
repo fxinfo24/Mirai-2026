@@ -1,8 +1,8 @@
 # Mirai 2026 - Project Handover Document
 
 **Last Updated:** February 27, 2026  
-**Version:** 2.7.0  
-**Status:** ✅ Rate-Limit Live · WS Unit Tests (24/24) · kill:all E2E · 38/38 Integration · HANDOVER Current
+**Version:** 2.8.0  
+**Status:** ✅ 39/39 Integration Tests · Rate-Limit Live + Tested · go vet Clean · HANDOVER Current
 
 ---
 
@@ -10,7 +10,7 @@
 
 Mirai 2026 is a fully modernized IoT security research platform based on the historic 2016 Mirai botnet source code. The project has been transformed into a production-ready, cloud-native system with comprehensive AI/ML integration, complete observability stack, robust security improvements, and **production-grade stealth & scalability features** for complete educational value.
 
-### Current State: ✅ FULLY OPERATIONAL + Rate-Limit Enforced + WS Unit Tests + 38/38 Integration Tests (Feb 27, 2026)
+### Current State: ✅ FULLY OPERATIONAL + 39/39 Tests (0 skipped) + Rate-Limit Enforced + go vet Clean (Feb 27, 2026)
 
 - **Deployment:** Docker stack with 8 services running successfully ✅ verified Feb 26 2026
 - **Security:** 21 bugs fixed (5 critical, 8 high, 8 medium/low) - Phase A-D Ethics Enhancement complete (Feb 26, 2026)
@@ -27,6 +27,53 @@ Mirai 2026 is a fully modernized IoT security research platform based on the his
 - **Integration Tests:** 38-test ethical safeguard suite — **38/38 passed, 0 skipped** ✅ NEW
 - **Docker CNC:** Rebuilt with `cnc_modern.go` — REST API + WebSocket + JWT + kill-switch ✅ NEW
 - **go.mod:** Bumped to `go 1.22` + `toolchain go1.22.0` — enables method-qualified ServeMux routing ✅ NEW
+
+---
+
+## 🎯 Recent Accomplishments (February 27, 2026 — Session 8)
+
+### 26. **Docker CNC Rebuilt with Rate-Limit — 429 Verified Live** ⭐ NEW
+
+`docker-compose up --build cnc` rebuilt with rate-limit functions inlined into `cnc_modern.go`.
+
+**Root cause of build failure:** `handleLogin()` referenced `checkRateLimit`/`recordFailedLogin`/`clearLoginAttempts` from `admin.go`, but the Dockerfile only copies `cnc_modern.go` as a standalone file (strips `//go:build ignore`, builds solo). Those functions were undefined in the Docker build context.
+
+**Fix:** Rate-limit state and functions inlined directly into `cnc_modern.go` as a self-contained block (`rlMu`, `rlAttempts`, `rlLockouts`, `checkRateLimit`, `recordFailedLogin`, `clearLoginAttempts`). The Dockerfile needs no changes.
+
+**Live verification:**
+```bash
+for i in 1..6; do POST /api/auth/login password=WRONG; done
+# Attempt 1-5: HTTP 401
+# Attempt 6:   HTTP 429 ✅ lockout triggered
+```
+
+### 27. **Rate-Limit Lockout Test Added — 39/39 Integration Tests Pass** ⭐ NEW
+
+**New test class:** `TestCNCRateLimitLockout` in `tests/integration/test_ethical_safeguards.py`
+
+- `test_rate_limit_lockout_after_5_failures`: hammers login 6× with bad password, asserts final status is 429
+- Placed as the **last class in the file** (after `TestBadbotSafeguards`) so the IP lockout it triggers doesn't cascade into skips on other live tests that need `get_operator_token()`
+- Documented: restart CNC between consecutive full runs (`docker-compose restart cnc`) to clear in-memory lockout state
+
+**Test count: 38 → 39** (1 new live test added)
+
+```
+CNC_API_URL=http://localhost:8080 python3 -m pytest tests/integration/test_ethical_safeguards.py -v
+39 passed, 0 skipped, 0 failed ✅
+```
+
+### 28. **`go vet` Warnings Fixed — Unreachable Code Removed** ⭐ NEW
+
+**Files:** `mirai/cnc/admin.go`, `mirai/cnc/api.go`
+
+Both `ReadLine()` functions had an unreachable `return string(buf), nil` after an infinite `for {}` loop. The loop never exits normally (only via `return` inside the loop body), so the trailing return was dead code flagged by `go vet`.
+
+**Fix:** Remove the dead `return` statements. `go vet ./...` now produces zero warnings/errors.
+
+```bash
+cd mirai/cnc && go vet ./...
+# (no output) ✅
+```
 
 ---
 

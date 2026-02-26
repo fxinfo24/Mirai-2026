@@ -239,13 +239,60 @@ func (a *ActiveAttackRegistry) Count() int {
 	return len(a.attacks)
 }
 
+// ── Login Rate Limiter ────────────────────────────────────────────────────────
+// Tracks failed REST login attempts per IP. Mirrors the same logic in admin.go
+// so the two login paths share a lockout state in the same process.
+// 5 failures → 5-minute lockout, returning HTTP 429.
+
+var (
+	rlMu       sync.Mutex
+	rlAttempts = make(map[string]int)
+	rlLockouts = make(map[string]time.Time)
+)
+
+const (
+	rlMaxFails       = 5
+	rlLockoutMinutes = 5
+)
+
+func checkRateLimit(ip string) bool {
+	rlMu.Lock()
+	defer rlMu.Unlock()
+	if t, locked := rlLockouts[ip]; locked {
+		if time.Now().Before(t) {
+			return false // still locked out
+		}
+		// Lockout expired — clear it
+		delete(rlLockouts, ip)
+		delete(rlAttempts, ip)
+	}
+	return true
+}
+
+func recordFailedLogin(ip string) {
+	rlMu.Lock()
+	defer rlMu.Unlock()
+	rlAttempts[ip]++
+	if rlAttempts[ip] >= rlMaxFails {
+		rlLockouts[ip] = time.Now().Add(rlLockoutMinutes * time.Minute)
+		logger.Warn("Login lockout triggered", "ip", ip, "attempts", rlAttempts[ip])
+	}
+}
+
+func clearLoginAttempts(ip string) {
+	rlMu.Lock()
+	defer rlMu.Unlock()
+	delete(rlAttempts, ip)
+	delete(rlLockouts, ip)
+}
+
 // ── Global state ──────────────────────────────────────────────────────────────
 
 var (
-	registry     = NewBotRegistry()
-	hub          = NewWSHub()
+	registry      = NewBotRegistry()
+	hub           = NewWSHub()
 	activeAttacks = NewActiveAttackRegistry()
-	logger       = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+	logger        = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}))
 )

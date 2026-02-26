@@ -88,5 +88,4 @@ func (this *Api) ReadLine() (string, error) {
         }
         bufPos++
     }
-    return string(buf), nil
 }

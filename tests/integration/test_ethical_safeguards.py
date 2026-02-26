@@ -292,6 +292,7 @@ class TestCNCRateLimiting:
         assert data["status"] == "ok"
 
 
+
 # ── Category 4: Kill-Switch API (live) ───────────────────────────────────────
 
 @pytest.mark.skipif(not HAS_REQUESTS, reason="requests not installed")
@@ -531,6 +532,42 @@ class TestBadbotSafeguards:
         src = self.BADBOT.read_text()
         assert "BADBOT_START" in src or "BADBOT_REPORT" in src, \
             "No audit events emitted by badbot.c"
+
+
+# ── Category 8: Rate-Limit Lockout (live — MUST RUN LAST) ────────────────────
+# Separated from TestCNCRateLimiting and placed at the end of the file because
+# this test intentionally triggers a 5-minute IP lockout on the CNC server.
+# Running it last ensures all other live tests (which need valid logins) complete
+# first. After this test, restart the CNC to clear the lockout before re-running:
+#   docker-compose restart cnc
+
+@pytest.mark.skipif(not HAS_REQUESTS, reason="requests not installed")
+class TestCNCRateLimitLockout:
+    """
+    Verifies that 5 consecutive bad-password attempts trigger HTTP 429.
+    MUST be the last test class — it locks out the test runner IP for 5 minutes.
+    """
+
+    def test_rate_limit_lockout_after_5_failures(self):
+        """5 consecutive bad-password attempts from the same IP must trigger 429."""
+        if not cnc_reachable():
+            pytest.skip(f"CNC not running at {CNC_API_URL}")
+        bad_payload = {"username": "operator", "password": "WRONG-ratelimit-trigger-test"}
+        last_status = None
+        for attempt in range(6):
+            r = requests.post(
+                f"{CNC_API_URL}/api/auth/login",
+                json=bad_payload,
+                timeout=5,
+            )
+            last_status = r.status_code
+            if r.status_code == 429:
+                break  # lockout triggered — test passes
+        assert last_status == 429, (
+            f"Expected 429 after 5 failed login attempts, "
+            f"last status was {last_status}. "
+            "Rate-limit lockout may not be wired into the REST login handler."
+        )
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────
