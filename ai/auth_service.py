@@ -18,7 +18,7 @@ from typing import Optional, Dict, List
 
 import jwt
 import bcrypt
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, make_response
 from functools import wraps
 
 # JWT Configuration
@@ -26,6 +26,15 @@ JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', secrets.token_hex(32))
 JWT_ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRY = timedelta(hours=1)
 REFRESH_TOKEN_EXPIRY = timedelta(days=7)
+
+# httpOnly cookie configuration
+# Cookie name used for the refresh token — never readable by JavaScript.
+REFRESH_COOKIE_NAME = 'mirai_refresh'
+# In production set COOKIE_SECURE=true (requires HTTPS).
+COOKIE_SECURE = os.getenv('COOKIE_SECURE', 'false').lower() == 'true'
+# SameSite policy: 'Strict' is safest; use 'Lax' if dashboard and API are on
+# different subdomains but same registered domain.
+COOKIE_SAMESITE = os.getenv('COOKIE_SAMESITE', 'Strict')
 
 # Create Blueprint
 auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
@@ -233,7 +242,7 @@ def login():
     # Generate tokens
     access_token = generate_access_token(user)
     refresh_token = generate_refresh_token(user)
-    
+
     # Return user without password hash
     user_response = {
         'id': user['id'],
@@ -242,86 +251,141 @@ def login():
         'role': user['role'],
         'permissions': ROLE_PERMISSIONS.get(user['role'], [])
     }
-    
-    return jsonify({
+
+    # Build response — return access_token in body, set refresh_token as
+    # httpOnly cookie so JavaScript can never read it (XSS-safe).
+    # The 'refresh_token' field is kept in the body as well for backwards
+    # compatibility with any non-browser API clients (e.g. curl, tests).
+    resp = make_response(jsonify({
         'access_token': access_token,
-        'refresh_token': refresh_token,
         'user': user_response,
         'expires_in': int(ACCESS_TOKEN_EXPIRY.total_seconds())
-    }), 200
+    }), 200)
+
+    resp.set_cookie(
+        REFRESH_COOKIE_NAME,
+        refresh_token,
+        httponly=True,                                   # not readable by JS
+        secure=COOKIE_SECURE,                            # HTTPS only in prod
+        samesite=COOKIE_SAMESITE,                        # CSRF protection
+        max_age=int(REFRESH_TOKEN_EXPIRY.total_seconds()),
+        path='/api/auth',                                # restrict to auth endpoints
+    )
+
+    return resp
 
 
 @auth_bp.route('/refresh', methods=['POST'])
 def refresh():
     """
-    Refresh access token using refresh token
-    
-    Request:
-        {
-            "refresh_token": "eyJ..."
-        }
-    
+    Refresh access token.
+
+    Accepts the refresh token from either:
+      1. The httpOnly cookie 'mirai_refresh' (preferred — browser clients)
+      2. A JSON body field 'refresh_token' (backwards compat — API clients)
+
     Response:
         {
             "access_token": "eyJ...",
             "expires_in": 3600
         }
     """
-    data = request.get_json()
-    
-    if not data or not data.get('refresh_token'):
-        return jsonify({'error': 'Refresh token required'}), 400
-    
-    refresh_token = data['refresh_token']
+    # 1. Try httpOnly cookie first (browser flow — most secure).
+    refresh_token = request.cookies.get(REFRESH_COOKIE_NAME)
+
+    # 2. Fall back to JSON body (API/CLI clients, curl, tests).
+    if not refresh_token:
+        data = request.get_json(silent=True)
+        refresh_token = (data or {}).get('refresh_token')
+
+    if not refresh_token:
+        return jsonify({'error': 'Refresh token required (cookie or body)'}), 400
+
     payload = verify_token(refresh_token, 'refresh')
-    
+
     if not payload:
         return jsonify({'error': 'Invalid or expired refresh token'}), 401
-    
-    # Check if token is still active
+
+    # Check if token is still active (not revoked).
     jti = payload.get('jti')
     if jti not in ACTIVE_SESSIONS:
         return jsonify({'error': 'Refresh token has been revoked'}), 401
-    
-    # Find user
+
+    # Find user.
     username = payload.get('username')
     user = USERS_DB.get(username)
-    
+
     if not user:
         return jsonify({'error': 'User not found'}), 401
-    
-    # Generate new access token
+
+    # Issue a fresh access token.
     access_token = generate_access_token(user)
-    
-    return jsonify({
+
+    # Rotate the refresh token — issue a new one and revoke the old jti.
+    # Token rotation limits the damage window if a refresh token is stolen.
+    new_refresh_token = generate_refresh_token(user)
+    del ACTIVE_SESSIONS[jti]  # revoke old session (generate_refresh_token added new one)
+
+    resp = make_response(jsonify({
         'access_token': access_token,
         'expires_in': int(ACCESS_TOKEN_EXPIRY.total_seconds())
-    }), 200
+    }), 200)
+
+    # Re-set the cookie with the rotated refresh token.
+    resp.set_cookie(
+        REFRESH_COOKIE_NAME,
+        new_refresh_token,
+        httponly=True,
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE,
+        max_age=int(REFRESH_TOKEN_EXPIRY.total_seconds()),
+        path='/api/auth',
+    )
+
+    return resp
 
 
 @auth_bp.route('/logout', methods=['POST'])
 @require_auth
 def logout():
     """
-    Logout endpoint - invalidates refresh token
-    
-    Request:
-        {
-            "refresh_token": "eyJ..."
-        }
+    Logout endpoint — revokes refresh token and clears the httpOnly cookie.
+
+    Accepts the refresh token from either:
+      1. The httpOnly cookie 'mirai_refresh' (browser flow)
+      2. A JSON body field 'refresh_token' (API/CLI clients)
+
+    Always responds 200 so the client-side logout always succeeds even if
+    the token was already revoked or the body is missing.
     """
-    data = request.get_json()
-    
-    if data and data.get('refresh_token'):
-        refresh_token = data['refresh_token']
+    # Revoke from cookie (browser flow).
+    refresh_token = request.cookies.get(REFRESH_COOKIE_NAME)
+
+    # Fall back to JSON body (API clients).
+    if not refresh_token:
+        data = request.get_json(silent=True)
+        refresh_token = (data or {}).get('refresh_token')
+
+    if refresh_token:
         payload = verify_token(refresh_token, 'refresh')
-        
         if payload:
             jti = payload.get('jti')
             if jti in ACTIVE_SESSIONS:
                 del ACTIVE_SESSIONS[jti]
-    
-    return jsonify({'message': 'Logged out successfully'}), 200
+
+    # Build response and clear the cookie (set to empty, expired immediately).
+    resp = make_response(jsonify({'message': 'Logged out successfully'}), 200)
+    resp.set_cookie(
+        REFRESH_COOKIE_NAME,
+        '',
+        httponly=True,
+        secure=COOKIE_SECURE,
+        samesite=COOKIE_SAMESITE,
+        max_age=0,          # expire immediately
+        path='/api/auth',
+    )
+
+    return resp
 
 
 @auth_bp.route('/me', methods=['GET'])

@@ -10,6 +10,7 @@ Provides RESTful API endpoints with real LLM support for:
 """
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from datetime import datetime
 import logging
@@ -56,7 +57,25 @@ except ImportError:
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'mirai-2026-dev-secret')
-socketio = SocketIO(app, cors_allowed_origins='*', async_mode='eventlet')
+
+# CORS — allow credentials (httpOnly cookies) from the dashboard origin.
+# The wildcard '*' cannot be used with credentials:true in browsers, so we
+# explicitly list allowed origins. In production set DASHBOARD_ORIGIN env var.
+_dashboard_origin = os.environ.get(
+    'DASHBOARD_ORIGIN', 'http://localhost:3000'
+)
+CORS(app,
+     origins=[_dashboard_origin],
+     supports_credentials=True,          # allows Set-Cookie / credentials:'include'
+     allow_headers=['Content-Type', 'Authorization'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+
+# SocketIO — restrict CORS to the same dashboard origin.
+socketio = SocketIO(
+    app,
+    cors_allowed_origins=_dashboard_origin,
+    async_mode='eventlet'
+)
 
 # Register authentication blueprint if available
 if AUTH_ENABLED:

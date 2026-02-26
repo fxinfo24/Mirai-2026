@@ -2,18 +2,35 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { isAuthenticated, getCurrentUser } from '@/lib/auth';
+import { isAuthenticated, refreshAccessToken, getCurrentUser } from '@/lib/auth';
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/login');
-    } else {
-      setIsChecking(false);
+    // Fix #1 (AuthGuard side): on page reload the in-memory access token is
+    // gone. Try to silently restore it via the httpOnly refresh cookie before
+    // deciding whether the user is logged in or needs to go to /login.
+    async function checkAuth() {
+      if (isAuthenticated()) {
+        // Token already in memory (same tab, no reload) — proceed immediately.
+        setIsChecking(false);
+        return;
+      }
+
+      // Memory token is missing (page reload or new tab). Attempt silent refresh.
+      const newToken = await refreshAccessToken();
+      if (newToken && getCurrentUser()) {
+        // Refresh succeeded — user is still logged in.
+        setIsChecking(false);
+      } else {
+        // No valid session — redirect to login.
+        router.push('/login');
+      }
     }
+
+    checkAuth();
   }, [router]);
 
   if (isChecking) {

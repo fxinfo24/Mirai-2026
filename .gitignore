@@ -11,6 +11,8 @@ scripts/
 # macOS
 .DS_Store
 **/.DS_Store
+.AppleDouble
+.LSOverride
 
 # Environment files (contains secrets - never commit)
 .env
@@ -18,3 +20,62 @@ scripts/
 !**/.env.example
 .env.local
 **/.env.local
+
+# Build artifacts (C/CMake)
+build/
+dist/
+*.o
+*.a
+*.so
+*.dylib
+cmake_install.cmake
+CMakeCache.txt
+CMakeFiles/
+Makefile.cmake
+
+# Dashboard build artifacts
+dashboard/.next/
+dashboard/out/
+dashboard/node_modules/
+dashboard/node_modules/.cache/
+dashboard/.turbo/
+dashboard/coverage/
+dashboard/*.tsbuildinfo
+dashboard/next-env.d.ts
+
+# Python
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+ai/venv/
+ai/**/venv/
+*.egg-info/
+.eggs/
+
+# Logs
+*.log
+dashboard-dev.log
+dashboard/build.log
+dashboard/websocket-server.log
+
+# VS Code (keep settings but not user-specific state)
+.vscode/*.log
+.vscode/ipch/
+.vscode/.intellisense-cache/
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+tmp_rovodev_*
+
+# Loader binaries (compiled, not source)
+loader/bins/
+
+# Docker
+.docker/

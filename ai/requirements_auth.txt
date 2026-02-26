@@ -14,3 +14,5 @@ SQLAlchemy==2.0.25
 
 # Flask extensions
 Flask-CORS==4.0.0
+# Flask-CORS is already listed above and used in api_server_enhanced.py
+# to allow credentials (httpOnly cookies) from the dashboard origin.

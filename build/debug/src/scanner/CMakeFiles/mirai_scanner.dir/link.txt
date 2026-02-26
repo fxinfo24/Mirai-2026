@@ -1,2 +1,0 @@
-"/usr/bin/ar" qc libmirai_scanner.a CMakeFiles/mirai_scanner.dir/scanner_modern.c.o CMakeFiles/mirai_scanner.dir/syn_scanner.c.o CMakeFiles/mirai_scanner.dir/telnet_state_machine.c.o
-"/usr/bin/ranlib" libmirai_scanner.a

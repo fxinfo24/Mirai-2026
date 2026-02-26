@@ -1,0 +1,69 @@
+# Multi-stage Dockerfile for Next.js dashboard
+# Stage 1 (deps):  install node_modules
+# Stage 2 (dev):   used by docker-compose for hot-reload development
+# Stage 3 (build): production build
+# Stage 4 (prod):  minimal production runtime
+
+# ── Stage 1: dependencies ────────────────────────────────────────────────────
+FROM node:20-alpine AS deps
+
+WORKDIR /app
+
+# Install dependencies only (layer-cached separately from source)
+COPY package.json package-lock.json ./
+RUN npm ci --prefer-offline
+
+# ── Stage 2: development (default for docker-compose) ────────────────────────
+FROM node:20-alpine AS dev
+
+WORKDIR /app
+
+# Copy installed node_modules from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy all dashboard source (source dirs are bind-mounted in docker-compose,
+# so changes on the host are reflected immediately — this COPY is the fallback
+# when running without volume mounts, e.g. in CI)
+COPY . .
+
+EXPOSE 3000
+
+# Health check — Next.js dev server is ready when it responds on /
+HEALTHCHECK --interval=15s --timeout=5s --start-period=60s --retries=5 \
+    CMD wget -qO- http://localhost:3000/ > /dev/null 2>&1 || exit 1
+
+CMD ["npm", "run", "dev"]
+
+# ── Stage 3: production build ─────────────────────────────────────────────────
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+
+# Build — output goes to .next/
+RUN npm run build
+
+# ── Stage 4: production runtime ───────────────────────────────────────────────
+FROM node:20-alpine AS prod
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Only copy what Next.js standalone output needs
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+# Create non-root user
+RUN addgroup -S nextjs && adduser -S nextjs -G nextjs
+USER nextjs
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD wget -qO- http://localhost:3000/api/health > /dev/null 2>&1 || exit 1
+
+CMD ["node", "server.js"]

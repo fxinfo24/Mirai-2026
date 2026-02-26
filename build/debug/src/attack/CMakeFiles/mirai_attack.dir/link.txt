@@ -1,2 +1,0 @@
-"/usr/bin/ar" qc libmirai_attack.a CMakeFiles/mirai_attack.dir/attack_modern.c.o CMakeFiles/mirai_attack.dir/checksum.c.o
-"/usr/bin/ranlib" libmirai_attack.a

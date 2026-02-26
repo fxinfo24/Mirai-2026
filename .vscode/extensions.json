@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    "ms-vscode.cpptools",
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "golang.go",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode-remote.remote-containers",
+    "eamodio.gitlens",
+    "ms-azuretools.vscode-docker",
+    "twxs.cmake"
+  ],
+  "unwantedRecommendations": []
+}

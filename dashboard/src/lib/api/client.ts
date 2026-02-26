@@ -26,9 +26,15 @@ class ApiClient {
     url: string,
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
+    // Fix #2: Wire authenticatedFetch() into every API request so the
+    // Authorization header is always set and 401s trigger a token refresh.
+    // Import is deferred to avoid circular dependency (auth imports apiClient
+    // indirectly via hooks). Dynamic import is resolved once and cached.
     try {
-      const response = await fetch(url, {
+      const { authenticatedFetch } = await import('@/lib/auth');
+      const response = await authenticatedFetch(url, {
         ...options,
+        credentials: 'include', // send httpOnly refresh cookie on every call
         headers: {
           'Content-Type': 'application/json',
           ...options.headers,

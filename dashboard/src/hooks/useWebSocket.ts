@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { wsService } from '@/lib/websocket';
 
 export function useWebSocket(autoConnect: boolean = true) {
@@ -46,60 +46,80 @@ export function useWebSocket(autoConnect: boolean = true) {
   };
 }
 
+// Fix #5: All three update hooks previously listed `callback` in their
+// useEffect dependency arrays. Because callers typically pass an inline
+// arrow function, the reference changes on every render, causing the
+// effect to re-run (unsubscribe + re-subscribe) on every render — a
+// classic React infinite-loop footgun.
+//
+// Solution: store the latest callback in a ref. The ref is always current
+// (updated synchronously before the effect runs) but is a stable object,
+// so it never triggers the effect to re-run. The wrapper passed to wsService
+// reads from the ref at call time, getting the latest version of the callback.
+
 export function useBotUpdates(callback: (data: any) => void) {
   const { isConnected } = useWebSocket();
+  const callbackRef = useRef(callback);
+  callbackRef.current = callback;
 
   useEffect(() => {
     if (!isConnected) return;
 
-    wsService.on('bot:update', callback);
-    wsService.on('bot:connected', callback);
-    wsService.on('bot:disconnected', callback);
+    const handler = (data: any) => callbackRef.current(data);
+    wsService.on('bot:update', handler);
+    wsService.on('bot:connected', handler);
+    wsService.on('bot:disconnected', handler);
 
     return () => {
-      wsService.off('bot:update', callback);
-      wsService.off('bot:connected', callback);
-      wsService.off('bot:disconnected', callback);
+      wsService.off('bot:update', handler);
+      wsService.off('bot:connected', handler);
+      wsService.off('bot:disconnected', handler);
     };
-  }, [isConnected, callback]);
+  }, [isConnected]); // stable — callbackRef never changes identity
 
   return { isConnected };
 }
 
 export function useAttackUpdates(callback: (data: any) => void) {
   const { isConnected } = useWebSocket();
+  const callbackRef = useRef(callback);
+  callbackRef.current = callback;
 
   useEffect(() => {
     if (!isConnected) return;
 
-    wsService.on('attack:update', callback);
-    wsService.on('attack:started', callback);
-    wsService.on('attack:completed', callback);
-    wsService.on('attack:failed', callback);
+    const handler = (data: any) => callbackRef.current(data);
+    wsService.on('attack:update', handler);
+    wsService.on('attack:started', handler);
+    wsService.on('attack:completed', handler);
+    wsService.on('attack:failed', handler);
 
     return () => {
-      wsService.off('attack:update', callback);
-      wsService.off('attack:started', callback);
-      wsService.off('attack:completed', callback);
-      wsService.off('attack:failed', callback);
+      wsService.off('attack:update', handler);
+      wsService.off('attack:started', handler);
+      wsService.off('attack:completed', handler);
+      wsService.off('attack:failed', handler);
     };
-  }, [isConnected, callback]);
+  }, [isConnected]); // stable — callbackRef never changes identity
 
   return { isConnected };
 }
 
 export function useMetricsUpdates(callback: (data: any) => void) {
   const { isConnected } = useWebSocket();
+  const callbackRef = useRef(callback);
+  callbackRef.current = callback;
 
   useEffect(() => {
     if (!isConnected) return;
 
-    wsService.on('metrics:update', callback);
+    const handler = (data: any) => callbackRef.current(data);
+    wsService.on('metrics:update', handler);
 
     return () => {
-      wsService.off('metrics:update', callback);
+      wsService.off('metrics:update', handler);
     };
-  }, [isConnected, callback]);
+  }, [isConnected]); // stable — callbackRef never changes identity
 
   return { isConnected };
 }

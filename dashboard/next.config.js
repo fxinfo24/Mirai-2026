@@ -2,8 +2,17 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  // Reduce memory usage during dev compilation
+  onDemandEntries: {
+    // Keep pages in memory for 60s (default 15s) — reduces recompilation
+    maxInactiveAge: 60 * 1000,
+    // Only keep 5 pages in memory at once (default 2)
+    pagesBufferLength: 5,
+  },
   experimental: {
     optimizePackageImports: ['three', 'framer-motion', '@heroicons/react'],
+    // Use faster SWC-based CSS transforms
+    turbo: {},
   },
   webpack: (config) => {
     // Optimize Three.js bundle

@@ -31,11 +31,33 @@ const AUTH_ENDPOINTS = {
   verify: `${API_BASE_URL}/api/auth/verify`,
 };
 
-// Token storage keys
+// Fix #1: Token storage strategy
+// Access tokens are stored in memory only (not localStorage) to prevent XSS theft.
+// Refresh tokens are stored in a secure httpOnly cookie set by the backend /api/auth/login.
+// The user profile (non-sensitive) is kept in sessionStorage so it survives page refresh
+// but is cleared when the tab closes.
+//
+// Cookie flow:
+//   login()  → backend sets "mirai_refresh" httpOnly cookie + returns access_token in body
+//   refresh() → sends cookie automatically (credentials:'include') → backend returns new access_token
+//   logout() → backend clears the httpOnly cookie
+//
+// This means:
+//   - Access token lives only in JS memory (gone on reload → refresh() called on mount)
+//   - Refresh token is never accessible to JS at all (httpOnly)
+//   - User object is non-sensitive so sessionStorage is fine
+let _memoryAccessToken: string | null = null;
+
+function setMemoryToken(token: string | null): void {
+  _memoryAccessToken = token;
+}
+
+function getMemoryToken(): string | null {
+  return _memoryAccessToken;
+}
+
 const STORAGE_KEYS = {
-  accessToken: 'mirai_access_token',
-  refreshToken: 'mirai_refresh_token',
-  user: 'mirai_user',
+  user: 'mirai_user', // sessionStorage — non-sensitive profile only
 };
 
 /**
@@ -59,11 +81,12 @@ export async function login(username: string, password: string): Promise<User | 
 
     const data: LoginResponse = await response.json();
 
-    // Store tokens and user
+    // Fix #1: Store access token in memory only; refresh token arrives as
+    // httpOnly cookie from the backend (credentials:'include' sends it back
+    // on every subsequent request — no JS access needed or possible).
+    setMemoryToken(data.access_token);
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEYS.accessToken, data.access_token);
-      localStorage.setItem(STORAGE_KEYS.refreshToken, data.refresh_token);
-      localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(data.user));
+      sessionStorage.setItem(STORAGE_KEYS.user, JSON.stringify(data.user));
     }
 
     return data.user;
@@ -77,58 +100,45 @@ export async function login(username: string, password: string): Promise<User | 
  * Logout and invalidate tokens
  */
 export async function logout(): Promise<void> {
-  const refreshToken = getRefreshToken();
-
   try {
-    // Call logout endpoint to invalidate refresh token
-    if (refreshToken) {
-      const accessToken = getAccessToken();
-      await fetch(AUTH_ENDPOINTS.logout, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ refresh_token: refreshToken }),
-      });
-    }
+    // Tell backend to clear the httpOnly refresh cookie and invalidate server-side.
+    // credentials:'include' sends the httpOnly cookie automatically.
+    const accessToken = getAccessToken();
+    await fetch(AUTH_ENDPOINTS.logout, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}),
+      },
+    });
   } catch (error) {
     console.error('Logout error:', error);
   } finally {
-    // Clear local storage regardless of API call result
+    // Clear in-memory token and sessionStorage user profile.
+    setMemoryToken(null);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem(STORAGE_KEYS.accessToken);
-      localStorage.removeItem(STORAGE_KEYS.refreshToken);
-      localStorage.removeItem(STORAGE_KEYS.user);
+      sessionStorage.removeItem(STORAGE_KEYS.user);
     }
   }
 }
 
 /**
- * Get stored access token
+ * Get in-memory access token (never touches localStorage).
  */
 export function getAccessToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem(STORAGE_KEYS.accessToken);
+  return getMemoryToken();
 }
 
 /**
- * Get stored refresh token
- */
-export function getRefreshToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem(STORAGE_KEYS.refreshToken);
-}
-
-/**
- * Get current authenticated user from local storage
+ * Get current authenticated user from sessionStorage (non-sensitive profile).
  */
 export function getCurrentUser(): User | null {
   if (typeof window === 'undefined') return null;
-  
-  const userStr = localStorage.getItem(STORAGE_KEYS.user);
+
+  const userStr = sessionStorage.getItem(STORAGE_KEYS.user);
   if (!userStr) return null;
-  
+
   try {
     return JSON.parse(userStr);
   } catch {
@@ -137,18 +147,20 @@ export function getCurrentUser(): User | null {
 }
 
 /**
- * Store user in local storage (called after login)
+ * Store user profile in sessionStorage (called after login or profile refresh).
  */
 export function setCurrentUser(user: User): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(user));
+  sessionStorage.setItem(STORAGE_KEYS.user, JSON.stringify(user));
 }
 
 /**
- * Check if user is authenticated (has valid token)
+ * Check if user is authenticated.
+ * On page reload the memory token will be null — refreshAccessToken() is
+ * called by AuthGuard on mount to restore it via the httpOnly cookie.
  */
 export function isAuthenticated(): boolean {
-  return getAccessToken() !== null && getCurrentUser() !== null;
+  return getMemoryToken() !== null && getCurrentUser() !== null;
 }
 
 /**
@@ -175,36 +187,34 @@ export function hasPermission(permission: string): boolean {
  * Refresh access token using refresh token
  * Returns new access token on success, null on failure
  */
+/**
+ * Refresh the in-memory access token using the httpOnly refresh cookie.
+ * credentials:'include' sends the cookie automatically — no JS token needed.
+ * Returns new access token on success, null if refresh cookie is expired/missing.
+ */
 export async function refreshAccessToken(): Promise<string | null> {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) return null;
-
   try {
     const response = await fetch(AUTH_ENDPOINTS.refresh, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refresh_token: refreshToken }),
+      credentials: 'include', // sends httpOnly refresh cookie automatically
+      headers: { 'Content-Type': 'application/json' },
     });
 
     if (!response.ok) {
-      // Refresh token expired or invalid, logout user
-      await logout();
+      // Refresh cookie expired or invalid — clear everything and force re-login.
+      setMemoryToken(null);
+      if (typeof window !== 'undefined') sessionStorage.removeItem(STORAGE_KEYS.user);
       return null;
     }
 
     const data: { access_token: string; expires_in: number } = await response.json();
 
-    // Store new access token
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEYS.accessToken, data.access_token);
-    }
-
+    // Store new access token in memory only — never in localStorage.
+    setMemoryToken(data.access_token);
     return data.access_token;
   } catch (error) {
     console.error('Token refresh error:', error);
-    await logout();
+    setMemoryToken(null);
     return null;
   }
 }
