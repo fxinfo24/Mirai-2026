@@ -1,8 +1,8 @@
 # Mirai 2026 - Project Handover Document
 
 **Last Updated:** February 27, 2026  
-**Version:** 2.6.0  
-**Status:** ✅ Native WS Protocol Fixed · 38/38 Tests (0 skipped) · kill:all End-to-End Live · HANDOVER Current
+**Version:** 2.7.0  
+**Status:** ✅ Rate-Limit Live · WS Unit Tests (24/24) · kill:all E2E · 38/38 Integration · HANDOVER Current
 
 ---
 
@@ -10,7 +10,7 @@
 
 Mirai 2026 is a fully modernized IoT security research platform based on the historic 2016 Mirai botnet source code. The project has been transformed into a production-ready, cloud-native system with comprehensive AI/ML integration, complete observability stack, robust security improvements, and **production-grade stealth & scalability features** for complete educational value.
 
-### Current State: ✅ FULLY OPERATIONAL + Native WS Fixed + kill:all End-to-End Live + 38/38 Tests (Feb 27, 2026)
+### Current State: ✅ FULLY OPERATIONAL + Rate-Limit Enforced + WS Unit Tests + 38/38 Integration Tests (Feb 27, 2026)
 
 - **Deployment:** Docker stack with 8 services running successfully ✅ verified Feb 26 2026
 - **Security:** 21 bugs fixed (5 critical, 8 high, 8 medium/low) - Phase A-D Ethics Enhancement complete (Feb 26, 2026)
@@ -27,6 +27,64 @@ Mirai 2026 is a fully modernized IoT security research platform based on the his
 - **Integration Tests:** 38-test ethical safeguard suite — **38/38 passed, 0 skipped** ✅ NEW
 - **Docker CNC:** Rebuilt with `cnc_modern.go` — REST API + WebSocket + JWT + kill-switch ✅ NEW
 - **go.mod:** Bumped to `go 1.22` + `toolchain go1.22.0` — enables method-qualified ServeMux routing ✅ NEW
+
+---
+
+## 🎯 Recent Accomplishments (February 27, 2026 — Session 7)
+
+### 23. **`NEXT_PUBLIC_WS_URL` Fixed — Points to CNC WebSocket** ⭐ NEW
+
+**File:** `dashboard/.env.local`
+
+**Before:** `NEXT_PUBLIC_WS_URL="http://localhost:8001"` — pointed to the AI service (wrong protocol, wrong service)  
+**After:** `NEXT_PUBLIC_WS_URL="ws://localhost:8080"` — correct WS URL for the CNC's `GET /ws` endpoint
+
+The native `wsService` adapter (Session 6b) derives its connection URL as:
+```ts
+(process.env.NEXT_PUBLIC_WS_URL ?? 'ws://localhost:8080') + '/ws'
+// → ws://localhost:8080/ws  ✅
+```
+
+### 24. **Rate-Limit Lockout Wired into REST Login (`cnc_modern.go`)** ⭐ NEW
+
+**File:** `mirai/cnc/cnc_modern.go` — `handleLogin()`
+
+The `checkRateLimit` / `recordFailedLogin` / `clearLoginAttempts` functions in `admin.go` already implemented a 5-failure → 5-minute IP lockout for the telnet login path — but the REST `POST /api/auth/login` handler was not calling them, making the API vulnerable to brute-force.
+
+**Changes to `handleLogin()`:**
+- Extracts client IP from `RemoteAddr` (strips port) + honours `X-Forwarded-For` for reverse-proxy deployments
+- Calls `checkRateLimit(ip)` before touching credentials → returns **429 Too Many Requests** if locked out
+- Calls `recordFailedLogin(ip)` on every failed credential check → increments failure counter, locks out at 5
+- Calls `clearLoginAttempts(ip)` on successful login → resets counter
+- Structured audit log entries: `Login blocked`, `Login failed`, `Login successful`
+
+**Lockout state is now shared** between the telnet (`admin.go`) and REST (`cnc_modern.go`) login paths — 5 telnet failures lock the REST path too, and vice versa.
+
+### 25. **Unit Tests — Native WebSocket Adapter (24/24 passing)** ⭐ NEW
+
+**File:** `dashboard/tests/unit/websocket.test.ts` — 24 tests across 10 categories:
+
+| Category | Tests | Covers |
+|---|---|---|
+| SSR safety | 1 | `typeof WebSocket` guard — no crash during Next.js SSR |
+| `connect()` | 4 | URL routing, chainability, idempotency |
+| Message dispatch | 4 | `msg.type` routing, non-JSON ignored, missing type ignored |
+| `on()` / `off()` | 3 | registration, specific removal, bulk removal |
+| `isConnected()` | 3 | before/after open/close |
+| `emit()` | 2 | JSON envelope format, no-throw when closed |
+| Reconnect | 1 | exponential back-off schedules new socket after close |
+| `disconnect()` | 1 | cancels reconnect, prevents further sockets |
+| `kill:all` E2E | 3 | payload dispatch, connect/disconnect events |
+| Multiple listeners | 2 | all fire, Set deduplication prevents double-fire |
+
+**Node.js polyfill:** `CloseEvent` is browser-only — test file polyfills it via `global.CloseEvent` so tests run cleanly in the Jest Node environment.
+
+```
+npx jest tests/unit/websocket.test.ts
+24 passed, 0 failed ✅  (1.36s)
+```
+
+**Integration tests unchanged:** 38/38 passed, 0 skipped ✅
 
 ---
 

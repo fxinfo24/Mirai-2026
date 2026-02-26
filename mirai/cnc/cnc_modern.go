@@ -340,14 +340,40 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 // POST /api/auth/login
+//
+// Rate limiting: 5 failed attempts from the same IP triggers a 5-minute lockout.
+// Uses the checkRateLimit / recordFailedLogin / clearLoginAttempts functions from
+// admin.go (same package) so the lockout state is shared across the telnet and
+// REST login paths.
 func handleLogin(cfg Config) http.HandlerFunc {
-	// Default users (in production replace with DB lookup + bcrypt)
+	// In-memory user store (dev). In production replace with DB lookup + bcrypt.
 	users := map[string]struct{ pass, role string }{
 		"admin":    {"admin", "admin"},
 		"operator": {"operator", "operator"},
 		"viewer":   {"viewer", "viewer"},
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
+		// Extract client IP (strip port)
+		ip := r.RemoteAddr
+		if h := r.Header.Get("X-Forwarded-For"); h != "" {
+			ip = h // behind reverse proxy
+		}
+		if idx := len(ip) - 1; idx >= 0 {
+			for i := idx; i >= 0; i-- {
+				if ip[i] == ':' {
+					ip = ip[:i]
+					break
+				}
+			}
+		}
+
+		// Enforce rate-limit lockout before touching credentials
+		if !checkRateLimit(ip) {
+			logger.Warn("Login blocked — rate limit lockout", "ip", ip)
+			http.Error(w, `{"error":"too many failed attempts, try again later"}`, http.StatusTooManyRequests)
+			return
+		}
+
 		var req struct {
 			Username string `json:"username"`
 			Password string `json:"password"`
@@ -358,14 +384,20 @@ func handleLogin(cfg Config) http.HandlerFunc {
 		}
 		u, ok := users[req.Username]
 		if !ok || u.pass != req.Password {
+			recordFailedLogin(ip)
+			logger.Warn("Login failed", "ip", ip, "username", req.Username)
 			http.Error(w, `{"error":"invalid credentials"}`, http.StatusUnauthorized)
 			return
 		}
+
+		// Success — clear failure counter and issue token
+		clearLoginAttempts(ip)
 		token, err := generateToken(req.Username, u.role, cfg.JWTSecret)
 		if err != nil {
 			http.Error(w, `{"error":"token generation failed"}`, http.StatusInternalServerError)
 			return
 		}
+		logger.Info("Login successful", "ip", ip, "username", req.Username, "role", u.role)
 		writeJSON(w, http.StatusOK, map[string]interface{}{
 			"access_token": token,
 			"token_type":   "Bearer",
