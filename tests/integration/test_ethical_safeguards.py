@@ -225,7 +225,7 @@ class TestLoaderAuthAndCIDR:
 
 # ── Category 3: CNC Rate Limiting (live — skips if CNC not running) ──────────
 
-@pytest.mark.skipif(not cnc_reachable(), reason="CNC not running at " + CNC_API_URL)
+@pytest.mark.skipif(not HAS_REQUESTS, reason="requests not installed")
 class TestCNCRateLimiting:
     """
     Live tests against the running CNC REST API.
@@ -233,6 +233,8 @@ class TestCNCRateLimiting:
     """
 
     def test_valid_login_returns_token(self):
+        if not cnc_reachable():
+            pytest.skip(f"CNC not running at {CNC_API_URL}")
         r = requests.post(
             f"{CNC_API_URL}/api/auth/login",
             json={"username": "operator", "password": "operator"},
@@ -244,6 +246,8 @@ class TestCNCRateLimiting:
         assert data["token_type"] == "Bearer"
 
     def test_invalid_login_returns_401(self):
+        if not cnc_reachable():
+            pytest.skip(f"CNC not running at {CNC_API_URL}")
         r = requests.post(
             f"{CNC_API_URL}/api/auth/login",
             json={"username": "operator", "password": "WRONG"},
@@ -252,11 +256,15 @@ class TestCNCRateLimiting:
         assert r.status_code == 401
 
     def test_missing_token_returns_401(self):
+        if not cnc_reachable():
+            pytest.skip(f"CNC not running at {CNC_API_URL}")
         r = requests.get(f"{CNC_API_URL}/api/bots", timeout=5)
         assert r.status_code == 401
 
     def test_viewer_cannot_trigger_attack(self):
         """Viewer role must be rejected from operator-gated endpoints."""
+        if not cnc_reachable():
+            pytest.skip(f"CNC not running at {CNC_API_URL}")
         # Login as viewer
         r = requests.post(
             f"{CNC_API_URL}/api/auth/login",
@@ -276,6 +284,8 @@ class TestCNCRateLimiting:
             f"Viewer should get 403 on /api/attack, got {r2.status_code}"
 
     def test_health_endpoint_is_public(self):
+        if not cnc_reachable():
+            pytest.skip(f"CNC not running at {CNC_API_URL}")
         r = requests.get(f"{CNC_API_URL}/api/health", timeout=5)
         assert r.status_code == 200
         data = r.json()
@@ -284,7 +294,7 @@ class TestCNCRateLimiting:
 
 # ── Category 4: Kill-Switch API (live) ───────────────────────────────────────
 
-@pytest.mark.skipif(not cnc_reachable(), reason="CNC not running at " + CNC_API_URL)
+@pytest.mark.skipif(not HAS_REQUESTS, reason="requests not installed")
 class TestKillSwitchAPI:
     """
     Live tests for POST /api/attack/stop kill-switch endpoint.
@@ -292,6 +302,8 @@ class TestKillSwitchAPI:
 
     def test_kill_switch_requires_auth(self):
         """Unauthenticated call must return 401."""
+        if not cnc_reachable():
+            pytest.skip(f"CNC not running at {CNC_API_URL}")
         r = requests.post(
             f"{CNC_API_URL}/api/attack/stop",
             json={"all": True},
@@ -302,6 +314,8 @@ class TestKillSwitchAPI:
 
     def test_kill_switch_viewer_rejected(self):
         """Viewer role must be forbidden from kill-switch."""
+        if not cnc_reachable():
+            pytest.skip(f"CNC not running at {CNC_API_URL}")
         r_login = requests.post(
             f"{CNC_API_URL}/api/auth/login",
             json={"username": "viewer", "password": "viewer"},
@@ -321,6 +335,8 @@ class TestKillSwitchAPI:
 
     def test_kill_switch_operator_succeeds(self):
         """Operator can trigger kill-switch and gets structured response."""
+        if not cnc_reachable():
+            pytest.skip(f"CNC not running at {CNC_API_URL}")
         token = get_operator_token()
         if not token:
             pytest.skip("Cannot obtain operator token")
@@ -339,6 +355,8 @@ class TestKillSwitchAPI:
 
     def test_kill_switch_response_schema(self):
         """Kill-switch response must match the dashboard-expected schema."""
+        if not cnc_reachable():
+            pytest.skip(f"CNC not running at {CNC_API_URL}")
         token = get_operator_token()
         if not token:
             pytest.skip("Cannot obtain operator token")
@@ -357,6 +375,8 @@ class TestKillSwitchAPI:
 
     def test_kill_switch_stop_all_true(self):
         """kill:all payload with all=true clears attack registry."""
+        if not cnc_reachable():
+            pytest.skip(f"CNC not running at {CNC_API_URL}")
         token = get_operator_token()
         if not token:
             pytest.skip("Cannot obtain operator token")

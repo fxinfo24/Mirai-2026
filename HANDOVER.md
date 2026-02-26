@@ -10,7 +10,7 @@
 
 Mirai 2026 is a fully modernized IoT security research platform based on the historic 2016 Mirai botnet source code. The project has been transformed into a production-ready, cloud-native system with comprehensive AI/ML integration, complete observability stack, robust security improvements, and **production-grade stealth & scalability features** for complete educational value.
 
-### Current State: ✅ FULLY OPERATIONAL + Kill-Switch API + Integration Tests + Docker Stack Verified (Feb 26, 2026)
+### Current State: ✅ FULLY OPERATIONAL + Kill-Switch API + 38/38 Tests Green + Docker CNC Rebuilt (Feb 26, 2026)
 
 - **Deployment:** Docker stack with 8 services running successfully ✅ verified Feb 26 2026
 - **Security:** 21 bugs fixed (5 critical, 8 high, 8 medium/low) - Phase A-D Ethics Enhancement complete (Feb 26, 2026)
@@ -23,8 +23,105 @@ Mirai 2026 is a fully modernized IoT security research platform based on the his
 - **CNC Server:** Fully rewritten in Go with REST API + WebSocket push to dashboard
 - **CI/CD:** GitHub Actions pipeline live (build/test/lint/docker/security)
 - **Dashboard:** Virtual scrolling (10k+ bots), performance optimized
-- **Kill-Switch API:** `POST /api/attack/stop` live in CNC + Next.js proxy route ✅ NEW
-- **Integration Tests:** 38-test ethical safeguard suite (28 pass, 10 skipped live-only) ✅ NEW
+- **Kill-Switch API:** `POST /api/attack/stop` live in CNC + Next.js proxy route ✅
+- **Integration Tests:** 38-test ethical safeguard suite — **38/38 passed, 0 skipped** ✅ NEW
+- **Docker CNC:** Rebuilt with `cnc_modern.go` — REST API + WebSocket + JWT + kill-switch ✅ NEW
+- **go.mod:** Bumped to `go 1.22` + `toolchain go1.22.0` — enables method-qualified ServeMux routing ✅ NEW
+
+---
+
+## 🎯 Recent Accomplishments (February 26, 2026 — Session 5)
+
+### 15. **38/38 Tests Passing — Live CNC Verified** ⭐ NEW
+
+**Root cause found and fixed:** Go 1.22+ method-qualified ServeMux routing (`"GET /api/health"`) requires `go 1.22` declared in `go.mod`. The CNC's `go.mod` had `go 1.21`, causing the mux to treat patterns as literal strings — every route returned 404.
+
+**Fix:** `mirai/cnc/go.mod` bumped to `go 1.22` + `toolchain go1.22.0`.
+
+**CNC live test results:**
+```
+CNC_API_URL=http://127.0.0.1:9086 python3 -m pytest tests/integration/test_ethical_safeguards.py -v
+38 passed, 0 skipped, 0 failed ✅
+```
+
+**All 7 test categories green:**
+| Category | Tests | Status |
+|---|---|---|
+| TestBotAuthGate | 5 | ✅ |
+| TestLoaderAuthAndCIDR | 7 | ✅ |
+| TestCNCRateLimiting | 5 | ✅ live |
+| TestKillSwitchAPI | 5 | ✅ live |
+| TestCNCBcryptAuth | 5 | ✅ |
+| TestDashboardKillSwitchRoute | 6 | ✅ |
+| TestBadbotSafeguards | 5 | ✅ |
+
+**Kill-switch end-to-end confirmed live:**
+```bash
+# Login → get token
+curl -X POST http://localhost:9086/api/auth/login \
+  -d '{"username":"operator","password":"operator"}'
+# → {"access_token":"eyJ...","token_type":"Bearer","expires_in":3600}
+
+# Trigger kill-switch with token
+curl -X POST http://localhost:9086/api/attack/stop \
+  -H "Authorization: Bearer eyJ..." \
+  -d '{"all":true}'
+# → {"status":"ok","stopped":0,"timestamp":"2026-02-26T..."}
+```
+
+### 16. **Docker CNC Image Rebuilt — cnc_modern.go** ⭐ NEW
+
+**`docker/Dockerfile.cnc` fully rewritten** (multi-stage build):
+
+- **Stage 1 (builder):** `golang:1.22-alpine` — strips `//go:build ignore` tag, builds `cnc_modern_server` binary
+- **Stage 2 (runtime):** `alpine:3.19` — 33.7MB final image, non-root `mirai` user
+- **Health check:** `wget http://localhost:8080/api/health`
+- **Ports:** 23 (bot connections), 8080 (REST API + WebSocket)
+
+**Build:**
+```bash
+docker build -f docker/Dockerfile.cnc -t mirai-2026/cnc:latest .
+docker-compose up --build cnc
+```
+
+**Key build trick — strip //go:build ignore for Docker:**
+```dockerfile
+RUN sed '/^\/\/go:build ignore/d; /^\/\/ +build ignore/d' cnc_modern_src.go > main.go
+```
+
+### 17. **go.mod Fix — Method-Qualified ServeMux Routing** ⭐ NEW
+
+**File:** `mirai/cnc/go.mod`
+
+Changed `go 1.21` → `go 1.22` + `toolchain go1.22.0`
+
+This enables Go 1.22's enhanced `net/http` ServeMux to correctly parse method-qualified patterns like:
+- `"GET /api/health"` → only matches GET requests to `/api/health`
+- `"POST /api/attack/stop"` → only matches POST requests
+- `"GET /ws"` → only matches WebSocket upgrade requests
+
+Without `go 1.22` in `go.mod`, these patterns were treated as literal path strings `"GET /api/health"` which never matched any URL.
+
+### 18. **dashboard/.env.local — CNC_API_URL Configured** ⭐ NEW
+
+`CNC_API_URL=http://localhost:8080` already present in `dashboard/.env.local` — kill-switch proxy route is pre-configured for local development.
+
+**To run the full local stack:**
+```bash
+# Terminal 1: CNC modern server
+cd mirai/cnc && go run cnc_modern.go
+
+# Terminal 2: Dashboard dev server
+cd dashboard && npm run dev
+
+# Terminal 3: Run all tests
+CNC_API_URL=http://localhost:8080 \
+  python3 -m pytest tests/integration/test_ethical_safeguards.py -v
+
+# Or bring up full Docker stack (8 services)
+docker-compose up -d
+docker-compose up --build cnc   # uses cnc_modern binary
+```
 
 ---
 
