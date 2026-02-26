@@ -808,6 +808,7 @@ func main() {
 	// REST API router
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/health",         handleHealth)
+	mux.HandleFunc("GET /api/status",         handleHealth) // alias for dashboard compatibility
 	mux.HandleFunc("POST /api/auth/login",     handleLogin(cfg))
 	mux.HandleFunc("GET /api/bots",            authMiddleware(cfg.JWTSecret, "viewer", handleGetBots))
 	mux.HandleFunc("GET /api/metrics",         authMiddleware(cfg.JWTSecret, "viewer", handleGetMetrics))

@@ -28,9 +28,14 @@ patches:
         path: /spec/replicas
         value: 1
 
-configMapGenerator:
-  - name: mirai-config
-    behavior: merge
-    literals:
-      - LOG_LEVEL=DEBUG
-      - SCANNER_MAX_CONNECTIONS=64
+patches:
+  - target:
+      kind: ConfigMap
+      name: mirai-config
+    patch: |-
+      - op: replace
+        path: /data/LOG_LEVEL
+        value: DEBUG
+      - op: replace
+        path: /data/SCANNER_MAX_CONNECTIONS
+        value: "64"
