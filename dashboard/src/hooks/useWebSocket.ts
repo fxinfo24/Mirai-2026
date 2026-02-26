@@ -123,3 +123,28 @@ export function useMetricsUpdates(callback: (data: any) => void) {
 
   return { isConnected };
 }
+
+// useKillSignal — subscribes to "kill:all" WebSocket messages broadcast by the
+// CNC server when POST /api/attack/stop is triggered. The callback receives the
+// full kill:all payload: { all, bot_id, stopped, timestamp }.
+//
+// Uses the same ref-stabilisation pattern as the other hooks to avoid
+// unsubscribe/resubscribe on every render.
+export function useKillSignal(callback: (data: any) => void) {
+  const { isConnected } = useWebSocket();
+  const callbackRef = useRef(callback);
+  callbackRef.current = callback;
+
+  useEffect(() => {
+    if (!isConnected) return;
+
+    const handler = (data: any) => callbackRef.current(data);
+    wsService.on('kill:all', handler);
+
+    return () => {
+      wsService.off('kill:all', handler);
+    };
+  }, [isConnected]); // stable — callbackRef never changes identity
+
+  return { isConnected };
+}

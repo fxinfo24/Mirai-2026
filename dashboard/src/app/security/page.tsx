@@ -3,14 +3,14 @@
 import { useState, useCallback } from 'react';
 import { AuthGuard } from '@/components/shared';
 import { KillSwitch, AuditLog, type AuditEvent } from '@/components/security';
-import { useWebSocket } from '@/hooks/useWebSocket';
+import { useWebSocket, useAttackUpdates } from '@/hooks/useWebSocket';
 
 export default function SecurityPage() {
   const [auditEvents, setAuditEvents] = useState<AuditEvent[]>([]);
   const [isAttacking, setIsAttacking] = useState(false);
-  const { isConnected } = useWebSocket();
+  const { isConnected, wsService } = useWebSocket();
 
-  // Handle incoming audit events from WebSocket
+  // Handle incoming audit events from WebSocket (audit:event messages from CNC)
   const handleAuditEvent = useCallback((data: any) => {
     if (data && typeof data === 'object') {
       const newEvent: AuditEvent = {
@@ -27,18 +27,20 @@ export default function SecurityPage() {
         // Keep only last 500 events
         return updated.slice(-500);
       });
-
-      // Track attack status from events
-      if (data.type === 'ATTACK_ALLOW') {
-        setIsAttacking(true);
-      }
     }
   }, []);
 
-  // Subscribe to WebSocket events
+  // Subscribe to attack:started events to set isAttacking = true
+  useAttackUpdates(useCallback((data: any) => {
+    if (data?.type === 'attack:started' || data?.status === 'started') {
+      setIsAttacking(true);
+    }
+  }, []));
+
+  // Subscribe to audit:event messages via wsService directly
+  // (useEffect-based subscription, stable because wsService is a singleton)
   useState(() => {
-    if (isConnected) {
-      const { wsService } = require('@/lib/websocket');
+    if (isConnected && wsService) {
       wsService.on('audit:event', handleAuditEvent);
       return () => {
         wsService.off('audit:event', handleAuditEvent);
@@ -50,9 +52,11 @@ export default function SecurityPage() {
     setAuditEvents([]);
   };
 
-  const handleKillSwitch = () => {
+  // Called by KillSwitch when the kill signal is sent OR received via WebSocket.
+  // Sets isAttacking = false so the kill-switch button disables correctly.
+  const handleKillSwitch = useCallback(() => {
     setIsAttacking(false);
-  };
+  }, []);
 
   return (
     <AuthGuard>
@@ -75,7 +79,9 @@ export default function SecurityPage() {
             </div>
           )}
 
-          {/* Kill Switch Section */}
+          {/* Kill Switch — receives isAttacking state and onKillSwitch callback.
+              Internally subscribes to kill:all WebSocket events via useKillSignal
+              hook, so it updates in real-time when any operator triggers the stop. */}
           <div className="mb-8">
             <KillSwitch isAttacking={isAttacking} onKillSwitch={handleKillSwitch} />
           </div>

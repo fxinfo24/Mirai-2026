@@ -1,8 +1,8 @@
 # Mirai 2026 - Project Handover Document
 
-**Last Updated:** February 26, 2026  
-**Version:** 2.4.0  
-**Status:** ✅ Docker Stack Live · Kill-Switch API · 38-test Ethical Safeguard Suite · HANDOVER Current
+**Last Updated:** February 27, 2026  
+**Version:** 2.5.0  
+**Status:** ✅ Docker CNC Verified · 38/38 Tests (0 skipped) · WebSocket kill:all Wired · HANDOVER Current
 
 ---
 
@@ -10,7 +10,7 @@
 
 Mirai 2026 is a fully modernized IoT security research platform based on the historic 2016 Mirai botnet source code. The project has been transformed into a production-ready, cloud-native system with comprehensive AI/ML integration, complete observability stack, robust security improvements, and **production-grade stealth & scalability features** for complete educational value.
 
-### Current State: ✅ FULLY OPERATIONAL + Kill-Switch API + 38/38 Tests Green + Docker CNC Rebuilt (Feb 26, 2026)
+### Current State: ✅ FULLY OPERATIONAL + 38/38 Tests (0 skipped) + WebSocket kill:all Wired + Docker CNC Verified (Feb 27, 2026)
 
 - **Deployment:** Docker stack with 8 services running successfully ✅ verified Feb 26 2026
 - **Security:** 21 bugs fixed (5 critical, 8 high, 8 medium/low) - Phase A-D Ethics Enhancement complete (Feb 26, 2026)
@@ -27,6 +27,75 @@ Mirai 2026 is a fully modernized IoT security research platform based on the his
 - **Integration Tests:** 38-test ethical safeguard suite — **38/38 passed, 0 skipped** ✅ NEW
 - **Docker CNC:** Rebuilt with `cnc_modern.go` — REST API + WebSocket + JWT + kill-switch ✅ NEW
 - **go.mod:** Bumped to `go 1.22` + `toolchain go1.22.0` — enables method-qualified ServeMux routing ✅ NEW
+
+---
+
+## 🎯 Recent Accomplishments (February 27, 2026 — Session 6)
+
+### 19. **Docker CNC Verified Live — All REST API Endpoints Green** ⭐ NEW
+
+`docker-compose up --build cnc` rebuilt and started the modern CNC container successfully:
+
+| Endpoint | Method | Auth | Result |
+|---|---|---|---|
+| `/api/health` | GET | none | ✅ `{"status":"ok"}` |
+| `/api/auth/login` | POST | none | ✅ JWT token returned |
+| `/api/attack/stop` | POST | operator token | ✅ `{"status":"ok","stopped":0}` |
+| `/api/attack` | POST | viewer token | ✅ 403 Forbidden |
+| `/api/attack/stop` | POST | viewer token | ✅ 403 Forbidden |
+
+Container: `mirai-2026-cnc-1` — healthy, ports 23 + 8080, non-root `mirai` user.
+
+### 20. **Admin + Viewer Users Seeded — 38/38 Tests Pass, 0 Skipped** ⭐ NEW
+
+**Root cause of 2 previously-skipping tests:**
+- `TestCNCRateLimiting::test_viewer_cannot_trigger_attack`
+- `TestKillSwitchAPI::test_kill_switch_viewer_rejected`
+
+Both tests called `pytest.skip("viewer user not available")` when viewer login returned non-200. The `cnc_modern.go` login handler already had all 3 users in its in-memory map (`admin/operator/viewer`) — so the tests pass as long as the CNC is live. The fix was ensuring the CNC is running when tests execute (confirmed via Docker stack).
+
+**Additionally seeded in `database.go` and `init-db.sql`** (for the MySQL-backed legacy path):
+- `mirai/cnc/database.go` — new `seedUsers()` method: bcrypt-hashes all 3 users and inserts them idempotently on startup
+- `mirai/cnc/init-db.sql` — explicit `INSERT` statements for `admin`, `operator`, `viewer` with correct roles, limits, and `ON DUPLICATE KEY UPDATE` safety
+
+**Test results:**
+```
+CNC_API_URL=http://localhost:8080 python3 -m pytest tests/integration/test_ethical_safeguards.py -v
+38 passed, 0 skipped, 0 failed ✅
+```
+
+All 7 categories green including the previously-skipping viewer tests.
+
+### 21. **WebSocket kill:all Wired to Dashboard KillSwitch** ⭐ NEW
+
+Full real-time kill-switch signal propagation implemented across 3 files:
+
+**`dashboard/src/hooks/useWebSocket.ts`** — new `useKillSignal` hook:
+- Subscribes to `"kill:all"` WebSocket events from the CNC
+- Same ref-stabilised pattern as other update hooks (no infinite-loop footgun)
+- Exported from the hooks barrel
+
+**`dashboard/src/components/security/KillSwitch.tsx`** — wired to `useKillSignal`:
+- `handleKillSignal` callback: extracts `stopped` count + timestamp from payload
+- Calls `onKillSwitch()` to set `isAttacking=false` in parent
+- Shows animated `🛑 Kill signal received at HH:MM:SS — N attacks stopped` notification banner (auto-dismisses after 8s via `AnimatePresence`)
+- Works for signals sent by ANY operator session, not just the current browser
+
+**`dashboard/src/app/security/page.tsx`** — updated:
+- Imports `useAttackUpdates` to set `isAttacking=true` on `attack:started` events
+- Passes `wsService` from `useWebSocket()` directly (no more `require()` call)
+- `handleKillSwitch` wrapped in `useCallback` for stability
+
+**TypeScript build:** `npm run build` → ✅ Compiled successfully, 0 errors, 16/16 pages generated.
+
+**End-to-end flow:**
+```
+Operator POSTs /api/attack/stop
+  → CNC broadcasts WSMessage{Type:"kill:all", Payload:{stopped:N, timestamp:...}}
+  → Dashboard useKillSignal fires handleKillSignal
+  → isAttacking set to false (button disables)
+  → "🛑 Kill signal received" banner shown for 8s
+```
 
 ---
 

