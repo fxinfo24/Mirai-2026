@@ -431,7 +431,8 @@ int detection_report_to_cnc(detection_engine_t *engine,
                  "curl -sf -X POST -H 'Content-Type: application/json'"
                  " -d '%s' '%s/api/detection/event' > /dev/null 2>&1 &",
                  json, cnc_url);
-        (void)system(cmd);  // fire-and-forget
+        int _sys_ret = system(cmd);  /* fire-and-forget — result intentionally ignored */
+        (void)_sys_ret;
 
         log_info("Detection event reported to C&C %s: type=%d confidence=%d",
                  cnc_url, event->type, event->confidence);
