@@ -2,7 +2,39 @@
 
 **Last Updated:** February 27, 2026  
 **Version:** 2.9.3  
-**Status:** ✅ CI 8/8 Green · 119/119 Tests · All Arch Binary Sizes CONFIRMED · Benchmarks Complete
+**Status:** ✅ CI 8/8 Green · 119/119 Tests · All Arch Binary Sizes CONFIRMED · Ready for Session 11
+
+---
+
+## 🧭 Quick Context for New Sessions
+
+> Read this section first — it tells you the current state and what to do next.
+
+### What works right now (verified Feb 27, 2026)
+| Component | State | How to verify |
+|-----------|-------|---------------|
+| Docker stack (8 services) | ✅ Running | `docker-compose ps` |
+| CNC REST API | ✅ Live | `curl http://localhost:8080/api/health` |
+| Dashboard (Next.js) | ✅ Live | `http://localhost:3002` |
+| CI/CD (GitHub Actions) | ✅ 8/8 green | `github.com/fxinfo24/Mirai-2026/actions` |
+| Tests | ✅ 119/119 | `cd dashboard && npx jest --no-coverage --forceExit --testPathPatterns="tests/unit"` |
+| Integration tests | ✅ 38/38 | `CNC_API_URL=http://localhost:8080 python3 -m pytest tests/integration/test_ethical_safeguards.py -k "not TestCNCRateLimitLockout"` |
+| Redis rate-limit | ✅ Persistent | `docker-compose restart cnc` → lockout survives |
+
+### Session 11 — Two tasks queued
+1. **Linux bare-metal benchmarks**: Run scanner/loader C benchmarks requiring `CAP_NET_RAW`. Terraform modules for AWS EKS exist (`terraform/`). `cnc_bench.go` is ready. Target: scanner 1000+ SYNs/sec/thread, loader 60k+ concurrent.
+2. **Academic paper expansion**: `docs/research/METHODOLOGY.md` (910 lines) is a strong research paper. Expand with actual benchmark data from Session 10, add session 11 Linux results, prepare for publication.
+
+### Key file locations for Session 11
+| Task | Key files |
+|------|-----------|
+| Linux benchmarks | `tests/benchmark/cnc_bench.go`, `tests/benchmark/run_all_benchmarks.sh`, `terraform/` |
+| Academic paper | `docs/research/METHODOLOGY.md`, `docs/research/BEHAVIORAL_INDICATORS.md`, `docs/research/COUNTERMEASURES.md` |
+| Benchmark results | `tests/benchmark/results_20260227_044457/benchmark_results.md` |
+| CNC source | `mirai/cnc/cnc_modern.go` |
+| CI pipeline | `.github/workflows/ci.yml` |
+
+---
 
 ---
 
@@ -3234,12 +3266,12 @@ ai/
 - ⏳ Large-scale testing (100k+ bots) — requires Linux bare-metal; `cnc_bench.go` ready to run
 - ⏳ C scanner/loader benchmarks — require Linux with raw socket privileges (`CAP_NET_RAW`)
 
-**Week 5-6: 🔄 IN PROGRESS / FUTURE**
-- [ ] Academic paper preparation (`docs/research/METHODOLOGY.md` is a strong starting point)
+**Week 5-6: 🔄 SESSION 11 TASKS**
+- [ ] **Linux bare-metal benchmarks** — scanner SYNs/sec (target: 1000+/thread), loader concurrent connections (60k+). `cnc_bench.go` ready. Terraform AWS EKS modules exist. Needs `CAP_NET_RAW`.
+- [ ] **Academic paper expansion** — `docs/research/METHODOLOGY.md` (910 lines, comprehensive). Add Session 10 binary size data, Session 11 Linux performance results. Prepare for IEEE/USENIX submission.
 - [ ] Conference presentation materials
 - [ ] Training curriculum development (tutorials exist in `docs/tutorials/interactive/`)
-- [ ] ARM/MIPS cross-compilation for bot binary size validation (<80KB target)
-- [ ] Linux bare-metal benchmark run (scanner SYNs/sec, loader concurrent connections)
+- ✅ ARM/MIPS cross-compilation — ALL CONFIRMED (ARM:46KB, AArch64:62KB, MIPS/MIPSel:70KB)
 - [ ] Open source release preparation (version tagging, GitHub releases)
 
 ---
