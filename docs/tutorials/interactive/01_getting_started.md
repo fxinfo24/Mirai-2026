@@ -1,11 +1,11 @@
-# Interactive Tutorial 1: Getting Started with Mirai 2026
+1# Interactive Tutorial 1: Getting Started with Mirai 2026
 
 ## Welcome! 🎉
 
 This is an interactive tutorial that will walk you through the Mirai 2026 research platform step-by-step.
 
-**Time**: ~30 minutes  
-**Prerequisites**: Docker, basic command line knowledge  
+**Time**: ~30 minutes
+**Prerequisites**: Docker, basic command line knowledge
 **Goal**: Build, run, and understand the basic architecture
 
 ---
@@ -303,10 +303,10 @@ rm -rf build/
 
 Now that you've completed the basics, try:
 
-📚 **Tutorial 2**: Understanding Detection Evasion  
-📚 **Tutorial 3**: Training the RL Agent  
-📚 **Tutorial 4**: Deploying to Kubernetes  
-📚 **Tutorial 5**: Advanced Attack Vectors  
+📚 **Tutorial 2**: Understanding Detection Evasion
+📚 **Tutorial 3**: Training the RL Agent
+📚 **Tutorial 4**: Deploying to Kubernetes
+📚 **Tutorial 5**: Advanced Attack Vectors
 
 ---
 
@@ -375,10 +375,10 @@ cmake -B build ...
 ## Summary
 
 Congratulations! You've:
-✅ Installed and ran Mirai 2026  
-✅ Understood the architecture  
-✅ Interacted with the AI service  
-✅ Viewed metrics in Grafana  
-✅ (Optional) Built from source  
+✅ Installed and ran Mirai 2026
+✅ Understood the architecture
+✅ Interacted with the AI service
+✅ Viewed metrics in Grafana
+✅ (Optional) Built from source
 
 **Next**: [Tutorial 2: Understanding Detection Evasion →](02_detection_evasion.md)

@@ -17,9 +17,15 @@ export default function DashboardPage() {
     successRate: 94.2,
   });
 
-  // Listen for real-time metric updates
+  // Listen for real-time metric updates — merge with defaults so partial
+  // WebSocket payloads don't overwrite valid fields with undefined.
   useMetricsUpdates((data) => {
-    setMetrics(data);
+    setMetrics(prev => ({
+      activeBots: data?.activeBots ?? prev.activeBots,
+      activeAttacks: data?.activeAttacks ?? prev.activeAttacks,
+      totalBandwidth: data?.totalBandwidth ?? prev.totalBandwidth,
+      successRate: data?.successRate ?? prev.successRate,
+    }));
   });
 
   // Simulate live updates if WebSocket not available
